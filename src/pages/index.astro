@@ -1,16 +1,132 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import DirectionCard from "../components/directions/DirectionCard.astro";
+import { directions } from "../data/directions";
+
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+	title="Camoka's Portfolio"
+	description="Camoka's multimedia portfolio featuring creative and development projects."
+	lang="en"
+>
+	<main>
+		<section class="hero" aria-labelledby="hero-title">
+			<p class="eyebrow">Creative development · Multimedia art</p>
+
+			<h1 id="hero-title">Multimedia Portfolio</h1>
+
+			<p class="intro">
+				Here are my projects from different areas of creativity and development.
+			</p>
+		</section>
+
+		<section class="directions" aria-labelledby="directions-title">
+			<div class="section-heading">
+				<p class="section-kicker">What I explore</p>
+
+				<h2 id="directions-title">Creative Directions</h2>
+
+				<p class="section-description">
+					Nine areas bringing together development, visual art, sound, motion,
+					and interactive experiments.
+				</p>
+			</div>
+
+			<ul class="direction-grid">
+				{
+					directions.map((direction, index) => (
+						<DirectionCard
+							numberLabel={String(index + 1).padStart(2, "0")}
+							title={direction.title}
+							description={direction.description}
+							slug={direction.slug}
+						/>
+					))
+				}
+			</ul>
+		</section>
+	</main>
+</BaseLayout>
+
+<style>
+	main {
+		width: min(calc(100% - 2rem), var(--content-width));
+		margin-inline: auto;
+	}
+
+	.hero {
+		display: grid;
+		align-content: center;
+		min-height: 100svh;
+		padding-block: 4rem;
+	}
+
+	.eyebrow {
+		margin: 0 0 1.25rem;
+		color: var(--color-accent);
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+	}
+
+	h1 {
+		max-width: 12ch;
+		margin: 0;
+		font-size: clamp(2.75rem, 8vw, 6.5rem);
+		line-height: 0.95;
+		letter-spacing: -0.06em;
+	}
+
+	.intro {
+		max-width: 42rem;
+		margin: 1.5rem 0 0;
+		color: var(--color-muted);
+		font-size: clamp(1.05rem, 2vw, 1.35rem);
+		line-height: 1.6;
+	}
+
+	.directions {
+		padding-block: clamp(4rem, 10vw, 8rem);
+		border-top: 1px solid var(--color-border);
+	}
+
+	.section-heading {
+		display: grid;
+		gap: 1rem;
+		max-width: 46rem;
+	}
+
+	.section-kicker {
+		margin: 0;
+		color: var(--color-accent);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+	}
+
+	h2 {
+		margin: 0;
+		font-size: clamp(2rem, 5vw, 4rem);
+		line-height: 1;
+		letter-spacing: -0.04em;
+	}
+
+	.section-description {
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 1.1rem;
+		line-height: 1.7;
+	}
+
+	.direction-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+		gap: 1rem;
+		margin: 3rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+</style>
