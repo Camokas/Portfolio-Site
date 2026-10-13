@@ -1,6 +1,6 @@
 ---
 import { Code } from "astro:components";
-import Icon from "../ui/Icon.astro";
+import CollapsibleSection from "../ui/CollapsibleSection.astro";
 
 type CodeLanguage =
 	| "astro"
@@ -31,14 +31,7 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<section class="project-code" aria-labelledby="project-code-title">
-	<div class="code-heading">
-		<h2 id="project-code-title">
-			<Icon name="code-2" size={17} /> Code
-		</h2>
-		<span>{items.length.toString().padStart(2, "0")}</span>
-	</div>
-
+<CollapsibleSection title="Code" icon="code-2" count={items.length} section="code">
 	<div class="code-list">
 		{
 			items.map((item) => (
@@ -64,7 +57,7 @@ const { items } = Astro.props;
 			))
 		}
 	</div>
-</section>
+</CollapsibleSection>
 
 <script>
 	class CodeSampleElement extends HTMLElement {
@@ -94,39 +87,10 @@ const { items } = Astro.props;
 </script>
 
 <style>
-	.project-code {
-		padding-bottom: clamp(3rem, 8vw, 6rem);
-	}
-
-	.code-heading {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid var(--color-border);
-	}
-
-	.code-heading h2,
-	.code-heading > span {
-		margin: 0;
-		color: var(--color-muted);
-		font-size: 0.75rem;
-		font-weight: 700;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-	}
-
-	.code-heading h2 {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
 	.code-list {
 		display: grid;
 		gap: 1.5rem;
-		margin-top: 2rem;
+		margin-top: 0;
 	}
 
 	.code-sample {

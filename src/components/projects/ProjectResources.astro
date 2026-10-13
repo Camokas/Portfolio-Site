@@ -1,5 +1,6 @@
 ---
 import Icon from "../ui/Icon.astro";
+import CollapsibleSection from "../ui/CollapsibleSection.astro";
 
 interface DownloadItem {
 	label: string;
@@ -29,14 +30,12 @@ function resolveDownloadUrl(file: string): string {
 }
 ---
 
-<section class="project-resources" aria-labelledby="project-resources-title">
-	<div class="resources-heading">
-		<h2 id="project-resources-title">
-			<Icon name="download" size={17} /> Resources
-		</h2>
-		<span>{String(downloads.length + links.length).padStart(2, "0")}</span>
-	</div>
-
+<CollapsibleSection
+	title="Resources"
+	icon="download"
+	count={downloads.length + links.length}
+	section="resources"
+>
 	<div class="resource-groups">
 		{
 			downloads.length > 0 && (
@@ -92,24 +91,9 @@ function resolveDownloadUrl(file: string): string {
 			)
 		}
 	</div>
-</section>
+</CollapsibleSection>
 
 <style>
-	.project-resources {
-		padding-bottom: clamp(3rem, 8vw, 6rem);
-	}
-
-	.resources-heading {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid var(--color-border);
-	}
-
-	.resources-heading h2,
-	.resources-heading > span,
 	.resource-groups h3 {
 		margin: 0;
 		color: var(--color-muted);
@@ -119,17 +103,11 @@ function resolveDownloadUrl(file: string): string {
 		text-transform: uppercase;
 	}
 
-	.resources-heading h2 {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
 	.resource-groups {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: clamp(1.5rem, 4vw, 3rem);
-		margin-top: 2rem;
+		margin-top: 0;
 	}
 
 	.resource-groups section {

@@ -1,0 +1,128 @@
+---
+import Icon from "./Icon.astro";
+import type { IconName } from "../../data/icons";
+
+interface Props {
+	title: string;
+	icon: IconName;
+	count: number;
+	section: string;
+}
+
+const { title, icon, count, section } = Astro.props;
+---
+
+<collapsible-section data-section={section}>
+	<details>
+		<summary>
+			<span class="section-title">
+				<Icon name={icon} size={17} />
+				{title}
+			</span>
+
+			<span class="section-state" aria-hidden="true">
+				<span>{count.toString().padStart(2, "0")}</span>
+				<Icon name="chevron-down" size={18} />
+			</span>
+		</summary>
+
+		<div class="section-content">
+			<slot />
+		</div>
+	</details>
+</collapsible-section>
+
+<script>
+	class CollapsibleSectionElement extends HTMLElement {
+		connectedCallback() {
+			const details = this.querySelector("details");
+			const section = this.dataset.section;
+
+			if (!details || !section) return;
+
+			const storageKey = `portfolio-section:${window.location.pathname}:${section}`;
+
+			try {
+				details.open = localStorage.getItem(storageKey) === "open";
+
+				details.addEventListener("toggle", () => {
+					localStorage.setItem(storageKey, details.open ? "open" : "closed");
+				});
+			} catch {
+				// The section remains usable when browser storage is unavailable.
+			}
+		}
+	}
+
+	if (!customElements.get("collapsible-section")) {
+		customElements.define("collapsible-section", CollapsibleSectionElement);
+	}
+</script>
+
+<style>
+	collapsible-section {
+		display: block;
+		border-top: 1px solid var(--color-border);
+	}
+
+	details summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-block: 1.15rem;
+		cursor: pointer;
+		list-style: none;
+	}
+
+	details summary::-webkit-details-marker {
+		display: none;
+	}
+
+	details summary:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 0.3rem;
+		border-radius: 0.2rem;
+	}
+
+	.section-title,
+	.section-state {
+		display: inline-flex;
+		align-items: center;
+	}
+
+	.section-title {
+		gap: 0.5rem;
+		color: var(--color-muted);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.section-state {
+		gap: 0.75rem;
+		color: var(--color-muted);
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+	}
+
+	.section-state :global(svg) {
+		transition: transform 180ms ease;
+	}
+
+	details[open] .section-state :global(svg) {
+		transform: rotate(180deg);
+	}
+
+	.section-content {
+		padding: 0.85rem 0 clamp(3rem, 8vw, 6rem);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.section-state :global(svg) {
+			transition: none;
+		}
+	}
+</style>

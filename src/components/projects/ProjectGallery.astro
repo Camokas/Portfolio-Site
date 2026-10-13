@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import Icon from "../ui/Icon.astro";
+import CollapsibleSection from "../ui/CollapsibleSection.astro";
 
 interface GalleryItem {
 	image: ImageMetadata;
@@ -17,13 +18,9 @@ interface Props {
 const { items, projectTitle } = Astro.props;
 ---
 
-<project-gallery class="project-gallery">
-	<div class="gallery-heading">
-		<p><Icon name="images" size={16} /> Selected visuals</p>
-		<span>{items.length.toString().padStart(2, "0")}</span>
-	</div>
-
-	<ul>
+<CollapsibleSection title="Selected visuals" icon="images" count={items.length} section="gallery">
+	<project-gallery class="project-gallery">
+		<ul>
 		{
 			items.map((item, index) => (
 				<li>
@@ -47,19 +44,20 @@ const { items, projectTitle } = Astro.props;
 				</li>
 			))
 		}
-	</ul>
+		</ul>
 
-	<dialog data-gallery-dialog aria-label={`${projectTitle} image viewer`}>
-		<div class="viewer-panel">
-			<button type="button" class="viewer-close" data-gallery-close aria-label="Close image viewer">
-				<Icon name="plus" size={22} />
-			</button>
+		<dialog data-gallery-dialog aria-label={`${projectTitle} image viewer`}>
+			<div class="viewer-panel">
+				<button type="button" class="viewer-close" data-gallery-close aria-label="Close image viewer">
+					<Icon name="plus" size={22} />
+				</button>
 
-			<img data-gallery-image alt="" />
-			<p data-gallery-caption hidden></p>
-		</div>
-	</dialog>
-</project-gallery>
+				<img data-gallery-image alt="" />
+				<p data-gallery-caption hidden></p>
+			</div>
+		</dialog>
+	</project-gallery>
+</CollapsibleSection>
 
 <script>
 	class ProjectGalleryElement extends HTMLElement {
@@ -105,39 +103,13 @@ const { items, projectTitle } = Astro.props;
 <style>
 	.project-gallery {
 		display: block;
-		padding-bottom: clamp(3rem, 8vw, 6rem);
-	}
-
-	.gallery-heading {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid var(--color-border);
-	}
-
-	.gallery-heading p,
-	.gallery-heading span {
-		margin: 0;
-		color: var(--color-muted);
-		font-size: 0.75rem;
-		font-weight: 700;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-	}
-
-	.gallery-heading p {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
 	}
 
 	ul {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: clamp(1rem, 3vw, 2rem);
-		margin: 2rem 0 0;
+		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
