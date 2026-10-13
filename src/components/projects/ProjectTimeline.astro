@@ -1,0 +1,80 @@
+---
+import type { CollectionEntry } from "astro:content";
+import ProjectCard from "./ProjectCard.astro";
+
+interface Props {
+	projects: CollectionEntry<"projects">[];
+}
+
+const { projects } = Astro.props;
+const ordered = [...projects].sort((a, b) =>
+	b.data.date.getTime() - a.data.date.getTime() || a.id.localeCompare(b.id),
+);
+const yearOf = (project: CollectionEntry<"projects">) => project.data.date.getUTCFullYear();
+const dateFormatter = new Intl.DateTimeFormat("en", {
+	day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+});
+---
+
+<div class="project-timeline">
+	<p class="timeline-intro">A timeline of projects · newest first</p>
+	<ol class="timeline-list" aria-label="Project timeline, newest first">
+		{ordered.map((project, index) => (
+			<li class:list={["timeline-entry", { "on-left": index % 2 === 1 }]}>
+				{(index === 0 || yearOf(project) !== yearOf(ordered[index - 1])) && (
+					<div class="year-marker"><span>{yearOf(project)}</span></div>
+				)}
+				<div class="timeline-row">
+					<span class="timeline-dot" aria-hidden="true"></span>
+					<time class="timeline-date" datetime={project.data.date.toISOString()}>
+						{dateFormatter.format(project.data.date)}
+					</time>
+					<div class="timeline-card">
+						<ul aria-label={`Project: ${project.data.title}`}>
+							<ProjectCard project={project} />
+						</ul>
+					</div>
+				</div>
+			</li>
+		))}
+	</ol>
+</div>
+
+<style>
+	.project-timeline { margin-top: 1.5rem; }
+	.timeline-intro { margin: 0 0 2.5rem; color: var(--color-muted); font-size: 0.85rem; }
+	.timeline-list { position: relative; margin: 0; padding: 0 0 2rem; list-style: none; }
+	.timeline-list::before {
+		content: ""; position: absolute; top: 1rem; bottom: 0; left: 50%; width: 1px;
+		background: linear-gradient(var(--color-border), var(--color-muted) 20%, var(--color-border) 90%, transparent);
+	}
+	.timeline-entry { position: relative; padding-bottom: 2.5rem; }
+	.year-marker { position: relative; display: flex; justify-content: center; margin: 0 0 2rem; }
+	.year-marker span {
+		padding: 0.5rem 1rem; color: var(--color-accent); background: var(--color-background);
+		border: 1px solid var(--color-border); border-radius: 999px;
+		font-size: 0.8rem; font-weight: 750; letter-spacing: 0.12em;
+	}
+	.timeline-row { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 4rem minmax(0, 1fr); align-items: start; }
+	.timeline-dot {
+		position: absolute; top: 1.1rem; left: 50%; width: 0.7rem; height: 0.7rem;
+		transform: translateX(-50%); border-radius: 50%; background: var(--color-accent);
+		box-shadow: 0 0 0 0.4rem var(--color-background);
+	}
+	.timeline-date { grid-column: 1; grid-row: 1; justify-self: end; padding-top: 0.9rem; color: var(--color-muted); font-size: 0.85rem; line-height: 1.5; }
+	.timeline-card { position: relative; grid-column: 3; grid-row: 1; min-width: 0; }
+	.timeline-card::before { content: ""; position: absolute; top: 1.4rem; left: -2rem; width: 2rem; height: 1px; background: var(--color-border); }
+	.timeline-card ul { margin: 0; padding: 0; list-style: none; }
+	.on-left .timeline-card { grid-column: 1; }
+	.on-left .timeline-date { grid-column: 3; justify-self: start; }
+	.on-left .timeline-card::before { left: auto; right: -2rem; }
+	@media (max-width: 48rem) {
+		.timeline-list::before { left: 0.5rem; }
+		.year-marker { justify-content: flex-start; margin-left: -0.15rem; }
+		.timeline-row { grid-template-columns: 2rem minmax(0, 1fr); gap: 0.75rem 0; }
+		.timeline-dot { left: 0.5rem; top: 0.45rem; }
+		.timeline-date, .on-left .timeline-date { grid-column: 2; grid-row: 1; justify-self: start; padding-top: 0; }
+		.timeline-card, .on-left .timeline-card { grid-column: 2; grid-row: 2; }
+		.timeline-card::before, .on-left .timeline-card::before { display: none; }
+	}
+</style>

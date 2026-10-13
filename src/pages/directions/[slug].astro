@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import ProjectCard from "../../components/projects/ProjectCard.astro";
+import ProjectTimeline from "../../components/projects/ProjectTimeline.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { directions } from "../../data/directions";
 import type { Direction } from "../../data/directions";
@@ -60,9 +60,7 @@ const homeUrl = import.meta.env.BASE_URL;
 
 			{
 				projects.length > 0 ? (
-					<ul class="project-grid">
-						{projects.map((project) => <ProjectCard project={project} />)}
-					</ul>
+					<ProjectTimeline projects={projects} />
 				) : (
 					<p class="empty-message">
 						Projects in this direction will appear here.
@@ -150,12 +148,4 @@ const homeUrl = import.meta.env.BASE_URL;
 		line-height: 1.6;
 	}
 
-	.project-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
-		gap: 1rem;
-		margin: 2.5rem 0 0;
-		padding: 0;
-		list-style: none;
-	}
 </style>
