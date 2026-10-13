@@ -58,6 +58,11 @@ const modelUrl = (src?: string) => src
 							</button>
 							<button type="button" data-reset-camera disabled>Reset view</button>
 						</div>
+						<details class="material-panel" data-material-panel>
+							<summary>Material textures</summary>
+							<label class="material-select">Material <select data-material-select disabled aria-label="Material to inspect"></select></label>
+							<div class="texture-grid" data-texture-grid></div>
+						</details>
 					</project-model-viewer>
 				</article>
 			))
@@ -112,6 +117,9 @@ const modelUrl = (src?: string) => src
 			const resetButton = this.querySelector<HTMLButtonElement>("[data-reset-camera]");
 			const retryButton = this.querySelector<HTMLButtonElement>("[data-retry-viewer]");
 			const displayMode = this.querySelector<HTMLSelectElement>("[data-display-mode]");
+			const materialSelect = this.querySelector<HTMLSelectElement>("[data-material-select]");
+			const materialPanel = this.querySelector<HTMLDetailsElement>("[data-material-panel]");
+			const textureGrid = this.querySelector<HTMLElement>("[data-texture-grid]");
 
 			if (!viewport || !status || !rotationButton || !resetButton) return;
 
@@ -211,6 +219,66 @@ const modelUrl = (src?: string) => src
 				};
 				displayMode?.addEventListener("change", applyDisplayMode);
 
+				const materials = [...new Set([...originalMaterials.values()].flat())];
+				materials.forEach((item, index) => {
+					materialSelect?.add(new Option(item.name || `Material ${index + 1}`, String(index)));
+				});
+				if (materialSelect) materialSelect.disabled = false;
+				const showTextures = () => {
+					if (!materialPanel?.open || !textureGrid) return;
+					textureGrid.replaceChildren();
+					const selected = materials[Number(materialSelect?.value ?? 0)];
+					const maps = [
+						["Base color", "map", -1],
+						["Normal", "normalMap", -1],
+						["Roughness · green channel", "roughnessMap", 1],
+						["Metalness · blue channel", "metalnessMap", 2],
+					] as const;
+					maps.forEach(([label, key, channel]) => {
+						const card = document.createElement("figure");
+						const caption = document.createElement("figcaption");
+						caption.textContent = label;
+						card.append(caption);
+						const texture = selected && Reflect.get(selected, key);
+						const note = document.createElement("p");
+						if (!(texture instanceof THREE.Texture) || !texture.image) {
+							note.textContent = "No texture map";
+							card.append(note);
+						} else {
+							try {
+								const image = texture.image;
+								const preview = document.createElement("canvas");
+								const scale = Math.min(1, 512 / Math.max(image.width, image.height));
+								preview.width = Math.max(1, Math.round(image.width * scale));
+								preview.height = Math.max(1, Math.round(image.height * scale));
+								preview.setAttribute("role", "img");
+								preview.setAttribute("aria-label", `${label} texture preview`);
+								const painter = preview.getContext("2d");
+								if (!painter) throw new Error("Canvas unavailable");
+								painter.drawImage(image, 0, 0, preview.width, preview.height);
+								if (channel >= 0) {
+									const pixels = painter.getImageData(0, 0, preview.width, preview.height);
+									for (let i = 0; i < pixels.data.length; i += 4) {
+										const value = pixels.data[i + channel];
+										pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = value;
+										pixels.data[i + 3] = 255;
+									}
+									painter.putImageData(pixels, 0, 0);
+								}
+								card.append(preview);
+								note.textContent = `${image.width} × ${image.height} px`;
+							} catch {
+								note.textContent = "Preview unavailable for this texture format";
+							}
+							card.append(note);
+						}
+						textureGrid.append(card);
+					});
+				};
+				materialPanel?.addEventListener("toggle", showTextures);
+				materialSelect?.addEventListener("change", showTextures);
+				showTextures();
+
 				const grid = new THREE.GridHelper(8, 16, 0x444444, 0x242424);
 				grid.position.y = -1.3;
 				scene.add(grid);
@@ -293,6 +361,10 @@ const modelUrl = (src?: string) => src
 				const removeToggleListener = this.cleanup;
 				releaseResources = () => {
 					renderer.setAnimationLoop(null);
+					materialPanel?.removeEventListener("toggle", showTextures);
+					materialSelect?.removeEventListener("change", showTextures);
+					materialSelect?.replaceChildren();
+					textureGrid?.replaceChildren();
 					displayMode?.removeEventListener("change", applyDisplayMode);
 					originalMaterials.forEach((original, mesh) => { mesh.material = original; });
 					neutralMaterial.dispose();
@@ -479,6 +551,58 @@ const modelUrl = (src?: string) => src
 		align-items: center;
 		gap: 0.6rem;
 		margin-right: auto;
+		color: var(--color-muted);
+		font-size: 0.75rem;
+	}
+
+	.material-panel {
+		padding: 1rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.material-panel > summary {
+		cursor: pointer;
+		font-size: 0.85rem;
+		font-weight: 700;
+	}
+
+	.material-select {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-block: 1rem;
+		font-size: 0.8rem;
+	}
+
+	.texture-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+		gap: 1rem;
+	}
+
+	.texture-grid :global(figure) {
+		margin: 0;
+		padding: 0.75rem;
+		border: 1px solid var(--color-border);
+		border-radius: 0.6rem;
+	}
+
+	.texture-grid :global(figcaption) {
+		margin-bottom: 0.75rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+	}
+
+	.texture-grid :global(canvas) {
+		display: block;
+		width: 100%;
+		height: auto;
+		background: #0e0e0e;
+	}
+
+	.texture-grid :global(p) {
+		margin-top: 0.5rem;
 		color: var(--color-muted);
 		font-size: 0.75rem;
 	}
