@@ -6,6 +6,7 @@ interface ModelItem {
 	description?: string;
 	kind: "demo" | "glb";
 	src?: string;
+	poster?: string;
 	autoRotate: boolean;
 }
 
@@ -24,14 +25,18 @@ const modelUrl = (src?: string) => src
 	<div class="model-list">
 		{
 			items.map((item) => (
-				<article class="model-card">
-					<header>
+				<details class="model-card" data-model-card>
+					<summary class="model-summary">
+						<span class="model-thumbnail" aria-hidden="true">
+							<img data-model-thumbnail src={modelUrl(item.poster)} alt="" hidden={!item.poster} />
+							<span data-model-thumbnail-placeholder hidden={Boolean(item.poster)}>3D</span>
+						</span>
 						<div>
 							<h3>{item.title}</h3>
 							{item.description && <p>{item.description}</p>}
 						</div>
 						<span>{item.kind === "demo" ? "Demo scene" : "glTF / GLB"}</span>
-					</header>
+					</summary>
 
 					<project-model-viewer data-auto-rotate={String(item.autoRotate)} data-model-src={modelUrl(item.src)}>
 						<div
@@ -50,6 +55,7 @@ const modelUrl = (src?: string) => src
 									<option value="original">Original materials</option>
 									<option value="neutral">Neutral material</option>
 									<option value="wireframe">Wireframe</option>
+									<option value="checker">UV checker</option>
 								</select>
 							</label>
 							<button type="button" data-retry-viewer hidden>Retry 3D preview</button>
@@ -73,7 +79,7 @@ const modelUrl = (src?: string) => src
 							<canvas class="uv-canvas" data-uv-canvas width="768" height="768" role="img" aria-label="UV triangle edges on a 0 to 1 grid" hidden></canvas>
 						</details>
 					</project-model-viewer>
-				</article>
+				</details>
 			))
 		}
 	</div>
@@ -93,8 +99,10 @@ const modelUrl = (src?: string) => src
 				void this.initialize();
 			});
 
+			const outerDetails = details.parentElement?.closest("details");
+			const isVisible = () => details.open && (!outerDetails || outerDetails.open);
 			const handleToggle = () => {
-				if (details.open) {
+				if (isVisible()) {
 					void this.initialize();
 				} else {
 					this.setRendering?.(false);
@@ -102,9 +110,13 @@ const modelUrl = (src?: string) => src
 			};
 
 			details.addEventListener("toggle", handleToggle);
-			this.cleanup = () => details.removeEventListener("toggle", handleToggle);
+			outerDetails?.addEventListener("toggle", handleToggle);
+			this.cleanup = () => {
+				details.removeEventListener("toggle", handleToggle);
+				outerDetails?.removeEventListener("toggle", handleToggle);
+			};
 
-			if (details.open) void this.initialize();
+			if (isVisible()) void this.initialize();
 		}
 
 		disconnectedCallback() {
@@ -223,11 +235,29 @@ const modelUrl = (src?: string) => src
 				const wireframeMaterial = new THREE.MeshBasicMaterial({
 					color: 0xe8e8e8, wireframe: true,
 				});
+				const checkerCanvas = document.createElement("canvas");
+				checkerCanvas.width = checkerCanvas.height = 512;
+				const checkerPainter = checkerCanvas.getContext("2d");
+				if (!checkerPainter) throw new Error("Checker canvas unavailable");
+				for (let y = 0; y < 8; y++) {
+					for (let x = 0; x < 8; x++) {
+						checkerPainter.fillStyle = (x + y) % 2 ? "#303740" : "#e1e7ec";
+						checkerPainter.fillRect(x * 64, y * 64, 64, 64);
+						checkerPainter.fillStyle = (x + y) % 2 ? "#e1e7ec" : "#303740";
+						checkerPainter.font = "bold 16px sans-serif";
+						checkerPainter.fillText(`${String.fromCharCode(65 + 7 - y)}${x + 1}`, x * 64 + 8, y * 64 + 24);
+					}
+				}
+				const checkerTexture = new THREE.CanvasTexture(checkerCanvas);
+				checkerTexture.colorSpace = THREE.SRGBColorSpace;
+				checkerTexture.wrapS = checkerTexture.wrapT = THREE.RepeatWrapping;
+				const checkerMaterial = new THREE.MeshBasicMaterial({ map: checkerTexture, side: THREE.DoubleSide });
 				const applyDisplayMode = () => {
 					const mode = displayMode?.value ?? "original";
 					originalMaterials.forEach((original, mesh) => {
 						mesh.material = mode === "neutral" ? neutralMaterial
-							: mode === "wireframe" ? wireframeMaterial : original;
+							: mode === "wireframe" ? wireframeMaterial
+								: mode === "checker" && mesh.geometry.getAttribute("uv") ? checkerMaterial : original;
 					});
 					edges.visible = mode === "original";
 				};
@@ -420,7 +450,11 @@ const modelUrl = (src?: string) => src
 				this.setRendering = (active) => {
 					renderer.setAnimationLoop(active && !document.hidden && !context.isContextLost() ? renderFrame : null);
 				};
-				const resumeRendering = () => this.setRendering?.(this.closest("details")?.open === true);
+				const resumeRendering = () => {
+					const card = this.closest("details");
+					const outer = card?.parentElement?.closest("details");
+					this.setRendering?.(card?.open === true && (!outer || outer.open));
+				};
 				const contextLost = (event: Event) => {
 					event.preventDefault();
 					this.setRendering?.(false);
@@ -451,6 +485,8 @@ const modelUrl = (src?: string) => src
 					originalMaterials.forEach((original, mesh) => { mesh.material = original; });
 					neutralMaterial.dispose();
 					wireframeMaterial.dispose();
+					checkerMaterial.dispose();
+					checkerTexture.dispose();
 					rotationButton.removeEventListener("click", toggleRotation);
 					resetButton.removeEventListener("click", resetCamera);
 					canvas.removeEventListener("webglcontextlost", contextLost);
@@ -485,6 +521,18 @@ const modelUrl = (src?: string) => src
 				};
 
 				renderFrame();
+				const thumbnail = this.closest("[data-model-card]")?.querySelector<HTMLImageElement>("[data-model-thumbnail]");
+				if (thumbnail && !thumbnail.getAttribute("src")) {
+					try {
+						const preview = document.createElement("canvas");
+						preview.width = 192; preview.height = 128;
+						preview.getContext("2d")?.drawImage(canvas, 0, 0, 192, 128);
+						thumbnail.src = preview.toDataURL("image/webp", 0.8);
+						thumbnail.hidden = false;
+						const placeholder = thumbnail.parentElement?.querySelector<HTMLElement>("[data-model-thumbnail-placeholder]");
+						if (placeholder) placeholder.hidden = true;
+					} catch { /* Keep the placeholder if image capture is blocked. */ }
+				}
 				rotationButton.disabled = false;
 				resetButton.disabled = false;
 				if (displayMode) displayMode.disabled = false;
@@ -529,17 +577,25 @@ const modelUrl = (src?: string) => src
 		background: var(--color-surface);
 	}
 
-	.model-card > header {
+	.model-summary {
 		display: flex;
 		align-items: start;
 		justify-content: space-between;
 		gap: 1.5rem;
 		padding: 1rem 1.25rem;
 		border-bottom: 1px solid var(--color-border);
+		cursor: pointer;
+		list-style: none;
 	}
+	.model-summary::-webkit-details-marker { display: none; }
+	.model-summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -3px; }
+	.model-thumbnail { flex: 0 0 5rem; display: grid; place-items: center; height: 3.5rem; overflow: hidden; background: #0e0e0e; border-radius: 0.5rem; }
+	.model-thumbnail img { width: 100%; height: 100%; object-fit: contain; }
+	.model-thumbnail [hidden] { display: none; }
 
-	.model-card > header > div {
+	.model-summary > div {
 		display: grid;
+		flex: 1;
 		gap: 0.35rem;
 	}
 
@@ -558,7 +614,7 @@ const modelUrl = (src?: string) => src
 		line-height: 1.5;
 	}
 
-	.model-card > header > span {
+	.model-summary > span:last-child {
 		color: var(--color-muted);
 		font-size: 0.65rem;
 		font-weight: 700;
@@ -727,7 +783,7 @@ const modelUrl = (src?: string) => src
 	}
 
 	@media (max-width: 36rem) {
-		.model-card > header {
+		.model-summary {
 			flex-direction: column;
 			gap: 0.65rem;
 		}
