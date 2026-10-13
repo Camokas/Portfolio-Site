@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import ProjectCard from "../../components/projects/ProjectCard.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Icon from "../../components/ui/Icon.astro";
+import CatalogControls from "../../components/projects/CatalogControls.astro";
 
 const projects = (await getCollection("projects", ({ data }) => !data.draft)).sort(
 	(firstProject, secondProject) =>
@@ -40,6 +41,7 @@ const projectCountLabel = `${projects.length} ${
 				<p>{projectCountLabel}</p>
 			</div>
 
+			<CatalogControls>
 			{
 				projects.length > 0 ? (
 					<ul class="project-grid">
@@ -51,6 +53,7 @@ const projectCountLabel = `${projects.length} ${
 					</p>
 				)
 			}
+			</CatalogControls>
 		</section>
 	</main>
 </BaseLayout>

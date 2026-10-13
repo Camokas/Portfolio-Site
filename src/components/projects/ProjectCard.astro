@@ -15,7 +15,13 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 });
 ---
 
-<li class="project-item">
+<li class="project-item"
+	data-project-card
+	data-title={project.data.title}
+	data-search={`${project.data.title} ${project.data.summary} ${project.data.tags.join(" ")}`}
+	data-direction={project.data.direction}
+	data-date={project.data.date.getTime()}
+>
 	<article class="project-card">
 		<a href={projectUrl} aria-label={`Open ${project.data.title}`}>
 			<div class="project-preview">

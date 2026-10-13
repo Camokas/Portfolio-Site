@@ -1,0 +1,105 @@
+---
+import { directions } from "../../data/directions";
+---
+
+<project-catalog>
+	<form class="catalog-controls" hidden role="search" aria-label="Search projects">
+		<label class="search-field">Search
+			<input type="search" name="q" placeholder="Title, description or tags" />
+		</label>
+		<label>Direction
+			<select name="direction">
+				<option value="">All directions</option>
+				{directions.map((direction) => <option value={direction.slug}>{direction.title}</option>)}
+			</select>
+		</label>
+		<label>Sort
+			<select name="sort">
+				<option value="newest">Newest first</option>
+				<option value="oldest">Oldest first</option>
+				<option value="title">Title A–Z</option>
+			</select>
+		</label>
+		<button type="reset">Reset</button>
+	</form>
+	<p class="catalog-results" data-results role="status" hidden></p>
+	<slot />
+	<p class="no-results" data-empty hidden>No matching projects. Try another search or reset the filters.</p>
+</project-catalog>
+
+<script>
+	class ProjectCatalogElement extends HTMLElement {
+		cleanup?: () => void;
+		connectedCallback() {
+			const form = this.querySelector<HTMLFormElement>("form");
+			const search = form?.querySelector<HTMLInputElement>('[name="q"]');
+			const direction = form?.querySelector<HTMLSelectElement>('[name="direction"]');
+			const sort = form?.querySelector<HTMLSelectElement>('[name="sort"]');
+			const results = this.querySelector<HTMLElement>("[data-results]");
+			const empty = this.querySelector<HTMLElement>("[data-empty]");
+			const cards = [...this.querySelectorAll<HTMLElement>("[data-project-card]")];
+			if (!form || !search || !direction || !sort || !results || !empty) return;
+			const normalize = (value: string) => value.normalize("NFKC").toLocaleLowerCase().trim();
+			const searchIndex = new Map(cards.map((card) => [card, normalize(card.dataset.search ?? "")]));
+			const collator = new Intl.Collator("en", { numeric: true, sensitivity: "base" });
+			const apply = (writeUrl = true) => {
+				const terms = normalize(search.value).split(/\s+/).filter(Boolean);
+				const ordered = [...cards].sort((a, b) => {
+					if (sort.value === "title") return collator.compare(a.dataset.title ?? "", b.dataset.title ?? "");
+					const difference = Number(a.dataset.date) - Number(b.dataset.date);
+					return sort.value === "oldest" ? difference : -difference;
+				});
+				let visible = 0;
+				ordered.forEach((card) => {
+					card.hidden = Boolean(direction.value && card.dataset.direction !== direction.value)
+						|| !terms.every((term) => searchIndex.get(card)?.includes(term));
+					if (!card.hidden) visible++;
+					card.parentElement?.append(card);
+				});
+				results.textContent = `${visible} of ${cards.length} projects`;
+				empty.hidden = visible > 0 || cards.length === 0;
+				if (writeUrl) {
+					const url = new URL(window.location.href);
+					for (const [key, value] of [["q", search.value.trim()], ["direction", direction.value], ["sort", sort.value === "newest" ? "" : sort.value]]) {
+						if (value) url.searchParams.set(key, value); else url.searchParams.delete(key);
+					}
+					history.replaceState(null, "", url);
+				}
+			};
+			const restore = () => {
+				const params = new URLSearchParams(location.search);
+				search.value = params.get("q") ?? "";
+					direction.value = params.get("direction") ?? "";
+					if (!direction.value) direction.value = "";
+					sort.value = params.get("sort") ?? "newest";
+					if (!sort.value) sort.value = "newest";
+					apply(false);
+			};
+			let timer: ReturnType<typeof setTimeout>;
+			const update = () => { clearTimeout(timer); timer = setTimeout(() => apply(), 150); };
+			form.addEventListener("input", update);
+			form.addEventListener("submit", (event) => { event.preventDefault(); clearTimeout(timer); apply(); });
+			form.addEventListener("reset", () => { clearTimeout(timer); setTimeout(() => apply(), 0); });
+			window.addEventListener("popstate", restore);
+			this.cleanup = () => { clearTimeout(timer); window.removeEventListener("popstate", restore); };
+			restore();
+			form.hidden = false;
+			results.hidden = false;
+		}
+		disconnectedCallback() { this.cleanup?.(); }
+	}
+	if (!customElements.get("project-catalog")) customElements.define("project-catalog", ProjectCatalogElement);
+</script>
+
+<style>
+	project-catalog { display: block; }
+	.catalog-controls { display: grid; grid-template-columns: minmax(12rem, 2fr) 1fr 1fr auto; align-items: end; gap: 1rem; margin-top: 2rem; }
+	.catalog-controls[hidden], [hidden] { display: none; }
+	label { display: grid; gap: 0.5rem; color: var(--color-muted); font-size: 0.8rem; }
+	input, select, button { min-width: 0; min-height: 2.75rem; padding: 0.7rem; border: 1px solid var(--color-border); border-radius: 0.6rem; background: var(--color-surface); color: var(--color-text); font: inherit; }
+	button { cursor: pointer; font-size: 0.8rem; }
+	input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 0.2rem; }
+	.catalog-results, .no-results { color: var(--color-muted); font-size: 0.85rem; line-height: 1.6; }
+	@media (max-width: 56rem) { .catalog-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+	@media (max-width: 30rem) { .catalog-controls { grid-template-columns: 1fr; } }
+</style>
