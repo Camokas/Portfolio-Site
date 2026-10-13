@@ -44,6 +44,24 @@ const projects = defineCollection({
 				}),
 			)
 			.default([]),
+		audio: z
+			.array(
+				z.object({
+					title: z.string(),
+					artist: z.string().optional(),
+					caption: z.string().optional(),
+					preload: z.enum(["none", "metadata", "auto"]).default("metadata"),
+					sources: z
+						.array(
+							z.object({
+								src: z.string().min(1),
+								type: z.enum(["audio/mpeg", "audio/ogg", "audio/wav"]),
+							}),
+						)
+						.min(1),
+				}),
+			)
+			.default([]),
 		featured: z.boolean().default(false),
 		draft: z.boolean().default(false),
 		demo: z.boolean().default(false),

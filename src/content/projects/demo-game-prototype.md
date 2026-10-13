@@ -21,6 +21,14 @@ videos:
     sources:
       - src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
         type: "video/mp4"
+audio:
+  - title: "Demo sound effect"
+    artist: "MDN Web Docs sample"
+    caption: "Temporary CC0 audio used only to verify native playback."
+    preload: "metadata"
+    sources:
+      - src: "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
+        type: "audio/mpeg"
 featured: true
 draft: false
 demo: true
@@ -30,14 +38,13 @@ demo: true
 
 ## About this entry
 
-This page demonstrates the basic structure that every future project can use: metadata, a short summary, tags, a gallery, video, and a longer Markdown description.
+This page demonstrates the basic structure that every future project can use: metadata, a short summary, tags, a gallery, video, audio, and a longer Markdown description.
 
 ## What will be added later
 
-- Audio materials.
 - Downloadable files and external links.
 - Interactive demonstrations when a project requires them.
 
-The temporary gallery images and video will be replaced with real project media when the first finished project is added.
+The temporary gallery images, video, and audio will be replaced with real project media when the first finished project is added.
 
 The content is intentionally simple while the foundation of the portfolio is being built.

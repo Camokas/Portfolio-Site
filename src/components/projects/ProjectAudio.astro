@@ -1,0 +1,181 @@
+---
+import Icon from "../ui/Icon.astro";
+
+interface AudioSource {
+	src: string;
+	type: "audio/mpeg" | "audio/ogg" | "audio/wav";
+}
+
+interface AudioItem {
+	title: string;
+	artist?: string;
+	caption?: string;
+	preload: "none" | "metadata" | "auto";
+	sources: AudioSource[];
+}
+
+interface Props {
+	items: AudioItem[];
+}
+
+const { items } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+
+function resolveMediaUrl(src: string): string {
+	if (/^(?:https?:)?\/\//.test(src)) return src;
+
+	return `${baseUrl}${src.replace(/^\/+/, "")}`;
+}
+---
+
+<section class="project-audio" aria-labelledby="project-audio-title">
+	<div class="audio-heading">
+		<h2 id="project-audio-title">
+			<Icon name="audio-lines" size={17} /> Audio
+		</h2>
+		<span>{items.length.toString().padStart(2, "0")}</span>
+	</div>
+
+	<ol>
+		{
+			items.map((item, index) => (
+				<li>
+					<div class="track-marker" aria-hidden="true">
+						<span>{String(index + 1).padStart(2, "0")}</span>
+						<Icon name="audio-lines" size={20} />
+					</div>
+
+					<div class="track-content">
+						<div class="track-copy">
+							<h3>{item.title}</h3>
+							{item.artist && <p class="track-artist">{item.artist}</p>}
+							{item.caption && <p class="track-caption">{item.caption}</p>}
+						</div>
+
+						<audio controls preload={item.preload} aria-label={item.title}>
+							{item.sources.map((source) => (
+								<source src={resolveMediaUrl(source.src)} type={source.type} />
+							))}
+
+							Your browser does not support HTML audio. You can
+							<a href={resolveMediaUrl(item.sources[0].src)}>open the audio file</a>.
+						</audio>
+					</div>
+				</li>
+			))
+		}
+	</ol>
+</section>
+
+<style>
+	.project-audio {
+		padding-bottom: clamp(3rem, 8vw, 6rem);
+	}
+
+	.audio-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.audio-heading h2,
+	.audio-heading > span {
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.audio-heading h2 {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	ol {
+		display: grid;
+		gap: 0.75rem;
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	li {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: 1.25rem;
+		padding: 1.25rem;
+		border: 1px solid var(--color-border);
+		border-radius: 1rem;
+		background: var(--color-surface);
+	}
+
+	.track-marker {
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: 1rem;
+		min-width: 2rem;
+		color: var(--color-muted);
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+	}
+
+	.track-content,
+	.track-copy {
+		display: grid;
+	}
+
+	.track-content {
+		gap: 1rem;
+	}
+
+	.track-copy {
+		gap: 0.3rem;
+	}
+
+	h3,
+	p {
+		margin: 0;
+	}
+
+	h3 {
+		font-size: 1.05rem;
+	}
+
+	.track-artist {
+		color: var(--color-accent);
+		font-size: 0.8rem;
+		font-weight: 700;
+	}
+
+	.track-caption {
+		color: var(--color-muted);
+		font-size: 0.85rem;
+		line-height: 1.5;
+	}
+
+	audio {
+		display: block;
+		width: 100%;
+		height: 2.75rem;
+	}
+
+	@media (max-width: 32rem) {
+		li {
+			grid-template-columns: 1fr;
+		}
+
+		.track-marker {
+			align-items: center;
+			flex-direction: row;
+		}
+	}
+</style>
