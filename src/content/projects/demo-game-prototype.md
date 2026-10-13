@@ -29,6 +29,17 @@ audio:
     sources:
       - src: "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
         type: "audio/mpeg"
+downloads:
+  - label: "Demo project notes"
+    file: "downloads/demo-game-prototype/demo-project-notes.txt"
+    description: "A temporary text file demonstrating local downloads."
+    format: "TXT"
+    size: "< 1 KB"
+links:
+  - label: "Portfolio source repository"
+    href: "https://github.com/Camokas/Portfolio-Site"
+    description: "The real GitHub repository containing this website."
+    kind: "source"
 featured: true
 draft: false
 demo: true
@@ -38,11 +49,10 @@ demo: true
 
 ## About this entry
 
-This page demonstrates the basic structure that every future project can use: metadata, a short summary, tags, a gallery, video, audio, and a longer Markdown description.
+This page demonstrates the basic structure that every future project can use: metadata, a short summary, tags, media, downloads, external links, and a longer Markdown description.
 
 ## What will be added later
 
-- Downloadable files and external links.
 - Interactive demonstrations when a project requires them.
 
 The temporary gallery images, video, and audio will be replaced with real project media when the first finished project is added.

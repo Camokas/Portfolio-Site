@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectGallery from "../../components/projects/ProjectGallery.astro";
 import ProjectVideo from "../../components/projects/ProjectVideo.astro";
 import ProjectAudio from "../../components/projects/ProjectAudio.astro";
+import ProjectResources from "../../components/projects/ProjectResources.astro";
 import {
 	getCollection,
 	render,
@@ -98,6 +99,15 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 			{
 				project.data.audio.length > 0 && (
 					<ProjectAudio items={project.data.audio} />
+				)
+			}
+
+			{
+				(project.data.downloads.length > 0 || project.data.links.length > 0) && (
+					<ProjectResources
+						downloads={project.data.downloads}
+						links={project.data.links}
+					/>
 				)
 			}
 

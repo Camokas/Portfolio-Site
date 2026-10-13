@@ -1,0 +1,7 @@
+DEMO CONTENT — PROJECT NOTES
+
+This temporary file verifies that project downloads work correctly.
+It is not a real portfolio project asset.
+
+Replace it later by placing a real file in the public/downloads folder and
+updating the matching `downloads` entry in the project's Markdown frontmatter.

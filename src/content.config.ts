@@ -62,6 +62,29 @@ const projects = defineCollection({
 				}),
 			)
 			.default([]),
+		downloads: z
+			.array(
+				z.object({
+					label: z.string(),
+					file: z.string().min(1),
+					description: z.string().optional(),
+					format: z.string(),
+					size: z.string().optional(),
+				}),
+			)
+			.default([]),
+		links: z
+			.array(
+				z.object({
+					label: z.string(),
+					href: z.string().url(),
+					description: z.string().optional(),
+					kind: z
+						.enum(["website", "source", "demo", "store", "documentation"])
+						.default("website"),
+				}),
+			)
+			.default([]),
 		featured: z.boolean().default(false),
 		draft: z.boolean().default(false),
 		demo: z.boolean().default(false),
