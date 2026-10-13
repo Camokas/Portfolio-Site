@@ -20,6 +20,11 @@ models:
     kind: "glb"
     src: "models/AluminumCan.glb"
     autoRotate: true
+  - title: "WorkTable"
+    description: "Work Table"
+    kind: "glb"
+    src: "models/Worktable.glb"
+    autoRotate: true
 videos:
   - title: "Demo video player"
     caption: "Temporary CC0 sample from MDN used only to verify native video playback."
