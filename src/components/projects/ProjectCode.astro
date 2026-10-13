@@ -1,0 +1,228 @@
+---
+import { Code } from "astro:components";
+import Icon from "../ui/Icon.astro";
+
+type CodeLanguage =
+	| "astro"
+	| "bash"
+	| "cpp"
+	| "csharp"
+	| "css"
+	| "glsl"
+	| "html"
+	| "js"
+	| "json"
+	| "plaintext"
+	| "python"
+	| "ts";
+
+interface CodeSample {
+	title: string;
+	filename: string;
+	language: CodeLanguage;
+	code: string;
+	description?: string;
+}
+
+interface Props {
+	items: CodeSample[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="project-code" aria-labelledby="project-code-title">
+	<div class="code-heading">
+		<h2 id="project-code-title">
+			<Icon name="code-2" size={17} /> Code
+		</h2>
+		<span>{items.length.toString().padStart(2, "0")}</span>
+	</div>
+
+	<div class="code-list">
+		{
+			items.map((item) => (
+				<code-sample class="code-sample">
+					<header>
+						<div>
+							<p>{item.filename}</p>
+							<span>{item.language}</span>
+						</div>
+
+						<button type="button" data-copy-code>Copy code</button>
+					</header>
+
+					<div class="sample-copy">
+						<h3>{item.title}</h3>
+						{item.description && <p>{item.description}</p>}
+					</div>
+
+					<div class="code-block">
+						<Code code={item.code.trim()} lang={item.language} theme="github-dark" />
+					</div>
+				</code-sample>
+			))
+		}
+	</div>
+</section>
+
+<script>
+	class CodeSampleElement extends HTMLElement {
+		connectedCallback() {
+			const button = this.querySelector<HTMLButtonElement>("[data-copy-code]");
+			const code = this.querySelector("pre code");
+
+			if (!button || !code) return;
+
+			button.addEventListener("click", async () => {
+				try {
+					await navigator.clipboard.writeText(code.textContent ?? "");
+					button.textContent = "Copied";
+					setTimeout(() => {
+						button.textContent = "Copy code";
+					}, 1600);
+				} catch {
+					button.textContent = "Copy failed";
+				}
+			});
+		}
+	}
+
+	if (!customElements.get("code-sample")) {
+		customElements.define("code-sample", CodeSampleElement);
+	}
+</script>
+
+<style>
+	.project-code {
+		padding-bottom: clamp(3rem, 8vw, 6rem);
+	}
+
+	.code-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.code-heading h2,
+	.code-heading > span {
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.code-heading h2 {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.code-list {
+		display: grid;
+		gap: 1.5rem;
+		margin-top: 2rem;
+	}
+
+	.code-sample {
+		display: block;
+		overflow: hidden;
+		border: 1px solid var(--color-border);
+		border-radius: 1rem;
+		background: var(--color-surface);
+	}
+
+	header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.85rem 1rem;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	header > div {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		min-width: 0;
+	}
+
+	header p,
+	header span,
+	.sample-copy h3,
+	.sample-copy p {
+		margin: 0;
+	}
+
+	header p {
+		overflow: hidden;
+		font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+		font-size: 0.8rem;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	header span {
+		color: var(--color-muted);
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	button {
+		padding: 0.45rem 0.7rem;
+		color: var(--color-text);
+		font: inherit;
+		font-size: 0.7rem;
+		font-weight: 700;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		background: transparent;
+		cursor: pointer;
+	}
+
+	button:hover {
+		border-color: var(--color-accent);
+	}
+
+	button:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 0.2rem;
+	}
+
+	.sample-copy {
+		display: grid;
+		gap: 0.35rem;
+		padding: 1rem;
+	}
+
+	.sample-copy h3 {
+		font-size: 1rem;
+	}
+
+	.sample-copy p {
+		color: var(--color-muted);
+		font-size: 0.85rem;
+		line-height: 1.5;
+	}
+
+	.code-block {
+		border-top: 1px solid var(--color-border);
+	}
+
+	.code-block :global(.astro-code) {
+		margin: 0;
+		padding: 1.25rem;
+		overflow: auto;
+		font-size: 0.82rem;
+		line-height: 1.7;
+		tab-size: 2;
+	}
+</style>

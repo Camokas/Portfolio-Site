@@ -85,6 +85,30 @@ const projects = defineCollection({
 				}),
 			)
 			.default([]),
+		codeSamples: z
+			.array(
+				z.object({
+					title: z.string(),
+					filename: z.string(),
+					language: z.enum([
+						"astro",
+						"bash",
+						"cpp",
+						"csharp",
+						"css",
+						"glsl",
+						"html",
+						"js",
+						"json",
+						"plaintext",
+						"python",
+						"ts",
+					]),
+					code: z.string(),
+					description: z.string().optional(),
+				}),
+			)
+			.default([]),
 		featured: z.boolean().default(false),
 		draft: z.boolean().default(false),
 		demo: z.boolean().default(false),

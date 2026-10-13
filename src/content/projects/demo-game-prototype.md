@@ -40,6 +40,27 @@ links:
     href: "https://github.com/Camokas/Portfolio-Site"
     description: "The real GitHub repository containing this website."
     kind: "source"
+codeSamples:
+  - title: "Demo movement update"
+    filename: "playerMovement.ts"
+    language: "ts"
+    description: "Temporary TypeScript used to demonstrate syntax highlighting and copying."
+    code: |
+      interface PlayerState {
+        position: number;
+        speed: number;
+      }
+
+      export function updateMovement(
+        player: PlayerState,
+        direction: -1 | 0 | 1,
+        deltaTime: number,
+      ): PlayerState {
+        return {
+          ...player,
+          position: player.position + direction * player.speed * deltaTime,
+        };
+      }
 featured: true
 draft: false
 demo: true
@@ -49,7 +70,7 @@ demo: true
 
 ## About this entry
 
-This page demonstrates the basic structure that every future project can use: metadata, a short summary, tags, media, downloads, external links, and a longer Markdown description.
+This page demonstrates the basic structure that every future project can use: metadata, a short summary, tags, media, downloads, external links, code, and a longer Markdown description.
 
 ## What will be added later
 

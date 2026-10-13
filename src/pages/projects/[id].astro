@@ -4,6 +4,7 @@ import ProjectGallery from "../../components/projects/ProjectGallery.astro";
 import ProjectVideo from "../../components/projects/ProjectVideo.astro";
 import ProjectAudio from "../../components/projects/ProjectAudio.astro";
 import ProjectResources from "../../components/projects/ProjectResources.astro";
+import ProjectCode from "../../components/projects/ProjectCode.astro";
 import {
 	getCollection,
 	render,
@@ -108,6 +109,12 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 						downloads={project.data.downloads}
 						links={project.data.links}
 					/>
+				)
+			}
+
+			{
+				project.data.codeSamples.length > 0 && (
+					<ProjectCode items={project.data.codeSamples} />
 				)
 			}
 
