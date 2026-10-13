@@ -102,7 +102,9 @@ const modelUrl = (src?: string) => src
 			const outerDetails = details.parentElement?.closest("details");
 			const isVisible = () => details.open && (!outerDetails || outerDetails.open);
 			const handleToggle = () => {
-				if (isVisible()) {
+				if (!this.initialized && (!outerDetails || outerDetails.open)) {
+					void this.initialize();
+				} else if (isVisible()) {
 					void this.initialize();
 				} else {
 					this.setRendering?.(false);
@@ -116,7 +118,7 @@ const modelUrl = (src?: string) => src
 				outerDetails?.removeEventListener("toggle", handleToggle);
 			};
 
-			if (isVisible()) void this.initialize();
+			if (!outerDetails || outerDetails.open) void this.initialize();
 		}
 
 		disconnectedCallback() {
@@ -196,7 +198,7 @@ const modelUrl = (src?: string) => src
 				let context = canvas.getContext("webgl2", { antialias: true });
 				if (!context) context = canvas.getContext("webgl2", { antialias: false });
 				if (!context) throw new Error("WebGL 2 context could not be created");
-				const renderer = new THREE.WebGLRenderer({ canvas, context });
+				const renderer = new THREE.WebGLRenderer({ canvas, context, alpha: true });
 				renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.domElement.setAttribute("aria-label", "Interactive 3D canvas");
@@ -524,10 +526,30 @@ const modelUrl = (src?: string) => src
 				const thumbnail = this.closest("[data-model-card]")?.querySelector<HTMLImageElement>("[data-model-thumbnail]");
 				if (thumbnail && !thumbnail.getAttribute("src")) {
 					try {
+						const previousBackground = scene.background;
+						const previousAspect = camera.aspect;
+						const previousSize = renderer.getSize(new THREE.Vector2());
+						const previousPosition = camera.position.clone();
+						scene.background = null;
+						grid.visible = false;
+						edges.visible = false;
+						renderer.setSize(384, 320, false);
+						camera.aspect = 384 / 320;
+						camera.position.copy(defaultCameraPosition).multiplyScalar(0.8);
+						camera.lookAt(0, 0, 0);
+						camera.updateProjectionMatrix();
+						renderer.render(scene, camera);
 						const preview = document.createElement("canvas");
-						preview.width = 192; preview.height = 128;
-						preview.getContext("2d")?.drawImage(canvas, 0, 0, 192, 128);
-						thumbnail.src = preview.toDataURL("image/webp", 0.8);
+						preview.width = 384; preview.height = 320;
+						preview.getContext("2d")?.drawImage(canvas, 0, 0, 384, 320);
+						thumbnail.src = preview.toDataURL("image/png");
+						scene.background = previousBackground;
+						grid.visible = true;
+						edges.visible = true;
+						camera.position.copy(previousPosition);
+						camera.aspect = previousAspect;
+						camera.updateProjectionMatrix();
+						renderer.setSize(previousSize.x, previousSize.y, false);
 						thumbnail.hidden = false;
 						const placeholder = thumbnail.parentElement?.querySelector<HTMLElement>("[data-model-thumbnail-placeholder]");
 						if (placeholder) placeholder.hidden = true;
@@ -589,7 +611,7 @@ const modelUrl = (src?: string) => src
 	}
 	.model-summary::-webkit-details-marker { display: none; }
 	.model-summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -3px; }
-	.model-thumbnail { flex: 0 0 5rem; display: grid; place-items: center; height: 3.5rem; overflow: hidden; background: #0e0e0e; border-radius: 0.5rem; }
+	.model-thumbnail { flex: 0 0 8rem; display: grid; place-items: center; height: 6.5rem; overflow: hidden; border-radius: 0.5rem; }
 	.model-thumbnail img { width: 100%; height: 100%; object-fit: contain; }
 	.model-thumbnail [hidden] { display: none; }
 
