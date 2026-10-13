@@ -63,6 +63,15 @@ const modelUrl = (src?: string) => src
 							<label class="material-select">Material <select data-material-select disabled aria-label="Material to inspect"></select></label>
 							<div class="texture-grid" data-texture-grid></div>
 						</details>
+						<details class="material-panel" data-uv-panel>
+							<summary>UV layout</summary>
+							<div class="material-select">
+								<label>Object <select data-uv-object disabled></select></label>
+								<label>UV channel <select data-uv-channel disabled></select></label>
+							</div>
+							<p data-uv-status role="status"></p>
+							<canvas class="uv-canvas" data-uv-canvas width="768" height="768" role="img" aria-label="UV triangle edges on a 0 to 1 grid" hidden></canvas>
+						</details>
 					</project-model-viewer>
 				</article>
 			))
@@ -120,6 +129,11 @@ const modelUrl = (src?: string) => src
 			const materialSelect = this.querySelector<HTMLSelectElement>("[data-material-select]");
 			const materialPanel = this.querySelector<HTMLDetailsElement>("[data-material-panel]");
 			const textureGrid = this.querySelector<HTMLElement>("[data-texture-grid]");
+			const uvPanel = this.querySelector<HTMLDetailsElement>("[data-uv-panel]");
+			const uvObject = this.querySelector<HTMLSelectElement>("[data-uv-object]");
+			const uvChannel = this.querySelector<HTMLSelectElement>("[data-uv-channel]");
+			const uvCanvas = this.querySelector<HTMLCanvasElement>("[data-uv-canvas]");
+			const uvStatus = this.querySelector<HTMLElement>("[data-uv-status]");
 
 			if (!viewport || !status || !rotationButton || !resetButton) return;
 
@@ -218,6 +232,69 @@ const modelUrl = (src?: string) => src
 					edges.visible = mode === "original";
 				};
 				displayMode?.addEventListener("change", applyDisplayMode);
+
+				const meshes = [...originalMaterials.keys()];
+				meshes.forEach((mesh, index) => {
+					uvObject?.add(new Option(mesh.name || `Object ${index + 1}`, String(index)));
+				});
+				if (uvObject) uvObject.disabled = false;
+				const drawUV = () => {
+					if (!uvPanel?.open || !uvCanvas || !uvStatus) return;
+					uvCanvas.hidden = true;
+					const geometry = meshes[Number(uvObject?.value ?? 0)]?.geometry;
+					const uv = geometry?.getAttribute(uvChannel?.value || "uv");
+					if (!uv) {
+						uvStatus.textContent = "This object has no UV coordinates.";
+						return;
+					}
+					const painter = uvCanvas.getContext("2d");
+					if (!painter) { uvStatus.textContent = "UV preview is unavailable."; return; }
+					const size = uvCanvas.width;
+					painter.fillStyle = "#0e0e0e";
+					painter.fillRect(0, 0, size, size);
+					painter.strokeStyle = "#383838";
+					painter.lineWidth = 1;
+					painter.beginPath();
+					for (let i = 0; i <= 8; i++) {
+						const position = i * (size - 2) / 8 + 1;
+						painter.moveTo(position, 1); painter.lineTo(position, size - 1);
+						painter.moveTo(1, position); painter.lineTo(size - 1, position);
+					}
+					painter.stroke();
+					painter.strokeStyle = "#fdfcfc";
+					painter.lineWidth = 0.65;
+					const indices = geometry.index;
+					const count = indices?.count ?? uv.count;
+					let outside = false;
+					painter.beginPath();
+					for (let i = 0; i + 2 < count; i += 3) {
+						for (let corner = 0; corner < 3; corner++) {
+							const index = indices ? indices.getX(i + corner) : i + corner;
+							const u = uv.getX(index), v = uv.getY(index);
+							if (!Number.isFinite(u) || !Number.isFinite(v)) continue;
+							outside ||= u < 0 || u > 1 || v < 0 || v > 1;
+							const x = 1 + u * (size - 2), y = 1 + (1 - v) * (size - 2);
+							if (corner === 0) painter.moveTo(x, y); else painter.lineTo(x, y);
+						}
+						painter.closePath();
+					}
+					painter.stroke();
+					uvCanvas.hidden = false;
+					uvStatus.textContent = `UV space 0–1 · ${Math.floor(count / 3).toLocaleString()} triangles${outside ? " · Coordinates outside this tile are clipped" : ""}`;
+				};
+				const selectUVObject = () => {
+					uvChannel?.replaceChildren();
+					const geometry = meshes[Number(uvObject?.value ?? 0)]?.geometry;
+					["uv", "uv1", "uv2", "uv3"].forEach((key) => {
+						if (geometry?.getAttribute(key)) uvChannel?.add(new Option(key === "uv" ? "UV 0" : `UV ${key.slice(2)}`, key));
+					});
+					if (uvChannel) uvChannel.disabled = uvChannel.options.length === 0;
+					drawUV();
+				};
+				uvPanel?.addEventListener("toggle", drawUV);
+				uvObject?.addEventListener("change", selectUVObject);
+				uvChannel?.addEventListener("change", drawUV);
+				selectUVObject();
 
 				const materials = [...new Set([...originalMaterials.values()].flat())];
 				materials.forEach((item, index) => {
@@ -361,6 +438,11 @@ const modelUrl = (src?: string) => src
 				const removeToggleListener = this.cleanup;
 				releaseResources = () => {
 					renderer.setAnimationLoop(null);
+					uvPanel?.removeEventListener("toggle", drawUV);
+					uvObject?.removeEventListener("change", selectUVObject);
+					uvChannel?.removeEventListener("change", drawUV);
+					uvObject?.replaceChildren();
+					uvChannel?.replaceChildren();
 					materialPanel?.removeEventListener("toggle", showTextures);
 					materialSelect?.removeEventListener("change", showTextures);
 					materialSelect?.replaceChildren();
@@ -579,6 +661,19 @@ const modelUrl = (src?: string) => src
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
 		gap: 1rem;
+	}
+
+	.uv-canvas {
+		display: block;
+		width: min(100%, 40rem);
+		height: auto;
+		margin: 1rem auto 0;
+		border: 1px solid var(--color-border);
+		border-radius: 0.5rem;
+	}
+
+	.uv-canvas[hidden] {
+		display: none;
 	}
 
 	.texture-grid :global(figure) {
