@@ -4,85 +4,88 @@ class MediaPreview extends HTMLElement {
 	items: PreviewMedia[] = [];
 	index = -1;
 	visible = false;
-	paused = false;
-	loading = false;
-	timer?: ReturnType<typeof setTimeout>;
+	timer?: ReturnType<typeof setInterval>;
 	observer?: IntersectionObserver;
 	events?: AbortController;
-	motion = matchMedia("(prefers-reduced-motion: reduce)");
 	failed = new Set<number>();
-	get running() { return this.visible && !document.hidden && !this.paused && !this.motion.matches && this.isConnected; }
+	prepared = new Map<number, HTMLImageElement | HTMLVideoElement>();
+	pending = new Set<number>();
+	get running() { return this.visible && !document.hidden && this.isConnected; }
 	connectedCallback() {
 		this.items = JSON.parse(this.dataset.items ?? "[]");
 		if (!this.items.length) return;
 		this.events = new AbortController();
 		const options = { signal: this.events.signal };
-		const controls = this.querySelector<HTMLElement>(".preview-controls");
-		if (controls) controls.hidden = false;
-		this.querySelector("[data-pause]")?.addEventListener("click", () => {
-			this.paused = !this.paused; this.sync();
-		}, options);
-		this.querySelector("[data-next]")?.addEventListener("click", () => { void this.advance(); }, options);
 		document.addEventListener("visibilitychange", () => this.sync(), options);
-		this.motion.addEventListener("change", () => this.sync(), options);
+		const initial = this.querySelector<HTMLImageElement>("img.slide");
+		if (initial && this.items[0].kind === "image") {
+			this.prepared.set(0, initial); this.index = 0;
+		}
 		this.observer = new IntersectionObserver(([entry]) => {
 			this.visible = entry.isIntersecting;
-			if (this.visible && this.index < 0) void this.advance();
 			this.sync();
 		}, { threshold: 0.05 });
 		this.observer.observe(this);
 	}
 	disconnectedCallback() {
-		clearTimeout(this.timer); this.observer?.disconnect(); this.events?.abort();
-		this.querySelectorAll("video").forEach((video) => { video.pause(); video.removeAttribute("src"); video.replaceChildren(); video.load(); });
+		clearInterval(this.timer); this.timer = undefined; this.observer?.disconnect(); this.events?.abort();
+		this.prepared.forEach((element) => this.release(element));
+		this.prepared.clear();
 	}
 	sync() {
-		clearTimeout(this.timer);
-		const button = this.querySelector<HTMLButtonElement>("[data-pause]");
-		if (button) {
-			button.textContent = this.paused ? "▶" : "Ⅱ";
-			button.setAttribute("aria-pressed", String(this.paused));
-			button.setAttribute("aria-label", this.paused ? "Resume preview slideshow" : "Pause preview slideshow");
-		}
-		this.querySelectorAll("video").forEach((video) => {
-			if (this.running && video.classList.contains("active")) void video.play().catch(() => {});
-			else video.pause();
-		});
-		if (this.running && !this.loading && this.items.length > 1 && this.failed.size < this.items.length) {
-			this.timer = setTimeout(() => { void this.advance(); }, 5000);
+		this.updateVideo();
+		if (!this.running) { clearInterval(this.timer); this.timer = undefined; return; }
+		this.preload();
+		if (this.items.length > 1 && !this.timer) {
+			this.timer = setInterval(() => this.advance(), 1000);
 		}
 	}
-	async advance() {
-		if (this.loading || !this.isConnected) return;
-		clearTimeout(this.timer);
-		this.loading = true;
-		try {
-			for (let attempt = 0; attempt < this.items.length; attempt++) {
-				const next = (this.index + 1 + attempt) % this.items.length;
-				if (this.failed.has(next)) continue;
-				try {
-					const item = this.items[next];
-					const element = await this.prepare(item);
-					if (!this.isConnected) { if (element instanceof HTMLVideoElement) element.pause(); return; }
-					const old = [...this.querySelectorAll<HTMLElement>(".slide")];
-					element.className = `slide${item.kind === "model" ? " model" : ""}`;
-					this.querySelector(".preview-link")?.prepend(element);
-					// Establish the transparent starting frame before fading in.
-					void element.offsetWidth;
-					element.classList.add("active");
-					old.forEach((node) => { node.classList.remove("active"); if (node instanceof HTMLVideoElement) node.pause(); });
-					setTimeout(() => old.forEach((node) => { node.remove(); if (node instanceof HTMLVideoElement) { node.replaceChildren(); node.removeAttribute("src"); node.load(); } }), 750);
-					this.index = next;
-					this.querySelector<HTMLElement>(".placeholder")!.hidden = true;
-					this.querySelector("[data-counter]")!.textContent = `${next + 1} / ${this.items.length}`;
-					this.querySelector("[data-label]")!.textContent = `${item.kind === "model" ? "3D · " : item.kind === "video" ? "Video · " : ""}${item.label}`;
-					return;
-				} catch (error) {
-					this.failed.add(next);
-					console.warn("[Portfolio preview] Skipping unavailable media:", this.items[next].src, error);
-				}
-			}
-		} finally { this.loading = false; this.sync(); }
+	updateVideo() {
+		this.prepared.forEach((element, index) => {
+			if (!(element instanceof HTMLVideoElement)) return;
+			if (this.running && index === this.index) void element.play().catch(() => {});
+			else element.pause();
+		});
+	}
+	preload() {
+		if (!this.running) return;
+		// Slow video/model loading never blocks the one-second slideshow clock.
+		for (let step = 1; step <= this.items.length && this.pending.size < 2; step++) {
+			const index = (this.index + step) % this.items.length;
+			if (this.prepared.has(index) || this.pending.has(index) || this.failed.has(index)) continue;
+			this.pending.add(index);
+			void this.prepare(this.items[index]).then((element) => {
+				if (!this.isConnected) { this.release(element); return; }
+				this.prepared.set(index, element);
+				if (this.index < 0 && this.running) this.show(index);
+			}).catch((error) => {
+				this.failed.add(index);
+				console.warn("[Portfolio preview] Skipping unavailable media:", this.items[index].src, error);
+			}).finally(() => { this.pending.delete(index); this.preload(); });
+		}
+	}
+	advance() {
+		if (!this.running) return;
+		for (let step = 1; step <= this.items.length; step++) {
+			const next = (this.index + step) % this.items.length;
+			if (next !== this.index && this.prepared.has(next)) { this.show(next); break; }
+		}
+		this.preload();
+	}
+	show(index: number) {
+		const element = this.prepared.get(index)!;
+		const old = [...this.querySelectorAll<HTMLElement>(".slide")].filter((node) => node !== element);
+		element.className = `slide${this.items[index].kind === "model" ? " model" : ""}`;
+		this.querySelector(".preview-layers")?.append(element);
+		void element.offsetWidth;
+		element.classList.add("active");
+		old.forEach((node) => node.classList.remove("active"));
+		setTimeout(() => old.forEach((node) => node.remove()), 750);
+		this.index = index;
+		this.updateVideo();
+	}
+	release(element: HTMLImageElement | HTMLVideoElement) {
+		if (element instanceof HTMLVideoElement) { element.pause(); element.removeAttribute("src"); element.replaceChildren(); element.load(); }
 	}
 	async prepare(item: PreviewMedia): Promise<HTMLImageElement | HTMLVideoElement> {
 		if (item.kind === "video") {
