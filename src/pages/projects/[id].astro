@@ -51,6 +51,9 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 	title={`${project.data.title} | Camoka's Portfolio`}
 	description={project.data.summary}
 	lang="en"
+	type="article"
+	publishedAt={project.data.date}
+	noindex={project.data.demo}
 >
 	<main class="project-page" id="main-content" tabindex="-1">
 		<a class="back-link" href={directionUrl}>
