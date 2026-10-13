@@ -64,6 +64,12 @@ const modelUrl = (src?: string) => src
 							</button>
 							<button type="button" data-reset-camera disabled>Reset view</button>
 						</div>
+						<div class="animation-controls" data-animation-panel hidden>
+							<label>Animation <select data-animation-clip aria-label="Animation clip"></select></label>
+							<button type="button" data-animation-toggle aria-pressed="false">Play animation</button>
+							<button type="button" data-animation-restart>Restart</button>
+							<label>Speed <select data-animation-speed><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
+						</div>
 						<details class="material-panel" data-material-panel>
 							<summary>Material textures</summary>
 							<label class="material-select">Material <select data-material-select disabled aria-label="Material to inspect"></select></label>
@@ -140,6 +146,11 @@ const modelUrl = (src?: string) => src
 			const resetButton = this.querySelector<HTMLButtonElement>("[data-reset-camera]");
 			const retryButton = this.querySelector<HTMLButtonElement>("[data-retry-viewer]");
 			const displayMode = this.querySelector<HTMLSelectElement>("[data-display-mode]");
+			const animationPanel = this.querySelector<HTMLElement>("[data-animation-panel]");
+			const animationClip = this.querySelector<HTMLSelectElement>("[data-animation-clip]");
+			const animationToggle = this.querySelector<HTMLButtonElement>("[data-animation-toggle]");
+			const animationRestart = this.querySelector<HTMLButtonElement>("[data-animation-restart]");
+			const animationSpeed = this.querySelector<HTMLSelectElement>("[data-animation-speed]");
 			const materialSelect = this.querySelector<HTMLSelectElement>("[data-material-select]");
 			const materialPanel = this.querySelector<HTMLDetailsElement>("[data-material-panel]");
 			const textureGrid = this.querySelector<HTMLElement>("[data-texture-grid]");
@@ -166,12 +177,14 @@ const modelUrl = (src?: string) => src
 				const scene = new THREE.Scene();
 				scene.background = new THREE.Color(0x0e0e0e);
 				let loadedModel: import("three").Group | undefined;
+				let clips: import("three").AnimationClip[] = [];
 				if (this.dataset.modelSrc) {
 					stage = "model";
 					status.textContent = "Loading 3D model…";
 					const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
 					const gltf = await new GLTFLoader().loadAsync(this.dataset.modelSrc);
 					loadedModel = gltf.scene;
+					clips = gltf.animations;
 					loadedModel.traverse((node) => {
 						if (node instanceof THREE.Mesh && !node.geometry.attributes.normal) {
 							node.geometry.computeVertexNormals();
@@ -444,12 +457,54 @@ const modelUrl = (src?: string) => src
 				resizeObserver.observe(viewport);
 				resize();
 
-				const renderFrame = () => {
+				const mixer = loadedModel && clips.length ? new THREE.AnimationMixer(loadedModel) : undefined;
+				let action: import("three").AnimationAction | undefined;
+				let animationPlaying = false;
+				const updateAnimationButton = () => {
+					if (!animationToggle) return;
+					animationToggle.textContent = animationPlaying ? "Pause animation" : "Play animation";
+					animationToggle.setAttribute("aria-pressed", String(animationPlaying));
+				};
+				const selectAnimation = () => {
+					mixer?.stopAllAction();
+					const clip = clips[Number(animationClip?.value ?? 0)];
+					if (!mixer || !clip) return;
+					action = mixer.clipAction(clip);
+					action.reset().play();
+					action.paused = !animationPlaying;
+				};
+				const toggleAnimation = () => {
+					animationPlaying = !animationPlaying;
+					if (action) action.paused = !animationPlaying;
+					updateAnimationButton();
+				};
+				const restartAnimation = () => {
+					action?.reset().play();
+					if (action) action.paused = !animationPlaying;
+				};
+				const changeAnimationSpeed = () => {
+					if (mixer) mixer.timeScale = Number(animationSpeed?.value ?? 1);
+				};
+				if (mixer) {
+					clips.forEach((clip, index) => animationClip?.add(new Option(clip.name || `Clip ${index + 1}`, String(index))));
+					if (animationPanel) animationPanel.hidden = false;
+					animationClip?.addEventListener("change", selectAnimation);
+					animationToggle?.addEventListener("click", toggleAnimation);
+					animationRestart?.addEventListener("click", restartAnimation);
+					animationSpeed?.addEventListener("change", changeAnimationSpeed);
+					selectAnimation();
+				}
+				let lastFrameTime: number | undefined;
+				const renderFrame = (time = performance.now()) => {
+					const delta = lastFrameTime === undefined ? 0 : Math.min((time - lastFrameTime) / 1000, 0.1);
+					lastFrameTime = time;
+					mixer?.update(delta);
 					controls.update();
 					renderer.render(scene, camera);
 				};
 
 				this.setRendering = (active) => {
+					lastFrameTime = undefined;
 					renderer.setAnimationLoop(active && !document.hidden && !context.isContextLost() ? renderFrame : null);
 				};
 				const resumeRendering = () => {
@@ -474,6 +529,14 @@ const modelUrl = (src?: string) => src
 				const removeToggleListener = this.cleanup;
 				releaseResources = () => {
 					renderer.setAnimationLoop(null);
+					animationClip?.removeEventListener("change", selectAnimation);
+					animationToggle?.removeEventListener("click", toggleAnimation);
+					animationRestart?.removeEventListener("click", restartAnimation);
+					animationSpeed?.removeEventListener("change", changeAnimationSpeed);
+					animationClip?.replaceChildren();
+					if (animationPanel) animationPanel.hidden = true;
+					mixer?.stopAllAction();
+					if (loadedModel) mixer?.uncacheRoot(loadedModel);
 					uvPanel?.removeEventListener("toggle", drawUV);
 					uvObject?.removeEventListener("change", selectUVObject);
 					uvChannel?.removeEventListener("change", drawUV);
@@ -719,6 +782,19 @@ const modelUrl = (src?: string) => src
 		padding: 1rem;
 		border-top: 1px solid var(--color-border);
 	}
+
+	.animation-controls {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		padding: 1rem;
+		border-top: 1px solid var(--color-border);
+		font-size: 0.8rem;
+	}
+
+	.animation-controls[hidden] { display: none; }
+	.animation-controls label { display: flex; align-items: center; gap: 0.5rem; }
 
 	.material-panel > summary {
 		cursor: pointer;
