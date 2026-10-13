@@ -5,6 +5,14 @@ import Icon from "../components/ui/Icon.astro";
 import { contactLinks } from "../data/contactLinks";
 import { directions } from "../data/directions";
 import { home } from "../data/home";
+import { getCollection } from "astro:content";
+import { projectPreviews } from "../data/projectPreviews";
+
+const projects = (await getCollection("projects", ({ data }) => !data.draft))
+	.sort((a, b) => b.data.date.getTime() - a.data.date.getTime() || a.id.localeCompare(b.id));
+const mediaByProject = await Promise.all(projects.map(async (project) => ({
+	direction: project.data.direction, items: await projectPreviews(project),
+})));
 
 ---
 
@@ -75,6 +83,7 @@ import { home } from "../data/home";
 							description={direction.description}
 							slug={direction.slug}
 							icon={direction.icon}
+							previews={mediaByProject.filter((project) => project.direction === direction.slug).flatMap((project) => project.items)}
 						/>
 					))
 				}

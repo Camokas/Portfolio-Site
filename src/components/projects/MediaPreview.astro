@@ -1,0 +1,44 @@
+---
+import type { PreviewMedia } from "../../data/projectPreviews";
+interface Props { items: PreviewMedia[]; href: string; title: string; }
+const { items, href, title } = Astro.props;
+const first = items[0];
+const initialImage = first?.kind === "image" ? first.src : first?.poster;
+---
+
+<media-preview data-items={JSON.stringify(items)}>
+	<a class="preview-link" href={href} aria-label={`Open ${title}`}>
+		<span class="placeholder" aria-hidden="true" hidden={Boolean(initialImage)}>{first?.kind === "model" ? "3D" : "Portfolio"}</span>
+		{initialImage && <img class:list={["slide", "active", { model: first.kind === "model" }]} src={initialImage} alt="" loading="lazy" decoding="async" />}
+		<span class="shade" aria-hidden="true"></span>
+		<span class="media-label" data-label aria-hidden="true">{first?.label ?? title}</span>
+	</a>
+	{items.length > 0 && <div class="preview-controls" hidden>
+		<span data-counter aria-hidden="true">1 / {items.length}</span>
+		<button type="button" data-pause aria-label="Pause preview slideshow" aria-pressed="false">Ⅱ</button>
+		{items.length > 1 && <button type="button" data-next aria-label="Next preview">→</button>}
+	</div>}
+</media-preview>
+
+<script>
+	import "../../scripts/mediaPreview";
+</script>
+
+<style>
+	media-preview { position: relative; display: block; width: 100%; height: 12rem; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #39302c, #171514); }
+	.preview-link { display: block; position: absolute; inset: 0; color: white; }
+	.placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: var(--color-muted); font-size: 0.75rem; letter-spacing: 0.12em; }
+	.placeholder[hidden] { display: none; }
+	media-preview :global(.slide) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 700ms ease; }
+	media-preview :global(.slide.active) { opacity: 1; }
+	media-preview :global(.slide.model) { object-fit: contain; padding: 0.35rem; }
+	.shade { position: absolute; inset: 0; background: linear-gradient(transparent 55%, rgb(0 0 0 / 0.7)); pointer-events: none; }
+	.media-label { position: absolute; left: 0.85rem; right: 7.5rem; bottom: 0.8rem; font-size: 0.72rem; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.preview-controls { position: absolute; display: flex; align-items: center; gap: 0.2rem; right: 0.5rem; bottom: 0.35rem; color: white; }
+	.preview-controls[hidden] { display: none; }
+	.preview-controls span { padding-inline: 0.3rem; font-size: 0.65rem; font-variant-numeric: tabular-nums; }
+	button { width: 2.75rem; height: 2.75rem; border: 0; border-radius: 50%; background: rgb(0 0 0 / 0.55); color: white; cursor: pointer; }
+	button:hover { background: #554139; }
+	button:focus-visible, .preview-link:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -3px; }
+	@media (prefers-reduced-motion: reduce) { media-preview :global(.slide) { transition: none; } }
+</style>
