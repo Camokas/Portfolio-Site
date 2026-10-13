@@ -16,8 +16,9 @@ gallery:
     caption: "A second temporary image used to test the gallery and image viewer."
 models:
   - title: "Interactive geometry study"
-    description: "A temporary Three.js scene used to verify camera and pointer controls."
-    kind: "demo"
+    description: "A local demonstration glTF tetrahedron used to verify model loading and camera controls."
+    kind: "glb"
+    src: "models/demo-tetrahedron.gltf"
     autoRotate: true
 videos:
   - title: "Demo video player"

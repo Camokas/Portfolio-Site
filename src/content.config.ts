@@ -117,6 +117,8 @@ const projects = defineCollection({
 					kind: z.enum(["demo", "glb"]).default("demo"),
 					src: z.string().optional(),
 					autoRotate: z.boolean().default(true),
+				}).refine((model) => model.kind === "demo" || Boolean(model.src), {
+					message: "GLB/glTF models require a src path",
 				}),
 			)
 			.default([]),

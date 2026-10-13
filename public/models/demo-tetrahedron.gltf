@@ -1,0 +1,11 @@
+{
+  "asset": { "version": "2.0", "generator": "Portfolio Site demo asset" },
+  "scene": 0,
+  "scenes": [{ "nodes": [0] }],
+  "nodes": [{ "mesh": 0, "name": "Demo tetrahedron" }],
+  "meshes": [{ "primitives": [{ "attributes": { "POSITION": 0 }, "material": 0 }] }],
+  "materials": [{ "doubleSided": true, "pbrMetallicRoughness": { "baseColorFactor": [0.8, 0.8, 0.8, 1], "metallicFactor": 0.1, "roughnessFactor": 0.5 } }],
+  "accessors": [{ "bufferView": 0, "componentType": 5126, "count": 12, "type": "VEC3", "min": [-1, -1, -1], "max": [1, 1, 1] }],
+  "bufferViews": [{ "buffer": 0, "byteLength": 144 }],
+  "buffers": [{ "byteLength": 144, "uri": "data:application/octet-stream;base64,AACAPwAAgD8AAIA/AACAvwAAgL8AAIA/AACAvwAAgD8AAIC/AACAPwAAgD8AAIA/AACAPwAAgL8AAIC/AACAvwAAgL8AAIA/AACAPwAAgD8AAIA/AACAvwAAgD8AAIC/AACAPwAAgL8AAIC/AACAvwAAgL8AAIA/AACAPwAAgL8AAIC/AACAvwAAgD8AAIC/" }]
+}

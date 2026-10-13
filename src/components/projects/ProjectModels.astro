@@ -14,6 +14,10 @@ interface Props {
 }
 
 const { items } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+const modelUrl = (src?: string) => src
+	? (/^https?:\/\//.test(src) ? src : `${baseUrl}${src.replace(/^\/+/, "")}`)
+	: undefined;
 ---
 
 <CollapsibleSection title="3D viewer" icon="box" count={items.length} section="models">
@@ -26,10 +30,10 @@ const { items } = Astro.props;
 							<h3>{item.title}</h3>
 							{item.description && <p>{item.description}</p>}
 						</div>
-						<span>{item.kind === "demo" ? "Demo scene" : "GLB model"}</span>
+						<span>{item.kind === "demo" ? "Demo scene" : "glTF / GLB"}</span>
 					</header>
 
-					<project-model-viewer data-auto-rotate={String(item.autoRotate)}>
+					<project-model-viewer data-auto-rotate={String(item.autoRotate)} data-model-src={modelUrl(item.src)}>
 						<div
 							class="model-viewport"
 							data-model-viewport
@@ -116,6 +120,29 @@ const { items } = Astro.props;
 
 				const scene = new THREE.Scene();
 				scene.background = new THREE.Color(0x0e0e0e);
+				let loadedModel: import("three").Group | undefined;
+				if (this.dataset.modelSrc) {
+					stage = "model";
+					status.textContent = "Loading 3D model…";
+					const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
+					const gltf = await new GLTFLoader().loadAsync(this.dataset.modelSrc);
+					loadedModel = gltf.scene;
+					loadedModel.traverse((node) => {
+						if (node instanceof THREE.Mesh && !node.geometry.attributes.normal) {
+							node.geometry.computeVertexNormals();
+						}
+					});
+					const bounds = new THREE.Box3().setFromObject(loadedModel);
+					const size = bounds.getSize(new THREE.Vector3());
+					const extent = Math.max(size.x, size.y, size.z);
+					if (!Number.isFinite(extent) || extent <= 0) throw new Error("Model has no visible geometry");
+					const center = bounds.getCenter(new THREE.Vector3());
+					const wrapper = new THREE.Group();
+					wrapper.add(loadedModel);
+					loadedModel.position.sub(center);
+					wrapper.scale.setScalar(2.5 / extent);
+					scene.add(wrapper);
+				}
 
 				const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
 				const defaultCameraPosition = new THREE.Vector3(3.6, 2.5, 4.6);
@@ -147,6 +174,7 @@ const { items } = Astro.props;
 				});
 				const object = new THREE.Mesh(geometry, material);
 				object.position.y = 0.2;
+				object.visible = !loadedModel;
 				scene.add(object);
 
 				const edgeGeometry = new THREE.EdgesGeometry(geometry, 18);
@@ -251,6 +279,17 @@ const { items } = Astro.props;
 					grid.geometry.dispose();
 					const gridMaterials = Array.isArray(grid.material) ? grid.material : [grid.material];
 					gridMaterials.forEach((item) => item.dispose());
+					loadedModel?.traverse((node) => {
+						if (!(node instanceof THREE.Mesh)) return;
+						node.geometry.dispose();
+						const materials = Array.isArray(node.material) ? node.material : [node.material];
+						materials.forEach((item) => {
+							Object.values(item).forEach((value) => {
+								if (value instanceof THREE.Texture) value.dispose();
+							});
+							item.dispose();
+						});
+					});
 					renderer.dispose();
 				};
 				this.cleanup = () => {
@@ -272,7 +311,9 @@ const { items } = Astro.props;
 					? "WebGL 2 is unavailable. Check browser graphics acceleration and your graphics driver, then retry."
 					: stage === "loading"
 						? "Could not load the 3D viewer. Check your connection and reload this page, or retry."
-						: "Could not start the 3D scene. Please retry.";
+						: stage === "model"
+							? "Could not load this model. Check the model file and its textures, then retry."
+							: "Could not start the 3D scene. Please retry.";
 				console.error(`[Portfolio 3D: ${stage}]`, error);
 				rotationButton.disabled = true;
 				resetButton.disabled = true;
