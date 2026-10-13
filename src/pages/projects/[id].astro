@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectGallery from "../../components/projects/ProjectGallery.astro";
+import ProjectVideo from "../../components/projects/ProjectVideo.astro";
 import {
 	getCollection,
 	render,
@@ -84,6 +85,12 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 						items={project.data.gallery}
 						projectTitle={project.data.title}
 					/>
+				)
+			}
+
+			{
+				project.data.videos.length > 0 && (
+					<ProjectVideo items={project.data.videos} />
 				)
 			}
 

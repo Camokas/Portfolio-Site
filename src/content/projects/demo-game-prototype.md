@@ -14,6 +14,13 @@ gallery:
   - image: "../../assets/projects/demo-game-prototype/demo-mechanics.svg"
     alt: "Abstract monochrome game mechanics diagram made from connected geometric shapes"
     caption: "A second temporary image used to test the gallery and image viewer."
+videos:
+  - title: "Demo video player"
+    caption: "Temporary CC0 sample from MDN used only to verify native video playback."
+    preload: "metadata"
+    sources:
+      - src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+        type: "video/mp4"
 featured: true
 draft: false
 demo: true
@@ -23,14 +30,14 @@ demo: true
 
 ## About this entry
 
-This page demonstrates the basic structure that every future project can use: metadata, a short summary, tags, a gallery, and a longer Markdown description.
+This page demonstrates the basic structure that every future project can use: metadata, a short summary, tags, a gallery, video, and a longer Markdown description.
 
 ## What will be added later
 
-- Video and audio materials.
+- Audio materials.
 - Downloadable files and external links.
 - Interactive demonstrations when a project requires them.
 
-The temporary gallery images will be replaced with real screenshots or artwork when the first finished project is added.
+The temporary gallery images and video will be replaced with real project media when the first finished project is added.
 
 The content is intentionally simple while the foundation of the portfolio is being built.

@@ -24,6 +24,26 @@ const projects = defineCollection({
 				}),
 			)
 			.default([]),
+		videos: z
+			.array(
+				z.object({
+					title: z.string(),
+					caption: z.string().optional(),
+					poster: image().optional(),
+					preload: z.enum(["none", "metadata", "auto"]).default("metadata"),
+					loop: z.boolean().default(false),
+					muted: z.boolean().default(false),
+					sources: z
+						.array(
+							z.object({
+								src: z.string().min(1),
+								type: z.enum(["video/mp4", "video/webm"]),
+							}),
+						)
+						.min(1),
+				}),
+			)
+			.default([]),
 		featured: z.boolean().default(false),
 		draft: z.boolean().default(false),
 		demo: z.boolean().default(false),
