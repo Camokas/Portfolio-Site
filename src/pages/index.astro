@@ -12,13 +12,44 @@ import { directions } from "../data/directions";
 >
 	<main>
 		<section class="hero" aria-labelledby="hero-title">
-			<p class="eyebrow">Creative development · Multimedia art</p>
+			<p class="eyebrow">Portfolio website</p>
 
-			<h1 id="hero-title">Multimedia Portfolio</h1>
+			<h1 id="hero-title">Camoka</h1>
 
-			<p class="intro">
-				Here are my projects from different areas of creativity and development.
-			</p>
+			<p class="alias">or Daniil Doroshkin</p>
+		</section>
+
+		<section class="about" aria-label="About this portfolio">
+			<details class="about-details">
+				<summary>
+					<span class="about-heading">
+						<span class="about-label">About this portfolio</span>
+
+						<span class="about-preview">
+							A multidisciplinary collection of creative and development work.
+						</span>
+					</span>
+
+					<span class="about-toggle" aria-hidden="true">
+						<span class="toggle-open">Read more</span>
+						<span class="toggle-close">Show less</span>
+						<span class="toggle-icon">+</span>
+					</span>
+				</summary>
+
+				<div class="about-expanded">
+					<p>
+						I work across software development and digital art, combining
+						technical experiments with visual storytelling, sound, motion, and
+						interactive ideas.
+					</p>
+
+					<p>
+						This portfolio brings together finished projects, prototypes,
+						studies, and works in progress from every direction I explore.
+					</p>
+				</div>
+			</details>
 		</section>
 
 		<section
@@ -60,14 +91,17 @@ import { directions } from "../data/directions";
 	}
 
 	.hero {
-		display: grid;
-		align-content: center;
-		min-height: 100svh;
-		padding-block: 4rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		min-height: clamp(17rem, 38svh, 24rem);
+		padding-block: clamp(2.5rem, 7vh, 4rem);
+		text-align: center;
 	}
 
 	.eyebrow {
-		margin: 0 0 1.25rem;
+		margin: 0 0 1rem;
 		color: var(--color-accent);
 		font-size: 0.8rem;
 		font-weight: 700;
@@ -76,24 +110,125 @@ import { directions } from "../data/directions";
 	}
 
 	h1 {
-		max-width: 12ch;
 		margin: 0;
-		font-size: clamp(2.75rem, 8vw, 6.5rem);
+		font-size: clamp(4rem, 12vw, 8.5rem);
 		line-height: 0.95;
 		letter-spacing: -0.06em;
 	}
 
-	.intro {
-		max-width: 42rem;
-		margin: 1.5rem 0 0;
+	.alias {
+		margin: 0.8rem 0 0;
 		color: var(--color-muted);
-		font-size: clamp(1.05rem, 2vw, 1.35rem);
-		line-height: 1.6;
+		font-size: clamp(1.2rem, 3vw, 2rem);
+		line-height: 1.2;
+		letter-spacing: -0.025em;
+	}
+
+	.about {
+		border-block: 1px solid var(--color-border);
+	}
+
+	.about-details summary {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 2rem;
+		padding-block: clamp(1.5rem, 4vw, 2.25rem);
+		cursor: pointer;
+		list-style: none;
+	}
+
+	.about-details summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.about-details summary:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 0.35rem;
+		border-radius: 0.2rem;
+	}
+
+	.about-heading {
+		display: grid;
+		gap: 0.45rem;
+	}
+
+	.about-label {
+		color: var(--color-accent);
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+	}
+
+	.about-preview {
+		font-size: clamp(1rem, 2vw, 1.2rem);
+		line-height: 1.5;
+	}
+
+	.about-toggle {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		color: var(--color-muted);
+		font-size: 0.85rem;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.toggle-close {
+		display: none;
+	}
+
+	.toggle-icon {
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		aspect-ratio: 1;
+		color: var(--color-text);
+		font-size: 1.25rem;
+		font-weight: 400;
+		border: 1px solid var(--color-border);
+		border-radius: 50%;
+		transition:
+			transform 180ms ease,
+			border-color 180ms ease;
+	}
+
+	.about-details summary:hover .toggle-icon {
+		border-color: var(--color-accent);
+	}
+
+	.about-details[open] .toggle-open {
+		display: none;
+	}
+
+	.about-details[open] .toggle-close {
+		display: inline;
+	}
+
+	.about-details[open] .toggle-icon {
+		transform: rotate(45deg);
+	}
+
+	.about-expanded {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: clamp(1rem, 4vw, 3rem);
+		max-width: 60rem;
+		padding: 0 0 clamp(1.75rem, 5vw, 3rem);
+		animation: reveal-description 220ms ease-out;
+	}
+
+	.about-expanded p {
+		margin: 0;
+		color: var(--color-muted);
+		line-height: 1.7;
 	}
 
 	.directions {
-		padding-block: clamp(4rem, 10vw, 8rem);
-		border-top: 1px solid var(--color-border);
+		scroll-margin-top: 4.5rem;
+		padding-block: clamp(2.5rem, 7vw, 6rem);
 	}
 
 	.section-heading {
@@ -132,5 +267,43 @@ import { directions } from "../data/directions";
 		margin: 3rem 0 0;
 		padding: 0;
 		list-style: none;
+	}
+
+	@keyframes reveal-description {
+		from {
+			opacity: 0;
+			transform: translateY(-0.4rem);
+		}
+
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@media (max-width: 40rem) {
+		.about-details summary {
+			align-items: end;
+			gap: 1rem;
+		}
+
+		.about-details .about-toggle .toggle-open,
+		.about-details .about-toggle .toggle-close {
+			display: none;
+		}
+
+		.about-expanded {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.about-expanded {
+			animation: none;
+		}
+
+		.toggle-icon {
+			transition: none;
+		}
 	}
 </style>
