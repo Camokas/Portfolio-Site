@@ -52,7 +52,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 	description={project.data.summary}
 	lang="en"
 >
-	<main class="project-page">
+	<main class="project-page" id="main-content" tabindex="-1">
 		<a class="back-link" href={directionUrl}>
 			<Icon name="arrow-left" size={17} /> Back to {direction.title}
 		</a>

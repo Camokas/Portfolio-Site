@@ -46,7 +46,9 @@ const { title, icon, count, section } = Astro.props;
 				details.open = localStorage.getItem(storageKey) === "open";
 
 				details.addEventListener("toggle", () => {
-					localStorage.setItem(storageKey, details.open ? "open" : "closed");
+					try {
+						localStorage.setItem(storageKey, details.open ? "open" : "closed");
+					} catch { /* Storage can become unavailable after initialization. */ }
 				});
 			} catch {
 				// The section remains usable when browser storage is unavailable.
