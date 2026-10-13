@@ -15,10 +15,10 @@ gallery:
     alt: "Abstract monochrome game mechanics diagram made from connected geometric shapes"
     caption: "A second temporary image used to test the gallery and image viewer."
 models:
-  - title: "Interactive geometry study"
-    description: "A local demonstration glTF tetrahedron used to verify model loading and camera controls."
+  - title: "Aluminum Can"
+    description: "Aluminum Can"
     kind: "glb"
-    src: "models/demo-tetrahedron.gltf"
+    src: "models/AluminumCan.glb"
     autoRotate: true
 videos:
   - title: "Demo video player"
