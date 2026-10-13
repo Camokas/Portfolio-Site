@@ -77,9 +77,17 @@ class MediaPreview extends HTMLElement {
 		const old = [...this.querySelectorAll<HTMLElement>(".slide")].filter((node) => node !== element);
 		element.className = `slide${this.items[index].kind === "model" ? " model" : ""}`;
 		this.querySelector(".preview-layers")?.append(element);
-		void element.offsetWidth;
 		element.classList.add("active");
-		old.forEach((node) => node.classList.remove("active"));
+		// Explicit keyframes also work when a detached, cached element is reused.
+		element.animate([{ opacity: 0 }, { opacity: 1 }], {
+			duration: 1200, easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+		});
+		old.forEach((node) => {
+			node.classList.remove("active");
+			node.animate([{ opacity: 1 }, { opacity: 0 }], {
+				duration: 1200, easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+			});
+		});
 		setTimeout(() => old.forEach((node) => node.remove()), 1250);
 		this.index = index;
 		this.updateVideo();
