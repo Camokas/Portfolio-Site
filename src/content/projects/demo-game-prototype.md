@@ -14,6 +14,11 @@ gallery:
   - image: "../../assets/projects/demo-game-prototype/demo-mechanics.svg"
     alt: "Abstract monochrome game mechanics diagram made from connected geometric shapes"
     caption: "A second temporary image used to test the gallery and image viewer."
+models:
+  - title: "Interactive geometry study"
+    description: "A temporary Three.js scene used to verify camera and pointer controls."
+    kind: "demo"
+    autoRotate: true
 videos:
   - title: "Demo video player"
     caption: "Temporary CC0 sample from MDN used only to verify native video playback."
@@ -74,7 +79,7 @@ This page demonstrates the basic structure that every future project can use: me
 
 ## What will be added later
 
-- Interactive demonstrations when a project requires them.
+- Project-specific interactive program demonstrations.
 
 The temporary gallery images, video, and audio will be replaced with real project media when the first finished project is added.
 

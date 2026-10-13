@@ -109,6 +109,17 @@ const projects = defineCollection({
 				}),
 			)
 			.default([]),
+		models: z
+			.array(
+				z.object({
+					title: z.string(),
+					description: z.string().optional(),
+					kind: z.enum(["demo", "glb"]).default("demo"),
+					src: z.string().optional(),
+					autoRotate: z.boolean().default(true),
+				}),
+			)
+			.default([]),
 		featured: z.boolean().default(false),
 		draft: z.boolean().default(false),
 		demo: z.boolean().default(false),

@@ -1,0 +1,336 @@
+---
+import CollapsibleSection from "../ui/CollapsibleSection.astro";
+
+interface ModelItem {
+	title: string;
+	description?: string;
+	kind: "demo" | "glb";
+	src?: string;
+	autoRotate: boolean;
+}
+
+interface Props {
+	items: ModelItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<CollapsibleSection title="3D viewer" icon="box" count={items.length} section="models">
+	<div class="model-list">
+		{
+			items.map((item) => (
+				<article class="model-card">
+					<header>
+						<div>
+							<h3>{item.title}</h3>
+							{item.description && <p>{item.description}</p>}
+						</div>
+						<span>{item.kind === "demo" ? "Demo scene" : "GLB model"}</span>
+					</header>
+
+					<project-model-viewer data-auto-rotate={String(item.autoRotate)}>
+						<div
+							class="model-viewport"
+							data-model-viewport
+							role="img"
+							aria-label={`Interactive 3D view: ${item.title}`}
+						>
+							<p data-model-status>Open section to load 3D preview.</p>
+						</div>
+
+						<div class="model-controls" aria-label="3D viewer controls">
+							<button type="button" data-toggle-rotation aria-pressed="true">
+								Pause rotation
+							</button>
+							<button type="button" data-reset-camera>Reset view</button>
+						</div>
+					</project-model-viewer>
+				</article>
+			))
+		}
+	</div>
+</CollapsibleSection>
+
+<script>
+	class ProjectModelViewerElement extends HTMLElement {
+		initialized = false;
+		cleanup: (() => void) | undefined;
+		setRendering: ((active: boolean) => void) | undefined;
+
+		connectedCallback() {
+			const details = this.closest("details");
+
+			if (!details) return;
+
+			const handleToggle = () => {
+				if (details.open) {
+					void this.initialize();
+				} else {
+					this.setRendering?.(false);
+				}
+			};
+
+			details.addEventListener("toggle", handleToggle);
+			this.cleanup = () => details.removeEventListener("toggle", handleToggle);
+
+			if (details.open) void this.initialize();
+		}
+
+		disconnectedCallback() {
+			this.setRendering?.(false);
+			this.cleanup?.();
+		}
+
+		async initialize() {
+			if (this.initialized) {
+				this.setRendering?.(true);
+				return;
+			}
+
+			this.initialized = true;
+
+			const viewport = this.querySelector<HTMLElement>("[data-model-viewport]");
+			const status = this.querySelector<HTMLElement>("[data-model-status]");
+			const rotationButton = this.querySelector<HTMLButtonElement>("[data-toggle-rotation]");
+			const resetButton = this.querySelector<HTMLButtonElement>("[data-reset-camera]");
+
+			if (!viewport || !status || !rotationButton || !resetButton) return;
+
+			status.textContent = "Loading 3D preview…";
+
+			try {
+				const [THREE, { OrbitControls }] = await Promise.all([
+					import("three"),
+					import("three/addons/controls/OrbitControls.js"),
+				]);
+
+				const scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x0e0e0e);
+
+				const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+				const defaultCameraPosition = new THREE.Vector3(3.6, 2.5, 4.6);
+				camera.position.copy(defaultCameraPosition);
+
+				const renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+				renderer.outputColorSpace = THREE.SRGBColorSpace;
+				renderer.domElement.setAttribute("aria-label", "Interactive 3D canvas");
+				viewport.replaceChildren(renderer.domElement);
+
+				const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x202020, 2.4);
+				const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
+				keyLight.position.set(4, 6, 3);
+				scene.add(hemisphereLight, keyLight);
+
+				const geometry = new THREE.IcosahedronGeometry(1.25, 2);
+				const material = new THREE.MeshStandardMaterial({
+					color: 0xe8e8e8,
+					metalness: 0.15,
+					roughness: 0.38,
+				});
+				const object = new THREE.Mesh(geometry, material);
+				object.position.y = 0.2;
+				scene.add(object);
+
+				const edgeGeometry = new THREE.EdgesGeometry(geometry, 18);
+				const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x4a4a4a });
+				const edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+				object.add(edges);
+
+				const grid = new THREE.GridHelper(8, 16, 0x444444, 0x242424);
+				grid.position.y = -1.3;
+				scene.add(grid);
+
+				const controls = new OrbitControls(camera, renderer.domElement);
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.06;
+				controls.minDistance = 2.5;
+				controls.maxDistance = 10;
+				controls.target.set(0, 0, 0);
+
+				const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+				controls.autoRotate = this.dataset.autoRotate === "true" && !prefersReducedMotion;
+				controls.autoRotateSpeed = 1.2;
+
+				const updateRotationButton = () => {
+					rotationButton.textContent = controls.autoRotate ? "Pause rotation" : "Start rotation";
+					rotationButton.setAttribute("aria-pressed", String(controls.autoRotate));
+				};
+
+				updateRotationButton();
+
+				rotationButton.addEventListener("click", () => {
+					controls.autoRotate = !controls.autoRotate;
+					updateRotationButton();
+				});
+
+				resetButton.addEventListener("click", () => {
+					camera.position.copy(defaultCameraPosition);
+					controls.target.set(0, 0, 0);
+					controls.update();
+				});
+
+				const resize = () => {
+					const width = viewport.clientWidth;
+					const height = viewport.clientHeight;
+
+					if (width === 0 || height === 0) return;
+
+					camera.aspect = width / height;
+					camera.updateProjectionMatrix();
+					renderer.setSize(width, height, false);
+				};
+
+				const resizeObserver = new ResizeObserver(resize);
+				resizeObserver.observe(viewport);
+				resize();
+
+				const renderFrame = () => {
+					controls.update();
+					renderer.render(scene, camera);
+				};
+
+				this.setRendering = (active) => {
+					renderer.setAnimationLoop(active ? renderFrame : null);
+				};
+
+				const removeToggleListener = this.cleanup;
+				this.cleanup = () => {
+					removeToggleListener?.();
+					resizeObserver.disconnect();
+					controls.dispose();
+					geometry.dispose();
+					material.dispose();
+					edgeGeometry.dispose();
+					edgeMaterial.dispose();
+					renderer.dispose();
+				};
+
+				this.setRendering(true);
+			} catch {
+				status.textContent = "3D preview is unavailable in this browser.";
+			}
+		}
+	}
+
+	if (!customElements.get("project-model-viewer")) {
+		customElements.define("project-model-viewer", ProjectModelViewerElement);
+	}
+</script>
+
+<style>
+	.model-list {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.model-card {
+		overflow: hidden;
+		border: 1px solid var(--color-border);
+		border-radius: 1rem;
+		background: var(--color-surface);
+	}
+
+	.model-card > header {
+		display: flex;
+		align-items: start;
+		justify-content: space-between;
+		gap: 1.5rem;
+		padding: 1rem 1.25rem;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.model-card > header > div {
+		display: grid;
+		gap: 0.35rem;
+	}
+
+	h3,
+	p {
+		margin: 0;
+	}
+
+	h3 {
+		font-size: 1rem;
+	}
+
+	p {
+		color: var(--color-muted);
+		font-size: 0.85rem;
+		line-height: 1.5;
+	}
+
+	.model-card > header > span {
+		color: var(--color-muted);
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		white-space: nowrap;
+	}
+
+	project-model-viewer {
+		display: block;
+	}
+
+	.model-viewport {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		min-height: 18rem;
+		background: #0e0e0e;
+		touch-action: none;
+	}
+
+	.model-viewport :global(canvas) {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.model-controls {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		flex-wrap: wrap;
+		gap: 0.65rem;
+		padding: 0.85rem 1rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	button {
+		padding: 0.5rem 0.8rem;
+		color: var(--color-text);
+		font: inherit;
+		font-size: 0.72rem;
+		font-weight: 700;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		background: transparent;
+		cursor: pointer;
+	}
+
+	button:hover {
+		border-color: var(--color-accent);
+	}
+
+	button:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 0.2rem;
+	}
+
+	@media (max-width: 36rem) {
+		.model-card > header {
+			flex-direction: column;
+			gap: 0.65rem;
+		}
+
+		.model-viewport {
+			aspect-ratio: 4 / 3;
+			min-height: 15rem;
+		}
+	}
+</style>
