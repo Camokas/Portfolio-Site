@@ -1,6 +1,7 @@
 ---
 const currentYear = new Date().getFullYear();
 const homeUrl = import.meta.env.BASE_URL;
+const contactUrl = `${homeUrl}#contact`;
 const repositoryUrl = "https://github.com/Camokas/Portfolio-Site";
 const commitsApiUrl =
 	"https://api.github.com/repos/Camokas/Portfolio-Site/commits?per_page=1";
@@ -27,7 +28,10 @@ const commitsApiUrl =
 			</p>
 		</div>
 
-		<a href={homeUrl}>Back to home</a>
+		<nav aria-label="Footer navigation">
+			<a href={contactUrl}>Contact</a>
+			<a href={homeUrl}>Back to home</a>
+		</nav>
 	</div>
 </footer>
 
@@ -51,6 +55,12 @@ const commitsApiUrl =
 	.footer-copy {
 		display: grid;
 		gap: 0.5rem;
+	}
+
+	nav {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
 	}
 
 	p {
@@ -99,6 +109,12 @@ const commitsApiUrl =
 			align-items: flex-start;
 			flex-direction: column;
 			justify-content: center;
+		}
+
+		nav {
+			align-items: flex-start;
+			flex-direction: column;
+			gap: 0.75rem;
 		}
 	}
 </style>

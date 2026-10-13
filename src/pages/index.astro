@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import DirectionCard from "../components/directions/DirectionCard.astro";
+import { contactLinks } from "../data/contactLinks";
 import { directions } from "../data/directions";
 
 ---
@@ -80,6 +81,42 @@ import { directions } from "../data/directions";
 					))
 				}
 			</ul>
+		</section>
+
+		<section id="contact" class="contact" aria-labelledby="contact-title">
+			<div class="contact-heading">
+				<p class="section-kicker">Get in touch</p>
+
+				<h2 id="contact-title">Contact</h2>
+			</div>
+
+			<div class="contact-content">
+				<p class="contact-description">
+					For now, GitHub is the best place to follow my work and the
+					development of this portfolio. More contact methods can be added
+					here later.
+				</p>
+
+				<ul class="contact-links">
+					{
+						contactLinks.map((link) => (
+							<li>
+								<a href={link.href} target="_blank" rel="noreferrer">
+									<span class="contact-link-copy">
+										<span class="contact-link-name">{link.label}</span>
+										<span class="contact-link-detail">{link.detail}</span>
+										<span class="contact-link-description">
+											{link.description}
+										</span>
+									</span>
+
+									<span class="contact-link-arrow" aria-hidden="true">↗</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
 		</section>
 	</main>
 </BaseLayout>
@@ -269,6 +306,97 @@ import { directions } from "../data/directions";
 		list-style: none;
 	}
 
+	.contact {
+		display: grid;
+		grid-template-columns: minmax(14rem, 0.8fr) minmax(0, 1.2fr);
+		gap: clamp(2rem, 8vw, 7rem);
+		scroll-margin-top: 4.5rem;
+		padding-block: clamp(3.5rem, 9vw, 7rem);
+		border-top: 1px solid var(--color-border);
+	}
+
+	.contact-heading {
+		display: grid;
+		align-content: start;
+		gap: 1rem;
+	}
+
+	.contact-content {
+		display: grid;
+		gap: 2rem;
+	}
+
+	.contact-description {
+		max-width: 40rem;
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 1.05rem;
+		line-height: 1.7;
+	}
+
+	.contact-links {
+		display: grid;
+		gap: 0.75rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.contact-links a {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 1.5rem;
+		padding: 1.25rem 1.5rem;
+		color: inherit;
+		text-decoration: none;
+		border: 1px solid var(--color-border);
+		border-radius: 1rem;
+		background: var(--color-surface);
+		transition:
+			transform 180ms ease,
+			border-color 180ms ease;
+	}
+
+	.contact-links a:hover {
+		transform: translateX(0.25rem);
+		border-color: var(--color-accent);
+	}
+
+	.contact-links a:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 0.25rem;
+	}
+
+	.contact-link-copy {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 0.35rem 0.75rem;
+	}
+
+	.contact-link-name {
+		font-weight: 750;
+	}
+
+	.contact-link-detail {
+		align-self: center;
+		color: var(--color-accent);
+		font-size: 0.8rem;
+		font-weight: 700;
+	}
+
+	.contact-link-description {
+		grid-column: 1 / -1;
+		color: var(--color-muted);
+		font-size: 0.9rem;
+		line-height: 1.5;
+	}
+
+	.contact-link-arrow {
+		color: var(--color-accent);
+		font-size: 1.25rem;
+	}
+
 	@keyframes reveal-description {
 		from {
 			opacity: 0;
@@ -294,6 +422,13 @@ import { directions } from "../data/directions";
 
 		.about-expanded {
 			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 48rem) {
+		.contact {
+			grid-template-columns: 1fr;
+			gap: 2rem;
 		}
 	}
 
