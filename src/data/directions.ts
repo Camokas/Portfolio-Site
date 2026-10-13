@@ -1,10 +1,24 @@
+export const directionSlugs = [
+	"game-development",
+	"3d-modeling",
+	"music-sound",
+	"drawing",
+	"video-editing",
+	"motion-design",
+	"programming",
+	"animation",
+	"shading",
+] as const;
+
+export type DirectionSlug = (typeof directionSlugs)[number];
+
 export interface Direction {
-	slug: string;
+	slug: DirectionSlug;
 	title: string;
 	description: string;
 }
 
-export const directions: Direction[] = [
+export const directions = [
 	{
 		slug: "game-development",
 		title: "Game Development",
@@ -50,4 +64,4 @@ export const directions: Direction[] = [
 		title: "Shading",
 		description: "Materials, shaders, and real-time visual effects.",
 	},
-];
+] satisfies readonly Direction[];

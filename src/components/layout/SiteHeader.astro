@@ -1,0 +1,91 @@
+---
+const baseUrl = import.meta.env.BASE_URL;
+const directionsUrl = `${baseUrl}#directions`;
+const isHomePage = Astro.url.pathname === baseUrl;
+const isDirectionPage = Astro.url.pathname.startsWith(`${baseUrl}directions/`);
+---
+
+<header class="site-header">
+	<div class="header-inner">
+		<a class="brand" href={baseUrl} aria-label="Camoka — home">
+			Camoka<span aria-hidden="true">.</span>
+		</a>
+
+		<nav aria-label="Primary navigation">
+			<a
+				class="nav-link"
+				href={baseUrl}
+				aria-current={isHomePage ? "page" : undefined}
+			>
+				Home
+			</a>
+
+			<a
+				class="nav-link"
+				href={directionsUrl}
+				aria-current={isDirectionPage ? "page" : undefined}
+			>
+				Directions
+			</a>
+		</nav>
+	</div>
+</header>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		border-bottom: 1px solid color-mix(in srgb, var(--color-border) 75%, transparent);
+		background: color-mix(in srgb, var(--color-background) 88%, transparent);
+		backdrop-filter: blur(1rem);
+	}
+
+	.header-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: min(calc(100% - 2rem), var(--content-width));
+		min-height: 4.5rem;
+		margin-inline: auto;
+		gap: 2rem;
+	}
+
+	.brand {
+		color: var(--color-text);
+		font-size: 1.15rem;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		text-decoration: none;
+	}
+
+	.brand span {
+		color: var(--color-accent);
+	}
+
+	nav {
+		display: flex;
+		align-items: center;
+		gap: clamp(1rem, 4vw, 2rem);
+	}
+
+	.nav-link {
+		color: var(--color-muted);
+		font-size: 0.9rem;
+		font-weight: 650;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.nav-link:hover,
+	.nav-link[aria-current="page"] {
+		color: var(--color-text);
+	}
+
+	.brand:focus-visible,
+	.nav-link:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 0.3rem;
+		border-radius: 0.15rem;
+	}
+</style>

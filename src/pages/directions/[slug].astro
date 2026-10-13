@@ -1,24 +1,36 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectCard from "../../components/projects/ProjectCard.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
 import { directions } from "../../data/directions";
 import type { Direction } from "../../data/directions";
 
-export function getStaticPaths() {
-	return directions.map((direction) => ({
-		params: {
-			slug: direction.slug,
-		},
-		props: {
-			direction,
-		},
-	}));
+export async function getStaticPaths() {
+	const projects = await getCollection("projects", ({ data }) => !data.draft);
+
+	return directions.map((direction) => {
+		const directionProjects = projects.filter(
+			(project) => project.data.direction === direction.slug,
+		);
+
+		return {
+			params: {
+				slug: direction.slug,
+			},
+			props: {
+				direction,
+				projects: directionProjects,
+			},
+		};
+	});
 }
 
 interface Props {
 	direction: Direction;
+	projects: CollectionEntry<"projects">[];
 }
 
-const { direction } = Astro.props;
+const { direction, projects } = Astro.props;
 const homeUrl = import.meta.env.BASE_URL;
 ---
 
@@ -41,9 +53,17 @@ const homeUrl = import.meta.env.BASE_URL;
 		<section class="projects" aria-labelledby="projects-title">
 			<h2 id="projects-title">Projects</h2>
 
-			<p class="empty-message">
-				Projects in this direction will appear here.
-			</p>
+			{
+				projects.length > 0 ? (
+					<ul class="project-grid">
+						{projects.map((project) => <ProjectCard project={project} />)}
+					</ul>
+				) : (
+					<p class="empty-message">
+						Projects in this direction will appear here.
+					</p>
+				)
+			}
 		</section>
 	</main>
 </BaseLayout>
@@ -118,5 +138,14 @@ const homeUrl = import.meta.env.BASE_URL;
 		margin: 1.5rem 0 0;
 		color: var(--color-muted);
 		line-height: 1.6;
+	}
+
+	.project-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+		gap: 1rem;
+		margin: 2.5rem 0 0;
+		padding: 0;
+		list-style: none;
 	}
 </style>

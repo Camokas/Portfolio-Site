@@ -1,0 +1,125 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+	project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const projectUrl = `${import.meta.env.BASE_URL}projects/${project.id}/`;
+const formattedDate = project.data.date.toLocaleDateString("en", {
+	year: "numeric",
+	month: "short",
+});
+---
+
+<li class="project-item">
+	<article class="project-card">
+		<a href={projectUrl} aria-label={`Open ${project.data.title}`}>
+			<div class="project-preview">
+				<span>{project.data.demo ? "Demo content" : "Project"}</span>
+			</div>
+
+			<div class="project-content">
+				<div class="project-meta">
+					<time datetime={project.data.date.toISOString()}>{formattedDate}</time>
+
+					{project.data.demo && <span>Demo</span>}
+				</div>
+
+				<h3>{project.data.title}</h3>
+
+				<p>{project.data.summary}</p>
+
+				<span class="project-action" aria-hidden="true">View project →</span>
+			</div>
+		</a>
+	</article>
+</li>
+
+<style>
+	.project-item {
+		min-width: 0;
+	}
+
+	.project-card,
+	.project-card > a {
+		height: 100%;
+	}
+
+	.project-card > a {
+		display: grid;
+		grid-template-rows: 11rem 1fr;
+		overflow: hidden;
+		color: inherit;
+		text-decoration: none;
+		border: 1px solid var(--color-border);
+		border-radius: 1rem;
+		background: var(--color-surface);
+		transition:
+			transform 180ms ease,
+			border-color 180ms ease;
+	}
+
+	.project-card > a:hover {
+		transform: translateY(-0.25rem);
+		border-color: var(--color-accent);
+	}
+
+	.project-card > a:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 0.25rem;
+	}
+
+	.project-preview {
+		display: grid;
+		place-items: center;
+		color: var(--color-accent);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		background:
+			linear-gradient(135deg, transparent 35%, rgb(255 192 167 / 0.12)),
+			#211914;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.project-content {
+		display: flex;
+		flex-direction: column;
+		padding: 1.5rem;
+	}
+
+	.project-meta {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		color: var(--color-muted);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	h3 {
+		margin: 1.25rem 0 0;
+		font-size: 1.5rem;
+		line-height: 1.15;
+	}
+
+	p {
+		margin: 0.75rem 0 0;
+		color: var(--color-muted);
+		line-height: 1.6;
+	}
+
+	.project-action {
+		margin-top: auto;
+		padding-top: 1.5rem;
+		color: var(--color-accent);
+		font-size: 0.9rem;
+		font-weight: 700;
+	}
+</style>

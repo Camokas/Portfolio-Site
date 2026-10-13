@@ -1,0 +1,104 @@
+---
+const currentYear = new Date().getFullYear();
+const homeUrl = import.meta.env.BASE_URL;
+const repositoryUrl = "https://github.com/Camokas/Portfolio-Site";
+const commitsApiUrl =
+	"https://api.github.com/repos/Camokas/Portfolio-Site/commits?per_page=1";
+---
+
+<footer class="site-footer">
+	<div class="footer-inner">
+		<div class="footer-copy">
+			<p>© {currentYear} Camoka</p>
+
+			<p class="last-updated" aria-live="polite">
+				<span>Last repository update:</span>
+
+				<a
+					href={repositoryUrl}
+					target="_blank"
+					rel="noreferrer"
+					data-latest-commit
+					data-api-url={commitsApiUrl}
+					data-repository-url={repositoryUrl}
+				>
+					<time data-latest-commit-date>Checking…</time>
+				</a>
+			</p>
+		</div>
+
+		<a href={homeUrl}>Back to home</a>
+	</div>
+</footer>
+
+<script src="../../scripts/latestCommit.ts"></script>
+
+<style>
+	.site-footer {
+		border-top: 1px solid var(--color-border);
+	}
+
+	.footer-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: min(calc(100% - 2rem), var(--content-width));
+		min-height: 7rem;
+		margin-inline: auto;
+		gap: 1.5rem;
+	}
+
+	.footer-copy {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	p {
+		margin: 0;
+		color: var(--color-muted);
+	}
+
+	.last-updated {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		font-size: 0.85rem;
+	}
+
+	a {
+		color: var(--color-text);
+		font-weight: 650;
+		text-decoration: none;
+	}
+
+	a:hover {
+		color: var(--color-accent);
+	}
+
+	.last-updated a {
+		color: var(--color-muted);
+		font-weight: inherit;
+		text-decoration: underline;
+		text-decoration-color: var(--color-border);
+		text-underline-offset: 0.2em;
+	}
+
+	.last-updated a:hover {
+		color: var(--color-accent);
+		text-decoration-color: currentColor;
+	}
+
+	a:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 0.3rem;
+		border-radius: 0.15rem;
+	}
+
+	@media (max-width: 32rem) {
+		.footer-inner {
+			align-items: flex-start;
+			flex-direction: column;
+			justify-content: center;
+		}
+	}
+</style>
