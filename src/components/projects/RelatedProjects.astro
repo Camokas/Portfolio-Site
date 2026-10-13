@@ -1,0 +1,64 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import ProjectCard from "./ProjectCard.astro";
+
+interface Props {
+	project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const normalizeTag = (tag: string) => tag.normalize("NFKC").trim().toLowerCase();
+const tags = new Set(project.data.tags.map(normalizeTag).filter(Boolean));
+const projects = await getCollection("projects", ({ data }) => !data.draft);
+
+const related = projects
+	.filter((candidate) => candidate.id !== project.id)
+	.map((candidate) => ({
+		project: candidate,
+		sameDirection: candidate.data.direction === project.data.direction,
+		sharedTags: [...new Set(candidate.data.tags.map(normalizeTag))]
+			.filter((tag) => tags.has(tag)).length,
+	}))
+	.filter((candidate) => candidate.sameDirection || candidate.sharedTags > 0)
+	.sort((first, second) =>
+		Number(second.sameDirection) - Number(first.sameDirection)
+		|| second.sharedTags - first.sharedTags
+		|| second.project.data.date.getTime() - first.project.data.date.getTime()
+		|| first.project.id.localeCompare(second.project.id),
+	)
+	.slice(0, 3);
+---
+
+{
+	related.length > 0 && (
+		<section class="related-projects" aria-labelledby="related-projects-title">
+			<h2 id="related-projects-title">Related projects</h2>
+			<ul>
+				{related.map((candidate) => <ProjectCard project={candidate.project} />)}
+			</ul>
+		</section>
+	)
+}
+
+<style>
+	.related-projects {
+		padding-block: clamp(2rem, 6vw, 4rem);
+		border-top: 1px solid var(--color-border);
+	}
+
+	h2 {
+		margin: 0;
+		font-size: clamp(1.75rem, 4vw, 3rem);
+		line-height: 1.1;
+		letter-spacing: -0.04em;
+	}
+
+	ul {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+		gap: 1rem;
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+</style>

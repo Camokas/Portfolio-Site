@@ -6,6 +6,7 @@ import ProjectAudio from "../../components/projects/ProjectAudio.astro";
 import ProjectResources from "../../components/projects/ProjectResources.astro";
 import ProjectCode from "../../components/projects/ProjectCode.astro";
 import ProjectModels from "../../components/projects/ProjectModels.astro";
+import RelatedProjects from "../../components/projects/RelatedProjects.astro";
 import {
 	getCollection,
 	render,
@@ -129,6 +130,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 				<Content />
 			</div>
 		</article>
+		<RelatedProjects project={project} />
 	</main>
 </BaseLayout>
 
