@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
+import Icon from "../ui/Icon.astro";
 
 interface GalleryItem {
 	image: ImageMetadata;
@@ -18,7 +19,7 @@ const { items, projectTitle } = Astro.props;
 
 <project-gallery class="project-gallery">
 	<div class="gallery-heading">
-		<p>Selected visuals</p>
+		<p><Icon name="images" size={16} /> Selected visuals</p>
 		<span>{items.length.toString().padStart(2, "0")}</span>
 	</div>
 
@@ -36,7 +37,9 @@ const { items, projectTitle } = Astro.props;
 							aria-label={`Open image ${index + 1} of ${items.length}`}
 						>
 							<Image src={item.image} alt={item.alt} loading="lazy" />
-							<span aria-hidden="true">View</span>
+							<span class="view-label" aria-hidden="true">
+								<Icon name="maximize-2" size={14} /> View
+							</span>
 						</button>
 
 						{item.caption && <figcaption>{item.caption}</figcaption>}
@@ -49,7 +52,7 @@ const { items, projectTitle } = Astro.props;
 	<dialog data-gallery-dialog aria-label={`${projectTitle} image viewer`}>
 		<div class="viewer-panel">
 			<button type="button" class="viewer-close" data-gallery-close aria-label="Close image viewer">
-				<span aria-hidden="true">×</span>
+				<Icon name="plus" size={22} />
 			</button>
 
 			<img data-gallery-image alt="" />
@@ -124,6 +127,12 @@ const { items, projectTitle } = Astro.props;
 		text-transform: uppercase;
 	}
 
+	.gallery-heading p {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
 	ul {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -170,7 +179,7 @@ const { items, projectTitle } = Astro.props;
 		filter: brightness(0.75);
 	}
 
-	figure > button > span {
+	.view-label {
 		position: absolute;
 		right: 1rem;
 		bottom: 1rem;
@@ -189,8 +198,14 @@ const { items, projectTitle } = Astro.props;
 			transform 180ms ease;
 	}
 
-	figure > button:hover > span,
-	figure > button:focus-visible > span {
+	.view-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	figure > button:hover > .view-label,
+	figure > button:focus-visible > .view-label {
 		opacity: 1;
 		transform: translateY(0);
 	}
@@ -253,6 +268,10 @@ const { items, projectTitle } = Astro.props;
 		cursor: pointer;
 	}
 
+	.viewer-close :global(svg) {
+		transform: rotate(45deg);
+	}
+
 	.viewer-panel > p {
 		margin: 0;
 		padding: 1rem 1.25rem;
@@ -266,7 +285,7 @@ const { items, projectTitle } = Astro.props;
 			grid-template-columns: 1fr;
 		}
 
-		figure > button > span {
+		.view-label {
 			opacity: 1;
 			transform: none;
 		}
@@ -274,7 +293,7 @@ const { items, projectTitle } = Astro.props;
 
 	@media (prefers-reduced-motion: reduce) {
 		figure :global(img),
-		figure > button > span {
+		.view-label {
 			transition: none;
 		}
 	}

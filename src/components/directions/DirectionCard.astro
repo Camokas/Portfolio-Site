@@ -1,21 +1,26 @@
 ---
+import Icon from "../ui/Icon.astro";
+import type { IconName } from "../../data/icons";
+
 interface Props {
 	numberLabel: string;
 	title: string;
 	description: string;
 	slug: string;
+	icon: IconName;
 }
 
-const { numberLabel, title, description, slug } = Astro.props;
+const { numberLabel, title, description, slug, icon } = Astro.props;
 
 const href = `${import.meta.env.BASE_URL}directions/${slug}/`;
 ---
 
 <li class="direction-item">
 	<a class="direction-card" href={href}>
-		<span class="direction-number" aria-hidden="true">
-			{numberLabel}
-		</span>
+		<div class="direction-marker" aria-hidden="true">
+			<span class="direction-icon"><Icon name={icon} size={22} /></span>
+			<span class="direction-number">{numberLabel}</span>
+		</div>
 
 		<h3>{title}</h3>
 
@@ -60,6 +65,34 @@ const href = `${import.meta.env.BASE_URL}directions/${slug}/`;
 		font-size: 0.75rem;
 		font-weight: 700;
 		letter-spacing: 0.12em;
+	}
+
+	.direction-marker {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.direction-icon {
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		aspect-ratio: 1;
+		color: var(--color-text);
+		border: 1px solid var(--color-border);
+		border-radius: 50%;
+		transition:
+			color 180ms ease,
+			border-color 180ms ease,
+			transform 180ms ease;
+	}
+
+	.direction-card:hover .direction-icon {
+		color: var(--color-background);
+		border-color: var(--color-accent);
+		background: var(--color-accent);
+		transform: rotate(-5deg);
 	}
 
 	h3 {

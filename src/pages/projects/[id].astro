@@ -7,6 +7,7 @@ import {
 	type CollectionEntry,
 } from "astro:content";
 import { directions } from "../../data/directions";
+import Icon from "../../components/ui/Icon.astro";
 
 export async function getStaticPaths() {
 	const projects = await getCollection("projects", ({ data }) => !data.draft);
@@ -46,12 +47,16 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 	lang="en"
 >
 	<main class="project-page">
-		<a class="back-link" href={directionUrl}>← Back to {direction.title}</a>
+		<a class="back-link" href={directionUrl}>
+			<Icon name="arrow-left" size={17} /> Back to {direction.title}
+		</a>
 
 		<article>
 			<header class="project-header">
 				<div class="project-labels">
-					<p class="eyebrow">{direction.title}</p>
+					<p class="eyebrow">
+						<Icon name={direction.icon} size={15} /> {direction.title}
+					</p>
 
 					{project.data.demo && <span class="demo-label">Demo content</span>}
 				</div>
@@ -97,7 +102,9 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 	}
 
 	.back-link {
-		display: inline-block;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
 		color: var(--color-accent);
 		font-weight: 700;
 		text-decoration: none;
@@ -136,6 +143,12 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 		font-weight: 700;
 		letter-spacing: 0.14em;
 		text-transform: uppercase;
+	}
+
+	.eyebrow {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
 	}
 
 	.demo-label {

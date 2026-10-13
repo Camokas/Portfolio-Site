@@ -16,8 +16,9 @@ interface CachedCommit {
 	storedAt: number;
 }
 
-const CACHE_KEY = "portfolio-latest-commit-v1";
-const CACHE_DURATION = 60 * 60 * 1000;
+const CACHE_KEY = "portfolio-latest-commit-v2";
+const OLD_CACHE_KEY = "portfolio-latest-commit-v1";
+const CACHE_DURATION = 5 * 60 * 1000;
 
 const commitLink = document.querySelector<HTMLAnchorElement>(
 	"[data-latest-commit]",
@@ -58,9 +59,32 @@ function readCachedCommit(): CachedCommit | null {
 function writeCachedCommit(commit: CachedCommit): void {
 	try {
 		localStorage.setItem(CACHE_KEY, JSON.stringify(commit));
+		localStorage.removeItem(OLD_CACHE_KEY);
 	} catch {
 		// The date still works when browser storage is unavailable.
 	}
+}
+
+function getRenderedCommit(): CachedCommit | null {
+	if (!commitLink || !commitTime || !commitTime.dateTime) {
+		return null;
+	}
+
+	const date = new Date(commitTime.dateTime);
+
+	if (Number.isNaN(date.getTime())) {
+		return null;
+	}
+
+	return {
+		date: date.toISOString(),
+		url: commitLink.href,
+		storedAt: 0,
+	};
+}
+
+function isNewerThan(candidate: CachedCommit, current: CachedCommit | null): boolean {
+	return !current || new Date(candidate.date).getTime() > new Date(current.date).getTime();
 }
 
 function showCommit(commit: CachedCommit): void {
@@ -93,6 +117,7 @@ async function fetchLatestCommit(
 	repositoryUrl: string,
 ): Promise<CachedCommit> {
 	const response = await fetch(apiUrl, {
+		cache: "no-store",
 		headers: {
 			Accept: "application/vnd.github+json",
 		},
@@ -140,9 +165,10 @@ async function updateLatestCommit(): Promise<void> {
 		return;
 	}
 
+	const renderedCommit = getRenderedCommit();
 	const cachedCommit = readCachedCommit();
 
-	if (cachedCommit) {
+	if (cachedCommit && isNewerThan(cachedCommit, renderedCommit)) {
 		showCommit(cachedCommit);
 	}
 
@@ -156,12 +182,13 @@ async function updateLatestCommit(): Promise<void> {
 	try {
 		const latestCommit = await fetchLatestCommit(apiUrl, repositoryUrl);
 		writeCachedCommit(latestCommit);
-		showCommit(latestCommit);
-	} catch {
-		if (!cachedCommit) {
-			commitTime.textContent = "Unavailable";
-			commitLink.title = "Open the repository on GitHub";
+
+		const visibleCommit = getRenderedCommit();
+		if (!visibleCommit || isNewerThan(latestCommit, visibleCommit)) {
+			showCommit(latestCommit);
 		}
+	} catch {
+		// Keep the build-time commit visible when GitHub is temporarily unavailable.
 	}
 }
 

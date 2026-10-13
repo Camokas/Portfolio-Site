@@ -1,4 +1,6 @@
 ---
+import Icon from "../ui/Icon.astro";
+
 const baseUrl = import.meta.env.BASE_URL;
 const directionsUrl = `${baseUrl}#directions`;
 const projectsUrl = `${baseUrl}projects/`;
@@ -19,6 +21,7 @@ const isProjectsPage = Astro.url.pathname.startsWith(projectsUrl);
 				href={baseUrl}
 				aria-current={isHomePage ? "page" : undefined}
 			>
+				<Icon name="house" size={16} />
 				Home
 			</a>
 
@@ -27,6 +30,7 @@ const isProjectsPage = Astro.url.pathname.startsWith(projectsUrl);
 				href={directionsUrl}
 				aria-current={isDirectionPage ? "page" : undefined}
 			>
+				<Icon name="compass" size={16} />
 				Directions
 			</a>
 
@@ -35,6 +39,7 @@ const isProjectsPage = Astro.url.pathname.startsWith(projectsUrl);
 				href={projectsUrl}
 				aria-current={isProjectsPage ? "page" : undefined}
 			>
+				<Icon name="layout-grid" size={16} />
 				Projects
 			</a>
 		</nav>
@@ -80,6 +85,9 @@ const isProjectsPage = Astro.url.pathname.startsWith(projectsUrl);
 	}
 
 	.nav-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
 		color: var(--color-muted);
 		font-size: clamp(0.78rem, 2.5vw, 0.9rem);
 		font-weight: 650;
@@ -97,5 +105,17 @@ const isProjectsPage = Astro.url.pathname.startsWith(projectsUrl);
 		outline: 2px solid var(--color-accent);
 		outline-offset: 0.3rem;
 		border-radius: 0.15rem;
+	}
+
+	@media (max-width: 32rem) {
+		.nav-link {
+			gap: 0;
+			font-size: 0;
+		}
+
+		.nav-link :global(svg) {
+			width: 1.15rem;
+			height: 1.15rem;
+		}
 	}
 </style>

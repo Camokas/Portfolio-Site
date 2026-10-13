@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
+import Icon from "../ui/Icon.astro";
 
 interface Props {
 	project: CollectionEntry<"projects">;
@@ -38,7 +39,9 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 
 				<p>{project.data.summary}</p>
 
-				<span class="project-action" aria-hidden="true">View project →</span>
+				<span class="project-action" aria-hidden="true">
+					View project <Icon name="arrow-right" size={17} />
+				</span>
 			</div>
 		</a>
 	</article>
@@ -136,10 +139,21 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 	}
 
 	.project-action {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
 		margin-top: auto;
 		padding-top: 1.5rem;
 		color: var(--color-accent);
 		font-size: 0.9rem;
 		font-weight: 700;
+	}
+
+	.project-action :global(svg) {
+		transition: transform 180ms ease;
+	}
+
+	.project-card > a:hover .project-action :global(svg) {
+		transform: translateX(0.2rem);
 	}
 </style>

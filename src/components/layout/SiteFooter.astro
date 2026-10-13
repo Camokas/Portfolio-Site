@@ -1,10 +1,20 @@
 ---
+import Icon from "../ui/Icon.astro";
+import { getBuildCommit } from "../../data/latestCommit";
+
 const currentYear = new Date().getFullYear();
 const homeUrl = import.meta.env.BASE_URL;
 const contactUrl = `${homeUrl}#contact`;
 const repositoryUrl = "https://github.com/Camokas/Portfolio-Site";
 const commitsApiUrl =
-	"https://api.github.com/repos/Camokas/Portfolio-Site/commits?per_page=1";
+	"https://api.github.com/repos/Camokas/Portfolio-Site/commits?sha=master&per_page=1";
+const buildCommit = getBuildCommit(repositoryUrl);
+const formattedCommitDate = buildCommit
+	? new Intl.DateTimeFormat("en", {
+			dateStyle: "medium",
+			timeStyle: "short",
+		}).format(new Date(buildCommit.date))
+	: "View repository";
 ---
 
 <footer class="site-footer">
@@ -13,24 +23,27 @@ const commitsApiUrl =
 			<p>© {currentYear} Camoka</p>
 
 			<p class="last-updated" aria-live="polite">
+				<Icon name="clock-3" size={15} />
 				<span>Last website update:</span>
 
 				<a
-					href={repositoryUrl}
+					href={buildCommit?.url ?? repositoryUrl}
 					target="_blank"
 					rel="noreferrer"
 					data-latest-commit
 					data-api-url={commitsApiUrl}
 					data-repository-url={repositoryUrl}
 				>
-					<time data-latest-commit-date>Checking…</time>
+					<time datetime={buildCommit?.date} data-latest-commit-date>
+						{formattedCommitDate}
+					</time>
 				</a>
 			</p>
 		</div>
 
 		<nav aria-label="Footer navigation">
-			<a href={contactUrl}>Contact</a>
-			<a href={homeUrl}>Back to home</a>
+			<a href={contactUrl}><Icon name="mail" size={16} />Contact</a>
+			<a href={homeUrl}><Icon name="house" size={16} />Back to home</a>
 		</nav>
 	</div>
 </footer>
@@ -70,6 +83,7 @@ const commitsApiUrl =
 
 	.last-updated {
 		display: flex;
+		align-items: center;
 		flex-wrap: wrap;
 		gap: 0.35rem;
 		font-size: 0.85rem;
@@ -79,6 +93,12 @@ const commitsApiUrl =
 		color: var(--color-text);
 		font-weight: 650;
 		text-decoration: none;
+	}
+
+	nav a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
 	}
 
 	a:hover {

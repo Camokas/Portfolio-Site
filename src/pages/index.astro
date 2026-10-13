@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import DirectionCard from "../components/directions/DirectionCard.astro";
+import Icon from "../components/ui/Icon.astro";
 import { contactLinks } from "../data/contactLinks";
 import { directions } from "../data/directions";
 
@@ -34,7 +35,10 @@ import { directions } from "../data/directions";
 					<span class="about-toggle" aria-hidden="true">
 						<span class="toggle-open">Read more</span>
 						<span class="toggle-close">Show less</span>
-						<span class="toggle-icon">+</span>
+						<span class="toggle-icon">
+							<span class="toggle-plus"><Icon name="plus" size={18} /></span>
+							<span class="toggle-minus"><Icon name="minus" size={18} /></span>
+						</span>
 					</span>
 				</summary>
 
@@ -59,7 +63,9 @@ import { directions } from "../data/directions";
 			aria-labelledby="directions-title"
 		>
 			<div class="section-heading">
-				<p class="section-kicker">What I explore</p>
+				<p class="section-kicker">
+					<Icon name="compass" size={15} /> What I explore
+				</p>
 
 				<h2 id="directions-title">Creative Directions</h2>
 
@@ -77,6 +83,7 @@ import { directions } from "../data/directions";
 							title={direction.title}
 							description={direction.description}
 							slug={direction.slug}
+							icon={direction.icon}
 						/>
 					))
 				}
@@ -85,7 +92,9 @@ import { directions } from "../data/directions";
 
 		<section id="contact" class="contact" aria-labelledby="contact-title">
 			<div class="contact-heading">
-				<p class="section-kicker">Get in touch</p>
+				<p class="section-kicker">
+					<Icon name="mail" size={15} /> Get in touch
+				</p>
 
 				<h2 id="contact-title">Contact</h2>
 			</div>
@@ -102,6 +111,10 @@ import { directions } from "../data/directions";
 						contactLinks.map((link) => (
 							<li>
 								<a href={link.href} target="_blank" rel="noreferrer">
+									<span class="contact-link-icon" aria-hidden="true">
+										<Icon name={link.icon} size={20} />
+									</span>
+
 									<span class="contact-link-copy">
 										<span class="contact-link-name">{link.label}</span>
 										<span class="contact-link-detail">{link.detail}</span>
@@ -110,7 +123,9 @@ import { directions } from "../data/directions";
 										</span>
 									</span>
 
-									<span class="contact-link-arrow" aria-hidden="true">↗</span>
+									<span class="contact-link-arrow" aria-hidden="true">
+										<Icon name="external-link" size={18} />
+									</span>
 								</a>
 							</li>
 						))
@@ -232,6 +247,10 @@ import { directions } from "../data/directions";
 			border-color 180ms ease;
 	}
 
+	.toggle-minus {
+		display: none;
+	}
+
 	.about-details summary:hover .toggle-icon {
 		border-color: var(--color-accent);
 	}
@@ -244,8 +263,12 @@ import { directions } from "../data/directions";
 		display: inline;
 	}
 
-	.about-details[open] .toggle-icon {
-		transform: rotate(45deg);
+	.about-details[open] .toggle-plus {
+		display: none;
+	}
+
+	.about-details[open] .toggle-minus {
+		display: block;
 	}
 
 	.about-expanded {
@@ -275,6 +298,9 @@ import { directions } from "../data/directions";
 	}
 
 	.section-kicker {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
 		margin: 0;
 		color: var(--color-accent);
 		font-size: 0.75rem;
@@ -344,7 +370,7 @@ import { directions } from "../data/directions";
 
 	.contact-links a {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-columns: auto minmax(0, 1fr) auto;
 		align-items: center;
 		gap: 1.5rem;
 		padding: 1.25rem 1.5rem;
@@ -356,6 +382,16 @@ import { directions } from "../data/directions";
 		transition:
 			transform 180ms ease,
 			border-color 180ms ease;
+	}
+
+	.contact-link-icon {
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		aspect-ratio: 1;
+		color: var(--color-accent);
+		border: 1px solid var(--color-border);
+		border-radius: 50%;
 	}
 
 	.contact-links a:hover {
@@ -394,7 +430,11 @@ import { directions } from "../data/directions";
 
 	.contact-link-arrow {
 		color: var(--color-accent);
-		font-size: 1.25rem;
+		transition: transform 180ms ease;
+	}
+
+	.contact-links a:hover .contact-link-arrow {
+		transform: translate(0.15rem, -0.15rem);
 	}
 
 	@keyframes reveal-description {
