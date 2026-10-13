@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+	<title id="title">Demo game mechanics diagram</title>
+	<desc id="description">An abstract monochrome diagram made from connected geometric shapes.</desc>
+	<rect width="1600" height="900" fill="#0e0e0e"/>
+	<path d="M155 226 463 450 800 210l337 240 308-224M155 674l308-224 337 240 337-240 308 224" fill="none" stroke="#383838" stroke-width="2"/>
+	<circle cx="155" cy="226" r="82" fill="#161616" stroke="#777" stroke-width="2"/>
+	<circle cx="463" cy="450" r="118" fill="#161616" stroke="#fdfcfc" stroke-width="3"/>
+	<circle cx="800" cy="210" r="66" fill="#fdfcfc"/>
+	<circle cx="1137" cy="450" r="118" fill="#161616" stroke="#fdfcfc" stroke-width="3"/>
+	<circle cx="1445" cy="226" r="82" fill="#161616" stroke="#777" stroke-width="2"/>
+	<rect x="85" y="604" width="140" height="140" rx="28" fill="#161616" stroke="#777" stroke-width="2" transform="rotate(45 155 674)"/>
+	<rect x="730" y="620" width="140" height="140" rx="28" fill="#161616" stroke="#fdfcfc" stroke-width="3" transform="rotate(45 800 690)"/>
+	<rect x="1375" y="604" width="140" height="140" rx="28" fill="#161616" stroke="#777" stroke-width="2" transform="rotate(45 1445 674)"/>
+	<path d="M424 450h78M1098 450h78M761 210h78M761 690h78" stroke="#0e0e0e" stroke-width="12" stroke-linecap="round"/>
+	<text x="80" y="840" fill="#b4b4b4" font-family="Arial, sans-serif" font-size="28" letter-spacing="8">DEMO CONTENT / MECHANICS STUDY 02</text>
+</svg>

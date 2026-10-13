@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectGallery from "../../components/projects/ProjectGallery.astro";
 import {
 	getCollection,
 	render,
@@ -71,6 +72,15 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 					}
 				</div>
 			</header>
+
+			{
+				project.data.gallery.length > 0 && (
+					<ProjectGallery
+						items={project.data.gallery}
+						projectTitle={project.data.title}
+					/>
+				)
+			}
 
 			<div class="project-content">
 				<Content />

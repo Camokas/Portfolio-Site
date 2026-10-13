@@ -8,12 +8,22 @@ const projects = defineCollection({
 		base: "./src/content/projects",
 		pattern: "**/*.md",
 	}),
-	schema: z.object({
+	schema: ({ image }) => z.object({
 		title: z.string(),
 		summary: z.string(),
 		direction: z.enum(directionSlugs),
 		date: z.coerce.date(),
 		tags: z.array(z.string()).default([]),
+		cover: image().optional(),
+		gallery: z
+			.array(
+				z.object({
+					image: image(),
+					alt: z.string(),
+					caption: z.string().optional(),
+				}),
+			)
+			.default([]),
 		featured: z.boolean().default(false),
 		draft: z.boolean().default(false),
 		demo: z.boolean().default(false),

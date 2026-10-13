@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
@@ -17,7 +18,13 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 	<article class="project-card">
 		<a href={projectUrl} aria-label={`Open ${project.data.title}`}>
 			<div class="project-preview">
-				<span>{project.data.demo ? "Demo content" : "Project"}</span>
+				{
+					project.data.cover ? (
+						<Image src={project.data.cover} alt="" loading="lazy" />
+					) : (
+						<span>{project.data.demo ? "Demo content" : "Project"}</span>
+					)
+				}
 			</div>
 
 			<div class="project-content">
@@ -74,6 +81,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 	.project-preview {
 		display: grid;
 		place-items: center;
+		overflow: hidden;
 		color: var(--color-accent);
 		font-size: 0.75rem;
 		font-weight: 700;
@@ -83,6 +91,18 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 			linear-gradient(135deg, transparent 35%, rgb(255 192 167 / 0.12)),
 			#211914;
 		border-bottom: 1px solid var(--color-border);
+	}
+
+	.project-preview :global(img) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 300ms ease;
+	}
+
+	.project-card > a:hover .project-preview :global(img) {
+		transform: scale(1.025);
 	}
 
 	.project-content {

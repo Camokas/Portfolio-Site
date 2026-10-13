@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+	<title id="title">Demo game interface</title>
+	<desc id="description">An abstract monochrome game interface with a circular map and status panels.</desc>
+	<rect width="1600" height="900" fill="#0e0e0e"/>
+	<path d="M0 120H1600M0 450H1600M0 780H1600M220 0V900M800 0V900M1380 0V900" stroke="#242424"/>
+	<circle cx="800" cy="450" r="270" fill="#161616" stroke="#fdfcfc" stroke-width="2"/>
+	<circle cx="800" cy="450" r="185" fill="none" stroke="#555" stroke-dasharray="7 15"/>
+	<path d="M800 230V670M580 450H1020" stroke="#383838"/>
+	<path d="M688 554 748 390l66 68 98-122" fill="none" stroke="#fdfcfc" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+	<circle cx="748" cy="390" r="16" fill="#fdfcfc"/>
+	<circle cx="814" cy="458" r="11" fill="#0e0e0e" stroke="#fdfcfc" stroke-width="5"/>
+	<rect x="80" y="80" width="360" height="155" rx="22" fill="#161616" stroke="#383838"/>
+	<rect x="1160" y="665" width="360" height="155" rx="22" fill="#161616" stroke="#383838"/>
+	<path d="M125 133H365M125 178H280M1205 718H1445M1205 763H1360" stroke="#777" stroke-width="12" stroke-linecap="round"/>
+	<text x="80" y="840" fill="#b4b4b4" font-family="Arial, sans-serif" font-size="28" letter-spacing="8">DEMO CONTENT / INTERFACE STUDY 01</text>
+</svg>
