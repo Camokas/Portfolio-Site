@@ -4,37 +4,38 @@ import DirectionCard from "../components/directions/DirectionCard.astro";
 import Icon from "../components/ui/Icon.astro";
 import { contactLinks } from "../data/contactLinks";
 import { directions } from "../data/directions";
+import { home } from "../data/home";
 
 ---
 
 <BaseLayout
-	title="Camoka's Portfolio"
-	description="Camoka's multimedia portfolio featuring creative and development projects."
+	title={home.pageTitle}
+	description={home.pageDescription}
 	lang="en"
 >
 	<main id="main-content" tabindex="-1">
 		<section class="hero" aria-labelledby="hero-title">
-			<p class="eyebrow">Portfolio website</p>
+			<p class="eyebrow">{home.eyebrow}</p>
 
-			<h1 id="hero-title">Camoka</h1>
+			<h1 id="hero-title">{home.name}</h1>
 
-			<p class="alias">or Daniil Doroshkin</p>
+			<p class="alias">{home.alias}</p>
 		</section>
 
-		<section class="about" aria-label="About this portfolio">
+		<section class="about" aria-label={home.aboutTitle}>
 			<details class="about-details">
 				<summary>
 					<span class="about-heading">
-						<span class="about-label">About this portfolio</span>
+						<span class="about-label">{home.aboutTitle}</span>
 
 						<span class="about-preview">
-							A multidisciplinary collection of creative and development work.
+							{home.aboutPreview}
 						</span>
 					</span>
 
 					<span class="about-toggle" aria-hidden="true">
-						<span class="toggle-open">Read more</span>
-						<span class="toggle-close">Show less</span>
+						<span class="toggle-open">{home.readMore}</span>
+						<span class="toggle-close">{home.showLess}</span>
 						<span class="toggle-icon">
 							<span class="toggle-plus"><Icon name="plus" size={18} /></span>
 							<span class="toggle-minus"><Icon name="minus" size={18} /></span>
@@ -43,16 +44,7 @@ import { directions } from "../data/directions";
 				</summary>
 
 				<div class="about-expanded">
-					<p>
-						I work across software development and digital art, combining
-						technical experiments with visual storytelling, sound, motion, and
-						interactive ideas.
-					</p>
-
-					<p>
-						This portfolio brings together finished projects, prototypes,
-						studies, and works in progress from every direction I explore.
-					</p>
+					{home.aboutParagraphs.map((paragraph) => <p>{paragraph}</p>)}
 				</div>
 			</details>
 		</section>
@@ -64,14 +56,13 @@ import { directions } from "../data/directions";
 		>
 			<div class="section-heading">
 				<p class="section-kicker">
-					<Icon name="compass" size={15} /> What I explore
+					<Icon name="compass" size={15} /> {home.directionsKicker}
 				</p>
 
-				<h2 id="directions-title">Creative Directions</h2>
+				<h2 id="directions-title">{home.directionsTitle}</h2>
 
 				<p class="section-description">
-					Nine areas bringing together development, visual art, sound, motion,
-					and interactive experiments.
+					{home.directionsDescription}
 				</p>
 			</div>
 
@@ -93,17 +84,15 @@ import { directions } from "../data/directions";
 		<section id="contact" class="contact" aria-labelledby="contact-title">
 			<div class="contact-heading">
 				<p class="section-kicker">
-					<Icon name="mail" size={15} /> Get in touch
+					<Icon name="mail" size={15} /> {home.contactKicker}
 				</p>
 
-				<h2 id="contact-title">Contact</h2>
+				<h2 id="contact-title">{home.contactTitle}</h2>
 			</div>
 
 			<div class="contact-content">
 				<p class="contact-description">
-					For now, GitHub is the best place to follow my work and the
-					development of this portfolio. More contact methods can be added
-					here later.
+					{home.contactDescription}
 				</p>
 
 				<ul class="contact-links">

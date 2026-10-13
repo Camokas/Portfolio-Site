@@ -1,0 +1,96 @@
+---
+# Копируйте в src/content/projects/my-project.md.
+# Примеры медиа закомментированы: включайте только после добавления своих файлов.
+# Уберите начальные «# » у ВСЕХ строк нужного блока, сохранив остальные отступы.
+title: "Название работы"
+summary: "Краткое описание для карточки, поиска и начала страницы."
+direction: "3d-modeling"
+date: 2026-10-13
+tags: ["Blender", "Texturing"]
+draft: true
+demo: false
+
+# cover: "../../assets/projects/my-project/cover.webp"
+
+# gallery:
+#   - image: "../../assets/projects/my-project/render.webp"
+#     alt: "Что изображено: объект, ракурс и важные детали"
+#     caption: "Подпись под изображением"
+
+# models:
+#   - title: "Название модели"
+#     description: "Краткое описание модели"
+#     kind: "glb"
+#     src: "projects/my-project/model.glb"
+#     poster: "projects/my-project/model-preview.png"
+#     autoRotate: true
+
+# videos:
+#   - title: "Демонстрация работы"
+#     caption: "Что показано в ролике"
+#     poster: "../../assets/projects/my-project/video-poster.webp"
+#     preload: "metadata"
+#     loop: false
+#     muted: false
+#     sources:
+#       - src: "projects/my-project/demo.mp4"
+#         type: "video/mp4"
+
+# audio:
+#   - title: "Название трека"
+#     artist: "Camoka"
+#     caption: "Как создавался звук"
+#     preload: "metadata"
+#     sources:
+#       - src: "projects/my-project/track.mp3"
+#         type: "audio/mpeg"
+
+# downloads:
+#   - label: "Скачать материалы"
+#     file: "projects/my-project/materials.zip"
+#     description: "Что внутри архива"
+#     format: "ZIP"
+#     size: "12 MB"
+
+# links:
+#   - label: "Исходный код"
+#     href: "https://github.com/Camokas/Portfolio-Site"
+#     description: "Замените адрес на репозиторий этой работы"
+#     kind: "source"
+
+# codeSamples:
+#   - title: "Ключевая часть алгоритма"
+#     filename: "example.ts"
+#     language: "ts"
+#     description: "Что делает этот фрагмент"
+#     code: |
+#       export function clamp(value: number, min: number, max: number) {
+#         return Math.min(max, Math.max(min, value));
+#       }
+---
+
+## О проекте
+
+Задача, идея и контекст. Замените этот текст своим.
+
+## Моя роль
+
+Что вы сделали сами. Если работа командная — укажите участников и их вклад.
+
+## Процесс
+
+1. С чего начали.
+2. Какие решения приняли.
+3. Что изменили после проверки.
+
+## Технические детали
+
+Инструменты, ограничения и интересные решения.
+
+## Результат
+
+Что получилось. При необходимости добавьте следующие шаги.
+
+## Авторы и материалы
+
+Укажите источники чужих материалов и условия их использования, если такие есть.
