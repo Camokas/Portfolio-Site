@@ -37,7 +37,7 @@ class MediaPreview extends HTMLElement {
 		if (!this.running) { clearInterval(this.timer); this.timer = undefined; return; }
 		this.preload();
 		if (this.items.length > 1 && !this.timer) {
-			this.timer = setInterval(() => this.advance(), 1000);
+			this.timer = setInterval(() => this.advance(), 2000);
 		}
 	}
 	updateVideo() {
@@ -49,7 +49,7 @@ class MediaPreview extends HTMLElement {
 	}
 	preload() {
 		if (!this.running) return;
-		// Slow video/model loading never blocks the one-second slideshow clock.
+		// Slow video/model loading never blocks the slideshow clock.
 		for (let step = 1; step <= this.items.length && this.pending.size < 2; step++) {
 			const index = (this.index + step) % this.items.length;
 			if (this.prepared.has(index) || this.pending.has(index) || this.failed.has(index)) continue;
@@ -80,7 +80,7 @@ class MediaPreview extends HTMLElement {
 		void element.offsetWidth;
 		element.classList.add("active");
 		old.forEach((node) => node.classList.remove("active"));
-		setTimeout(() => old.forEach((node) => node.remove()), 750);
+		setTimeout(() => old.forEach((node) => node.remove()), 1250);
 		this.index = index;
 		this.updateVideo();
 	}

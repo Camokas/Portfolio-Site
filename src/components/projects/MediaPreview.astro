@@ -19,7 +19,7 @@ const initialImage = first?.kind === "image" ? first.src : first?.poster;
 <style>
 	media-preview { position: absolute; inset: 0; display: block; overflow: hidden; pointer-events: none; }
 	.preview-layers { position: absolute; inset: 0; }
-	media-preview :global(.slide) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 700ms ease; }
+	media-preview :global(.slide) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1); }
 	media-preview :global(.slide.active) { opacity: 1; }
 	media-preview :global(.slide.model) { object-fit: contain; padding: 0.35rem; }
 	@media (prefers-reduced-motion: reduce) { media-preview :global(.slide) { transition: none; } }
