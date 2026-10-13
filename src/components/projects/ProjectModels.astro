@@ -165,8 +165,7 @@ const { items } = Astro.props;
 				controls.maxDistance = 10;
 				controls.target.set(0, 0, 0);
 
-				const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-				controls.autoRotate = this.dataset.autoRotate === "true" && !prefersReducedMotion;
+				controls.autoRotate = this.dataset.autoRotate === "true";
 				controls.autoRotateSpeed = 1.2;
 
 				const updateRotationButton = () => {
@@ -176,6 +175,12 @@ const { items } = Astro.props;
 
 				updateRotationButton();
 
+				const stopAutoRotation = () => {
+					controls.autoRotate = false;
+					updateRotationButton();
+				};
+				controls.addEventListener("start", stopAutoRotation);
+
 				const toggleRotation = () => {
 					controls.autoRotate = !controls.autoRotate;
 					updateRotationButton();
@@ -183,6 +188,7 @@ const { items } = Astro.props;
 				rotationButton.addEventListener("click", toggleRotation);
 
 				const resetCamera = () => {
+					stopAutoRotation();
 					camera.position.copy(defaultCameraPosition);
 					controls.target.set(0, 0, 0);
 					controls.update();
@@ -236,6 +242,7 @@ const { items } = Astro.props;
 					canvas.removeEventListener("webglcontextrestored", contextRestored);
 					document.removeEventListener("visibilitychange", resumeRendering);
 					resizeObserver.disconnect();
+					controls.removeEventListener("start", stopAutoRotation);
 					controls.dispose();
 					geometry.dispose();
 					material.dispose();
