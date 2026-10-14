@@ -2,11 +2,12 @@ import { getImage } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
 export interface PreviewMedia {
-	kind: "image" | "video" | "model";
+	kind: "image" | "video" | "model" | "code";
 	src: string;
 	poster?: string;
 	sources?: { src: string; type: string }[];
 	label: string;
+	code?: Pick<CollectionEntry<"projects">["data"]["codeSamples"][number], "code" | "language">;
 }
 
 const publicUrl = (src: string) => /^https?:\/\//.test(src)
@@ -30,6 +31,10 @@ export async function projectPreviews(project: CollectionEntry<"projects">): Pro
 	for (const model of data.models) {
 		previews.push({ kind: "model", src: model.src ? publicUrl(model.src) : "",
 			poster: model.poster ? publicUrl(model.poster) : undefined, label: model.title });
+	}
+	for (const sample of data.codeSamples) {
+		previews.push({ kind: "code", src: "", label: sample.filename,
+			code: { code: sample.code, language: sample.language } });
 	}
 	return previews;
 }

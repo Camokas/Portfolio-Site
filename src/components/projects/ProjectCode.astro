@@ -1,6 +1,7 @@
 ---
 import { Code } from "astro:components";
 import CollapsibleSection from "../ui/CollapsibleSection.astro";
+import Icon from "../ui/Icon.astro";
 
 type CodeLanguage =
 	| "astro"
@@ -36,8 +37,17 @@ const { items } = Astro.props;
 <CollapsibleSection title="Code" icon="code-2" count={items.length} section="code">
 	<div class="code-list">
 		{
-			items.map((item) => (
-				<code-sample class="code-sample">
+			items.map((item, index) => (
+				<code-sample class="code-sample" data-code-key={`${item.filename}:${index}`}>
+					<details>
+						<summary>
+							<div class="sample-copy">
+								<h3>{item.title}</h3>
+								<p>{item.filename} · {item.language}</p>
+								{item.description && <p>{item.description}</p>}
+							</div>
+							<span class="code-chevron" aria-hidden="true"><Icon name="chevron-down" size={18} /></span>
+						</summary>
 					<header>
 						<div>
 							<p>{item.filename}</p>
@@ -47,14 +57,10 @@ const { items } = Astro.props;
 						<button type="button" data-copy-code>Copy code</button>
 					</header>
 
-					<div class="sample-copy">
-						<h3>{item.title}</h3>
-						{item.description && <p>{item.description}</p>}
-					</div>
-
 					<div class="code-block">
 						<Code code={item.code.trim()} lang={item.language} theme="github-dark" tabindex="0" role="region" aria-label={`Code: ${item.filename}`} />
 					</div>
+					</details>
 				</code-sample>
 			))
 		}
@@ -64,6 +70,14 @@ const { items } = Astro.props;
 <script>
 	class CodeSampleElement extends HTMLElement {
 		connectedCallback() {
+			const details = this.querySelector("details");
+			const storageKey = `portfolio-code:${location.pathname}:${this.dataset.codeKey}`;
+			if (details) {
+				try { details.open = localStorage.getItem(storageKey) === "open"; } catch { /* Keep default closed. */ }
+				details.addEventListener("toggle", () => {
+					try { localStorage.setItem(storageKey, details.open ? "open" : "closed"); } catch { /* Optional persistence. */ }
+				});
+			}
 			const button = this.querySelector<HTMLButtonElement>("[data-copy-code]");
 			const code = this.querySelector("pre code");
 
@@ -102,6 +116,11 @@ const { items } = Astro.props;
 		border-radius: 1rem;
 		background: var(--color-surface);
 	}
+	summary { display: flex; justify-content: space-between; align-items: center; gap: 1rem; cursor: pointer; list-style: none; }
+	summary::-webkit-details-marker { display: none; }
+	summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -3px; }
+	.code-chevron { flex-shrink: 0; margin-right: 1rem; transition: transform 180ms ease; }
+	details[open] .code-chevron { transform: rotate(180deg); }
 
 	header {
 		display: flex;

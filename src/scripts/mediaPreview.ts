@@ -8,7 +8,7 @@ class MediaPreview extends HTMLElement {
 	observer?: IntersectionObserver;
 	events?: AbortController;
 	failed = new Set<number>();
-	prepared = new Map<number, HTMLImageElement | HTMLVideoElement>();
+	prepared = new Map<number, HTMLElement>();
 	pending = new Set<number>();
 	get running() { return this.visible && !document.hidden && this.isConnected; }
 	connectedCallback() {
@@ -54,7 +54,7 @@ class MediaPreview extends HTMLElement {
 			const index = (this.index + step) % this.items.length;
 			if (this.prepared.has(index) || this.pending.has(index) || this.failed.has(index)) continue;
 			this.pending.add(index);
-			void this.prepare(this.items[index]).then((element) => {
+			void this.prepare(this.items[index], index).then((element) => {
 				if (!this.isConnected) { this.release(element); return; }
 				this.prepared.set(index, element);
 				if (this.index < 0 && this.running) this.show(index);
@@ -75,7 +75,7 @@ class MediaPreview extends HTMLElement {
 	show(index: number) {
 		const element = this.prepared.get(index)!;
 		const old = [...this.querySelectorAll<HTMLElement>(".slide")].filter((node) => node !== element);
-		element.className = `slide${this.items[index].kind === "model" ? " model" : ""}`;
+		element.className = `slide${this.items[index].kind === "model" ? " model" : this.items[index].kind === "code" ? " code-preview" : ""}`;
 		this.querySelector(".preview-layers")?.append(element);
 		element.classList.add("active");
 		// Explicit keyframes also work when a detached, cached element is reused.
@@ -92,10 +92,16 @@ class MediaPreview extends HTMLElement {
 		this.index = index;
 		this.updateVideo();
 	}
-	release(element: HTMLImageElement | HTMLVideoElement) {
+	release(element: HTMLElement) {
 		if (element instanceof HTMLVideoElement) { element.pause(); element.removeAttribute("src"); element.replaceChildren(); element.load(); }
 	}
-	async prepare(item: PreviewMedia): Promise<HTMLImageElement | HTMLVideoElement> {
+	async prepare(item: PreviewMedia, index: number): Promise<HTMLElement> {
+		if (item.kind === "code") {
+			const template = this.querySelector<HTMLTemplateElement>(`template[data-preview-code="${index}"]`);
+			const element = template?.content.firstElementChild?.cloneNode(true);
+			if (!(element instanceof HTMLElement)) throw new Error("Code preview unavailable");
+			return element;
+		}
 		if (item.kind === "video") {
 			const video = document.createElement("video");
 			video.muted = true; video.defaultMuted = true; video.playsInline = true; video.loop = true;
