@@ -1932,29 +1932,19 @@
 			this.disableChevronIfNeededForNode(inputNodeElement);
 			this.disableChevronIfNeededForNode(outputNodeElement);
 
-			var positionIn = this.getPosition(inputElement);
-			if (!isContextEdge)
-			{
-				positionIn.x -= 18;
-				positionIn.y -= 18;
-			}
-			else
-			{
-				positionIn.x -= 21;
-				positionIn.y -= 18;
-			}
-
-			var positionOut = this.getPosition(outputElement);
-			if (!isContextEdge)
-			{
-				positionOut.x -= 18;
-				positionOut.y -= 18;
-			}
-			else
-			{
-				positionOut.x -= 21;
-				positionOut.y -= 8;
-			}
+			// Convert actual port centers from viewport to SVG coordinates. The
+			// original fixed offsets depended on body padding and port dimensions.
+			// This also handles graph zoom/pan and context ports without exceptions.
+			const inverseMatrix = this.svgElement.getScreenCTM().inverse();
+			const portPosition = (element) => {
+				const bounds = element.getBoundingClientRect();
+				const point = this.svgElement.createSVGPoint();
+				point.x = bounds.left + bounds.width / 2;
+				point.y = bounds.top + bounds.height / 2;
+				return point.matrixTransform(inverseMatrix);
+			};
+			var positionIn = portPosition(inputElement);
+			var positionOut = portPosition(outputElement);
 			
 			let width = Math.abs(positionIn.x - positionOut.x);
 			let height= Math.abs(positionIn.y - positionOut.y);
