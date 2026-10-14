@@ -74,19 +74,14 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 
 		<article>
 			<header class="project-header">
-				<div class="project-labels">
-					<p class="eyebrow">
-						<Icon name={direction.icon} size={15} /> {direction.title}
-					</p>
-
-					{project.data.demo && <span class="demo-label">Demo content</span>}
-				</div>
-
 				<h1>{project.data.title}</h1>
 
 				<p class="summary">{project.data.summary}</p>
 
 				<div class="project-meta">
+					<p class="eyebrow">
+						<Icon name={direction.icon} size={15} /> {direction.title}
+					</p>
 					<time datetime={project.data.date.toISOString()}>{formattedDate}</time>
 
 					{
@@ -96,6 +91,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 							</ul>
 						)
 					}
+					{project.data.demo && <span class="demo-label">Demo content</span>}
 				</div>
 			</header>
 
@@ -186,7 +182,6 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 		padding-bottom: clamp(2rem, 4vw, 2.5rem);
 	}
 
-	.project-labels,
 	.project-meta,
 	.project-meta ul {
 		display: flex;
