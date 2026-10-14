@@ -7,13 +7,14 @@ interface Props {
 	icon: IconName;
 	count: number;
 	section: string;
+	open?: boolean;
 }
 
-const { title, icon, count, section } = Astro.props;
+const { title, icon, count, section, open = false } = Astro.props;
 ---
 
 <collapsible-section data-section={section}>
-	<details>
+	<details open={open}>
 		<summary>
 			<span class="section-title">
 				<Icon name={icon} size={17} />
@@ -43,7 +44,8 @@ const { title, icon, count, section } = Astro.props;
 			const storageKey = `portfolio-section:${window.location.pathname}:${section}`;
 
 			try {
-				details.open = localStorage.getItem(storageKey) === "open";
+				const savedState = localStorage.getItem(storageKey);
+				if (savedState !== null) details.open = savedState === "open";
 
 				details.addEventListener("toggle", () => {
 					try {

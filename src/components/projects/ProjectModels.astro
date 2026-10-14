@@ -12,16 +12,18 @@ interface ModelItem {
 
 interface Props {
 	items: ModelItem[];
+	sectionKey?: string;
+	open?: boolean;
 }
 
-const { items } = Astro.props;
+const { items, sectionKey = "models", open = false } = Astro.props;
 const baseUrl = import.meta.env.BASE_URL;
 const modelUrl = (src?: string) => src
 	? (/^https?:\/\//.test(src) ? src : `${baseUrl}${src.replace(/^\/+/, "")}`)
 	: undefined;
 ---
 
-<CollapsibleSection title="3D viewer" icon="box" count={items.length} section="models">
+<CollapsibleSection title="3D viewer" icon="box" count={items.length} section={sectionKey} open={open}>
 	<div class="model-list">
 		{
 			items.map((item) => (

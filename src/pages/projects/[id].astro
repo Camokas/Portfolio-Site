@@ -14,6 +14,14 @@ import {
 } from "astro:content";
 import { directions } from "../../data/directions";
 import Icon from "../../components/ui/Icon.astro";
+import Gallery from "../../components/projects/inline/Gallery.astro";
+import Video from "../../components/projects/inline/Video.astro";
+import Audio from "../../components/projects/inline/Audio.astro";
+import Models from "../../components/projects/inline/Models.astro";
+import Code from "../../components/projects/inline/Code.astro";
+import Resources from "../../components/projects/inline/Resources.astro";
+import Downloads from "../../components/projects/inline/Downloads.astro";
+import Links from "../../components/projects/inline/Links.astro";
 
 export async function getStaticPaths() {
 	const projects = await getCollection("projects", ({ data }) => !data.draft);
@@ -30,6 +38,8 @@ interface Props {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+const inline = project.data.mediaLayout === "inline";
+const mediaComponents = { Gallery, Image: Gallery, Video, Audio, Models, Code, Resources, Downloads, Links };
 const direction = directions.find(
 	(item) => item.slug === project.data.direction,
 );
@@ -88,7 +98,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 			</header>
 
 			{
-				project.data.gallery.length > 0 && (
+				!inline && project.data.gallery.length > 0 && (
 					<ProjectGallery
 						items={project.data.gallery}
 						projectTitle={project.data.title}
@@ -97,25 +107,25 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 			}
 
 			{
-				project.data.models.length > 0 && (
+				!inline && project.data.models.length > 0 && (
 					<ProjectModels items={project.data.models} />
 				)
 			}
 
 			{
-				project.data.videos.length > 0 && (
+				!inline && project.data.videos.length > 0 && (
 					<ProjectVideo items={project.data.videos} />
 				)
 			}
 
 			{
-				project.data.audio.length > 0 && (
+				!inline && project.data.audio.length > 0 && (
 					<ProjectAudio items={project.data.audio} />
 				)
 			}
 
 			{
-				(project.data.downloads.length > 0 || project.data.links.length > 0) && (
+				!inline && (project.data.downloads.length > 0 || project.data.links.length > 0) && (
 					<ProjectResources
 						downloads={project.data.downloads}
 						links={project.data.links}
@@ -124,13 +134,13 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 			}
 
 			{
-				project.data.codeSamples.length > 0 && (
+				!inline && project.data.codeSamples.length > 0 && (
 					<ProjectCode items={project.data.codeSamples} />
 				)
 			}
 
 			<div class="project-content">
-				<Content />
+				<Content components={mediaComponents} />
 			</div>
 		</article>
 		<RelatedProjects project={project} />

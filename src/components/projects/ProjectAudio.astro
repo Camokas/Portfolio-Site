@@ -17,9 +17,11 @@ interface AudioItem {
 
 interface Props {
 	items: AudioItem[];
+	sectionKey?: string;
+	open?: boolean;
 }
 
-const { items } = Astro.props;
+const { items, sectionKey = "audio", open = false } = Astro.props;
 const baseUrl = import.meta.env.BASE_URL;
 
 function resolveMediaUrl(src: string): string {
@@ -29,7 +31,7 @@ function resolveMediaUrl(src: string): string {
 }
 ---
 
-<CollapsibleSection title="Audio" icon="audio-lines" count={items.length} section="audio">
+<CollapsibleSection title="Audio" icon="audio-lines" count={items.length} section={sectionKey} open={open}>
 	<ol>
 		{
 			items.map((item, index) => (

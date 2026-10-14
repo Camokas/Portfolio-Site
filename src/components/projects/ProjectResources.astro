@@ -20,9 +20,13 @@ interface ExternalLink {
 interface Props {
 	downloads: DownloadItem[];
 	links: ExternalLink[];
+	sectionKey?: string;
+	open?: boolean;
 }
 
-const { downloads, links } = Astro.props;
+const { downloads, links, sectionKey = "resources", open = false } = Astro.props;
+const downloadsId = `${sectionKey}-downloads-title`;
+const linksId = `${sectionKey}-links-title`;
 const baseUrl = import.meta.env.BASE_URL;
 
 function resolveDownloadUrl(file: string): string {
@@ -34,13 +38,14 @@ function resolveDownloadUrl(file: string): string {
 	title="Resources"
 	icon="download"
 	count={downloads.length + links.length}
-	section="resources"
+	section={sectionKey}
+	open={open}
 >
 	<div class="resource-groups">
 		{
 			downloads.length > 0 && (
-				<section aria-labelledby="downloads-title">
-					<h3 id="downloads-title">Downloads</h3>
+				<section aria-labelledby={downloadsId}>
+					<h3 id={downloadsId}>Downloads</h3>
 					<ul>
 						{downloads.map((item) => (
 							<li>
@@ -67,8 +72,8 @@ function resolveDownloadUrl(file: string): string {
 
 		{
 			links.length > 0 && (
-				<section aria-labelledby="external-links-title">
-					<h3 id="external-links-title">External links</h3>
+				<section aria-labelledby={linksId}>
+					<h3 id={linksId}>External links</h3>
 					<ul>
 						{links.map((item) => (
 							<li>

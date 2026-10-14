@@ -13,12 +13,14 @@ interface GalleryItem {
 interface Props {
 	items: GalleryItem[];
 	projectTitle: string;
+	sectionKey?: string;
+	open?: boolean;
 }
 
-const { items, projectTitle } = Astro.props;
+const { items, projectTitle, sectionKey = "gallery", open = false } = Astro.props;
 ---
 
-<CollapsibleSection title="Selected visuals" icon="images" count={items.length} section="gallery">
+<CollapsibleSection title="Selected visuals" icon="images" count={items.length} section={sectionKey} open={open}>
 	<project-gallery class="project-gallery">
 		<ul>
 		{

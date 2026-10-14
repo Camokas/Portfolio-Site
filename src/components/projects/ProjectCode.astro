@@ -29,16 +29,18 @@ interface CodeSample {
 
 interface Props {
 	items: CodeSample[];
+	sectionKey?: string;
+	open?: boolean;
 }
 
-const { items } = Astro.props;
+const { items, sectionKey = "code", open = false } = Astro.props;
 ---
 
-<CollapsibleSection title="Code" icon="code-2" count={items.length} section="code">
+<CollapsibleSection title="Code" icon="code-2" count={items.length} section={sectionKey} open={open}>
 	<div class="code-list">
 		{
 			items.map((item, index) => (
-				<code-sample class="code-sample" data-code-key={`${item.filename}:${index}`}>
+				<code-sample class="code-sample" data-code-key={`${sectionKey}:${item.filename}:${index}`}>
 					<details>
 						<summary>
 							<div class="sample-copy">

@@ -20,9 +20,11 @@ interface VideoItem {
 
 interface Props {
 	items: VideoItem[];
+	sectionKey?: string;
+	open?: boolean;
 }
 
-const { items } = Astro.props;
+const { items, sectionKey = "video", open = false } = Astro.props;
 const baseUrl = import.meta.env.BASE_URL;
 
 function resolveMediaUrl(src: string): string {
@@ -32,7 +34,7 @@ function resolveMediaUrl(src: string): string {
 }
 ---
 
-<CollapsibleSection title="Video" icon="clapperboard" count={items.length} section="video">
+<CollapsibleSection title="Video" icon="clapperboard" count={items.length} section={sectionKey} open={open}>
 	<ul>
 		{
 			items.map((item) => (

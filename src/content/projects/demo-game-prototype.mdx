@@ -1,5 +1,6 @@
 ---
 title: "Demo Game Prototype"
+mediaLayout: "inline"
 summary: "A temporary project used to demonstrate how portfolio entries are displayed."
 direction: "game-development"
 date: 2026-10-13
@@ -27,6 +28,9 @@ models:
     autoRotate: true
 videos:
   - title: "Demo video player"
+    autoplay: true
+    muted: true
+    loop: true
     caption: "Temporary CC0 sample from MDN used only to verify native video playback."
     preload: "metadata"
     sources:
@@ -79,14 +83,84 @@ demo: true
 
 > This is demonstration content, not a real portfolio project. It can be removed as soon as the first real project is added.
 
-## About this entry
+## Video, then text
 
-This page demonstrates the basic structure that every future project can use: metadata, a short summary, tags, media, downloads, external links, code, and a longer Markdown description.
+{/* Copy the component line AND the matching videos entry from the frontmatter. */}
+<Video index={1} open />
 
-## What will be added later
+Write your explanation here. The video above is followed directly by this text.
 
-- Project-specific interactive program demonstrations.
+## A single image
 
-The temporary gallery images, video, and audio will be replaced with real project media when the first finished project is added.
+{/* Image uses the gallery entries; index={1} means the first image. */}
+<Image index={1} open />
 
-The content is intentionally simple while the foundation of the portfolio is being built.
+Describe the image, your process, or the decisions behind it.
+
+## Another image and a full gallery
+
+<Gallery index={2} />
+
+A separate caption or paragraph can appear between individual images.
+
+{/* Omit index to show the whole list. Use indices={[2, 1]} to select and reorder entries. */}
+<Gallery />
+
+## 3D models
+
+<Models index={1} />
+
+This paragraph explains the first model. Each model retains its own collapsible preview and viewer controls.
+
+<Models index={2} />
+
+{/* To show all models together, use <Models /> instead. */}
+
+## Sound
+
+<Audio index={1} />
+
+Write about recording, composition, or sound design here.
+
+## Highlighted source code
+
+<Code index={1} />
+
+Explain the algorithm below the code. The fragment is collapsible and can be copied.
+
+{/* For shaders, set language: "shaderlab", "hlsl", or "glsl" in codeSamples. */}
+
+## Downloads
+
+<Downloads index={1} />
+
+Explain what the downloadable file contains.
+
+## External links
+
+<Links index={1} />
+
+{/* Resources combines all downloads and links in one section. */}
+<Resources />
+
+## Markdown examples
+
+**Emphasis**, *a short note*, and `inline code` work as usual.
+
+- Explain your own contribution.
+- List tools and techniques.
+
+1. Research.
+2. Prototype.
+3. Final result.
+
+[Browse all projects](/Portfolio-Site/projects/) or [visit the 3D section](/Portfolio-Site/directions/3d-modeling/).
+
+> Use a quotation for a short highlighted note.
+
+```ts
+// A simple code fence also gets syntax highlighting, without the Code viewer.
+const example = "Replace demo content with your own work";
+```
+
+{/* Components can be moved freely between paragraphs. Keep only one frontmatter block. */}

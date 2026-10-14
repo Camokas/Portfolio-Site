@@ -6,10 +6,11 @@ import { directionSlugs } from "./data/directions";
 const projects = defineCollection({
 	loader: glob({
 		base: "./src/content/projects",
-		pattern: "**/*.md",
+		pattern: "**/*.{md,mdx}",
 	}),
 	schema: ({ image }) => z.object({
 		title: z.string(),
+		mediaLayout: z.enum(["auto", "inline"]).default("auto"),
 		summary: z.string(),
 		direction: z.enum(directionSlugs),
 		date: z.coerce.date(),

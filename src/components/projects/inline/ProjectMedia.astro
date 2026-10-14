@@ -1,0 +1,63 @@
+---
+import { getEntry } from "astro:content";
+import ProjectGallery from "../ProjectGallery.astro";
+import ProjectVideo from "../ProjectVideo.astro";
+import ProjectAudio from "../ProjectAudio.astro";
+import ProjectModels from "../ProjectModels.astro";
+import ProjectCode from "../ProjectCode.astro";
+import ProjectResources from "../ProjectResources.astro";
+
+interface Props {
+	kind: "gallery" | "video" | "audio" | "models" | "code" | "resources" | "downloads" | "links";
+	index?: number;
+	indices?: number[];
+	open?: boolean;
+}
+
+const { kind, index, indices, open = false } = Astro.props;
+const path = decodeURIComponent(Astro.url.pathname).slice(import.meta.env.BASE_URL.length);
+const projectId = path.replace(/^projects\//, "").replace(/\/$/, "");
+const project = await getEntry("projects", projectId);
+if (!project) throw new Error(`Inline media: project "${projectId}" not found`);
+if (index !== undefined && indices !== undefined) throw new Error("Use either index or indices, not both");
+const selection = index !== undefined ? [index] : indices;
+if (selection?.some((value) => !Number.isInteger(value) || value < 1)) {
+	throw new Error(`Inline media in ${projectId}: indices must be integers starting at 1`);
+}
+function select<T>(items: T[]): T[] {
+	if (!selection) return items;
+	return selection.map((value) => {
+		if (value > items.length) throw new Error(`Inline ${kind} in ${projectId}: item ${value} does not exist (${items.length} available)`);
+		return items[value - 1];
+	});
+}
+if (kind === "resources" && selection) throw new Error("Use Downloads or Links to select individual resources");
+const lengths = {
+	gallery: project.data.gallery.length, video: project.data.videos.length,
+	audio: project.data.audio.length, models: project.data.models.length,
+	code: project.data.codeSamples.length, downloads: project.data.downloads.length,
+	links: project.data.links.length, resources: project.data.downloads.length + project.data.links.length,
+};
+if (selection?.some((value) => value > lengths[kind])) {
+	throw new Error(`Inline ${kind} in ${projectId}: selected item does not exist (${lengths[kind]} available)`);
+}
+const locals = Astro.locals as { inlineMediaCount?: number };
+locals.inlineMediaCount = (locals.inlineMediaCount ?? 0) + 1;
+const sectionKey = `inline-${kind}-${locals.inlineMediaCount}`;
+const { data } = project;
+---
+
+{lengths[kind] > 0 && <div class="inline-media">
+	{kind === "gallery" && data.gallery.length > 0 && <ProjectGallery items={select(data.gallery)} projectTitle={data.title} sectionKey={sectionKey} open={open} />}
+	{kind === "video" && data.videos.length > 0 && <ProjectVideo items={select(data.videos)} sectionKey={sectionKey} open={open} />}
+	{kind === "audio" && data.audio.length > 0 && <ProjectAudio items={select(data.audio)} sectionKey={sectionKey} open={open} />}
+	{kind === "models" && data.models.length > 0 && <ProjectModels items={select(data.models)} sectionKey={sectionKey} open={open} />}
+	{kind === "code" && data.codeSamples.length > 0 && <ProjectCode items={select(data.codeSamples)} sectionKey={sectionKey} open={open} />}
+	{kind === "resources" && (data.downloads.length > 0 || data.links.length > 0) && <ProjectResources downloads={data.downloads} links={data.links} sectionKey={sectionKey} open={open} />}
+	{kind === "downloads" && data.downloads.length > 0 && <ProjectResources downloads={select(data.downloads)} links={[]} sectionKey={sectionKey} open={open} />}
+	{kind === "links" && data.links.length > 0 && <ProjectResources downloads={[]} links={select(data.links)} sectionKey={sectionKey} open={open} />}
+</div>}
+
+<style>
+	.inline-media { margin-block: 2rem; }
+</style>

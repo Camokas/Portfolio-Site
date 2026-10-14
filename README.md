@@ -3,8 +3,9 @@
 Мультимедийное портфолио на Astro с публикацией через GitHub Pages.
 
 - [Руководство по наполнению](CONTENT_GUIDE.md) — начните здесь.
-- [Минимальный шаблон проекта](templates/project-minimal.md).
-- [Полный шаблон с медиаблоками](templates/project-full.md).
+- [Минимальный шаблон проекта](templates/project-minimal.mdx).
+- [Полный шаблон с медиаблоками](templates/project-full.mdx).
+- [Живой пример со всеми возможностями](src/content/projects/demo-game-prototype.mdx).
 - [Публикация сайта](DEPLOYMENT.md).
 
 Тексты главной: `src/data/home.ts`. Контакты: `src/data/contactLinks.ts`.
