@@ -37,3 +37,14 @@ test('group=false and unrelated components remain unchanged', () => {
   assert.equal(result.length, 3);
   assert.equal(result[1], video);
 });
+
+test('adjacent selected videos become one carousel, preserving other media', () => {
+  const first = media('Video'), second = media('Video');
+  first.attributes.push({ type: 'mdxJsxAttribute', name: 'index', value: { type: 'mdxJsxAttributeValueExpression', value: '1' } });
+  second.attributes.push({ type: 'mdxJsxAttribute', name: 'index', value: { type: 'mdxJsxAttributeValueExpression', value: '2' } });
+  const [row] = transform([text('Video explanation'), first, second, media('ShaderGraph')]);
+  const content = row.children.at(-1).children;
+  assert.deepEqual(content.map(node => node.name), ['Video', 'ShaderGraph']);
+  assert.equal(content[0].attributes.find(attr => attr.name === 'indices').value.value, '[1,2]');
+  assert.ok(content[0].attributes.some(attr => attr.name === 'carousel'));
+});

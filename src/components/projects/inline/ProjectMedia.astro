@@ -13,9 +13,10 @@ interface Props {
 	index?: number;
 	indices?: number[];
 	open?: boolean;
+	carousel?: boolean;
 }
 
-const { kind, index, indices, open = false } = Astro.props;
+const { kind, index, indices, open = false, carousel = false } = Astro.props;
 const path = decodeURIComponent(Astro.url.pathname).slice(import.meta.env.BASE_URL.length);
 const projectId = path.replace(/^projects\//, "").replace(/\/$/, "");
 const project = await getEntry("projects", projectId);
@@ -51,7 +52,7 @@ const { data } = project;
 
 {lengths[kind] > 0 && <div class="inline-media">
 	{kind === "gallery" && data.gallery.length > 0 && <ProjectGallery items={select(data.gallery)} projectTitle={data.title} sectionKey={sectionKey} open={open} />}
-	{kind === "video" && data.videos.length > 0 && <ProjectVideo items={select(data.videos)} sectionKey={sectionKey} open={open} />}
+	{kind === "video" && data.videos.length > 0 && <ProjectVideo items={select(data.videos)} sectionKey={sectionKey} open={open} carousel={carousel} />}
 	{kind === "audio" && data.audio.length > 0 && <ProjectAudio items={select(data.audio)} sectionKey={sectionKey} open={open} />}
 	{kind === "models" && data.models.length > 0 && <ProjectModels items={select(data.models)} sectionKey={sectionKey} open={open} />}
 	{kind === "code" && data.codeSamples.length > 0 && <ProjectCode items={select(data.codeSamples)} sectionKey={sectionKey} open={open} />}

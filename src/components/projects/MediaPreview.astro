@@ -4,12 +4,12 @@ import { Code } from "astro:components";
 interface Props { items: PreviewMedia[]; }
 const { items } = Astro.props;
 const first = items[0];
-const initialImage = first?.kind === "image" ? first.src : first?.poster;
+const initialImage = first?.kind === "image" || first?.kind === "shaderGraph" ? first.src : first?.poster;
 ---
 
 <media-preview data-items={JSON.stringify(items)} aria-hidden="true">
 	<div class="preview-layers">
-		{initialImage && <img class:list={["slide", "active", { model: first.kind === "model" }]} src={initialImage} alt="" loading="lazy" decoding="async" />}
+		{initialImage && <img class:list={["slide", "active", { model: first.kind === "model", 'graph-preview': first.kind === 'shaderGraph' }]} src={initialImage} alt="" loading="lazy" decoding="async" />}
 	</div>
 	{items.map((item, index) => item.code && (
 		<template data-preview-code={index}>
@@ -30,6 +30,7 @@ const initialImage = first?.kind === "image" ? first.src : first?.poster;
 	media-preview :global(.slide) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
 	media-preview :global(.slide.active) { opacity: 1; }
 	media-preview :global(.slide.model) { object-fit: contain; padding: 0.35rem; }
+	media-preview :global(.slide.graph-preview) { object-fit: contain; background: #10161c; padding: 0.5rem; }
 	media-preview :global(.slide.code-preview) { overflow: hidden; padding: 1rem; background: #0d1117; }
 	media-preview :global(.code-preview pre) { margin: 0; padding: 0; background: transparent !important; font-size: 0.7rem; line-height: 1.65; white-space: pre; tab-size: 2; }
 </style>

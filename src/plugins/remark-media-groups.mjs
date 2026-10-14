@@ -17,6 +17,7 @@ export default function remarkMediaGroups() {
         (attribute.value?.type === 'mdxJsxAttributeValueExpression' && attribute.value.value.trim() === 'true'));
       if (!grouped) { result.push(node); continue; }
       node.attributes = node.attributes.filter(item => item !== attribute);
+      if (node.name === 'Video') node.attributes.push({ type: 'mdxJsxAttribute', name: 'carousel', value: null });
       // Consecutive grouped media share the same right-hand column.
       const previous = result.findLast(item => !isComment(item));
       if (previous?.data?.mediaGroup) {
@@ -37,6 +38,36 @@ export default function remarkMediaGroups() {
       ]);
       row.data = { mediaGroup: true };
       result.push(row);
+    }
+    // Adjacent Video selections in one group are one carousel, not separate players.
+    for (const row of result.filter(item => item.data?.mediaGroup)) {
+      const children = row.children.at(-1).children;
+      for (let index = 0; index < children.length - 1; index++) {
+        const first = children[index], next = children[index + 1];
+        if (first.name !== 'Video' || next.name !== 'Video') continue;
+        const selection = node => {
+          const attr = node.attributes.find(item => item.name === 'indices' || item.name === 'index');
+          try {
+            const value = JSON.parse(attr?.value?.value ?? 'null');
+            const list = Array.isArray(value) ? value : [value];
+            return list.every(item => Number.isInteger(item) && item > 0) ? list : null;
+          } catch { return null; }
+        };
+        const a = selection(first), b = selection(next);
+        if (!a || !b) continue;
+        const values = [...new Set([...a, ...b])];
+        const expression = { type: 'ArrayExpression', elements: values.map(value => ({ type: 'Literal', value, raw: String(value) })) };
+        first.attributes = first.attributes.filter(item => item.name !== 'index' && item.name !== 'indices');
+        first.attributes.push({ type: 'mdxJsxAttribute', name: 'indices', value: {
+          type: 'mdxJsxAttributeValueExpression', value: JSON.stringify(values),
+          data: { estree: { type: 'Program', sourceType: 'module', body: [{ type: 'ExpressionStatement', expression }] } },
+        } });
+        if (next.attributes.some(item => item.name === 'open') && !first.attributes.some(item => item.name === 'open')) {
+          first.attributes.push(next.attributes.find(item => item.name === 'open'));
+        }
+        children.splice(index + 1, 1);
+        index--;
+      }
     }
     tree.children = result;
   };

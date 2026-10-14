@@ -34,10 +34,12 @@ const projects = defineCollection({
 		date: z.coerce.date(),
 		tags: z.array(z.string()).default([]),
 		cover: projectImage.optional(),
+		coverShowInCards: z.boolean().default(true),
 		gallery: z
 			.array(
 				z.object({
 					image: projectImage,
+					showInCards: z.boolean().default(true),
 					alt: z.string(),
 					caption: z.string().optional(),
 				}),
@@ -49,6 +51,7 @@ const projects = defineCollection({
 					title: z.string(),
 					caption: z.string().optional(),
 					poster: projectImage.optional(),
+					showInCards: z.boolean().default(true),
 					preload: z.enum(["none", "metadata", "auto"]).default("metadata"),
 					loop: z.boolean().default(false),
 					autoplay: z.boolean().default(false),
@@ -70,6 +73,7 @@ const projects = defineCollection({
 				z.object({
 					title: z.string(),
 					artist: z.string().optional(),
+					showInCards: z.boolean().default(true),
 					caption: z.string().optional(),
 					preload: z.enum(["none", "metadata", "auto"]).default("metadata"),
 					sources: z
@@ -111,6 +115,7 @@ const projects = defineCollection({
 				z.object({
 					title: z.string(),
 					filename: z.string(),
+					showInCards: z.boolean().default(true),
 					language: z.enum([
 						"astro",
 						"bash",
@@ -138,6 +143,7 @@ const projects = defineCollection({
 					title: z.string(),
 					description: z.string().optional(),
 					kind: z.enum(["demo", "glb"]).default("demo"),
+					showInCards: z.boolean().default(true),
 					src: mediaAsset.optional(),
 					poster: mediaAsset.optional(),
 					autoRotate: z.boolean().default(true),
@@ -148,6 +154,7 @@ const projects = defineCollection({
 			.default([]),
 		shaderGraphs: z.array(z.object({
 			title: z.string(),
+			showInCards: z.boolean().default(true),
 			src: localAsset.refine(value => /\.(shadergraph|shadersubgraph)$/i.test(value), 'Use a .shadergraph or .shadersubgraph file'),
 			description: z.string().optional(),
 		})).default([]),

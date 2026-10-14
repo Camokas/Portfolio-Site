@@ -25,7 +25,7 @@ class MediaPreview extends HTMLElement {
 		const options = { signal: this.events.signal };
 		document.addEventListener("visibilitychange", () => this.sync(), options);
 		const initial = this.querySelector<HTMLImageElement>("img.slide");
-		if (initial && this.items[0].kind === "image") {
+		if (initial && (this.items[0].kind === "image" || this.items[0].kind === "shaderGraph")) {
 			this.prepared.set(0, initial); this.index = 0;
 			this.shownInCycle.add(0);
 		}
@@ -103,7 +103,7 @@ class MediaPreview extends HTMLElement {
 	show(index: number) {
 		const element = this.prepared.get(index)!;
 		const old = [...this.querySelectorAll<HTMLElement>(".slide")].filter((node) => node !== element);
-		element.className = `slide${this.items[index].kind === "model" ? " model" : this.items[index].kind === "code" ? " code-preview" : ""}`;
+		element.className = `slide${this.items[index].kind === "model" ? " model" : this.items[index].kind === "code" ? " code-preview" : this.items[index].kind === "shaderGraph" ? " graph-preview" : ""}`;
 		this.querySelector(".preview-layers")?.append(element);
 		element.classList.add("active");
 		// Explicit keyframes also work when a detached, cached element is reused.

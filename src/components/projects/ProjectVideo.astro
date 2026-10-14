@@ -24,9 +24,10 @@ interface Props {
 	items: VideoItem[];
 	sectionKey?: string;
 	open?: boolean;
+	carousel?: boolean;
 }
 
-const { items, sectionKey = "video", open = false } = Astro.props;
+const { items, sectionKey = "video", open = false, carousel = false } = Astro.props;
 const baseUrl = import.meta.env.BASE_URL;
 
 function resolveMediaUrl(src: string): string {
@@ -35,7 +36,8 @@ function resolveMediaUrl(src: string): string {
 ---
 
 <CollapsibleSection title="Video" icon="clapperboard" count={items.length} section={sectionKey} open={open}>
-	<ul>
+	<project-video-carousel data-enabled={String(carousel && items.length > 1)}>
+	<ul class:list={{ carousel: carousel && items.length > 1 }} aria-label="Project videos" tabindex={carousel && items.length > 1 ? 0 : undefined}>
 		{
 			items.map((item) => (
 				<li>
@@ -44,12 +46,13 @@ function resolveMediaUrl(src: string): string {
 						<video
 							class:list={{ "auto-aspect": item.autoAspect }}
 							controls
+							tabindex="0"
 							playsinline
 							preload={item.preload}
 							poster={item.poster?.src}
 							loop={item.loop}
 							muted={item.muted}
-							aria-label={item.title}
+							aria-label={item.title || "Project video"}
 						>
 							{item.sources.map((source) => (
 								<source src={resolveMediaUrl(source.src)} type={source.type} />
@@ -69,9 +72,63 @@ function resolveMediaUrl(src: string): string {
 			))
 		}
 	</ul>
+	{carousel && items.length > 1 && <nav class="carousel-controls" aria-label="Video gallery controls">
+		<button type="button" data-prev aria-label="Previous video">←</button>
+		<span data-position aria-live="polite" aria-atomic="true">1 / {items.length}</span>
+		<button type="button" data-next aria-label="Next video">→</button>
+	</nav>}
+	</project-video-carousel>
 </CollapsibleSection>
 
 <script>
+	class ProjectVideoCarousel extends HTMLElement {
+		events?: AbortController;
+		frame = 0;
+		connectedCallback() {
+			if (this.dataset.enabled !== 'true') return;
+			this.events?.abort(); this.events = new AbortController();
+			const options = { signal: this.events.signal };
+			const track = this.querySelector('ul')!;
+			const slides = [...track.children] as HTMLElement[];
+			let active = 0;
+			const update = () => {
+				const bounds = track.getBoundingClientRect();
+				if (!bounds.width) return;
+				const center = bounds.left + bounds.width / 2;
+				active = slides.reduce((best, slide, index) => {
+					const distance = (element: HTMLElement) => { const r = element.getBoundingClientRect(); return Math.abs(r.left + r.width / 2 - center); };
+					return distance(slide) < distance(slides[best]) ? index : best;
+				}, 0);
+				slides.forEach((slide, index) => {
+					slide.dataset.active = String(index === active);
+					const player = slide.querySelector('project-video-player');
+					if (player) { player.dataset.active = String(index === active); player.dispatchEvent(new Event('video-selection')); }
+				});
+				this.querySelector('[data-position]')!.textContent = `${active + 1} / ${slides.length}`;
+				(this.querySelector('[data-prev]') as HTMLButtonElement).disabled = active === 0;
+				(this.querySelector('[data-next]') as HTMLButtonElement).disabled = active === slides.length - 1;
+			};
+			const go = (index: number) => {
+				const slide = slides[Math.max(0, Math.min(slides.length - 1, index))];
+				track.scrollTo({ left: track.scrollLeft + slide.getBoundingClientRect().left - track.getBoundingClientRect().left - (track.clientWidth - slide.clientWidth) / 2,
+					behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+			};
+			this.querySelector('[data-prev]')?.addEventListener('click', () => go(active - 1), options);
+			this.querySelector('[data-next]')?.addEventListener('click', () => go(active + 1), options);
+			track.addEventListener('keydown', event => {
+				if (event.target !== track) return;
+				if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+					event.preventDefault(); go(active + (event.key === 'ArrowRight' ? 1 : -1));
+				}
+			}, options);
+			track.addEventListener('scroll', () => { cancelAnimationFrame(this.frame); this.frame = requestAnimationFrame(update); }, options);
+			this.closest('details')?.addEventListener('toggle', update, options);
+			window.addEventListener('resize', () => go(active), options);
+			update();
+		}
+		disconnectedCallback() { this.events?.abort(); cancelAnimationFrame(this.frame); }
+	}
+	if (!customElements.get('project-video-carousel')) customElements.define('project-video-carousel', ProjectVideoCarousel);
 	class ProjectVideoPlayer extends HTMLElement {
 		events?: AbortController;
 		connectedCallback() {
@@ -84,15 +141,26 @@ function resolveMediaUrl(src: string): string {
 			// Explicitly set the property as well as the server-rendered muted attribute.
 			video.muted = video.defaultMuted;
 			const sync = () => {
-				const visible = section.open && !document.hidden;
-				video.autoplay = visible && this.dataset.autoplay === "true";
+				const visible = section.open && !document.hidden && this.dataset.active !== 'false';
+				video.autoplay = visible && (this.dataset.autoplay === "true" || this.dataset.active === 'true');
 				if (!visible) { video.pause(); return; }
 				if (video.autoplay) void video.play().catch(() => {
 					// Native controls remain available when browser autoplay is blocked.
 				});
 			};
 			section.addEventListener("toggle", sync, options);
+			this.addEventListener('video-selection', sync, options);
+			video.addEventListener('play', () => { if (this.dataset.active === 'false') video.pause(); }, options);
+			const pointer = matchMedia('(hover: hover) and (pointer: fine)');
+			const controls = () => { video.controls = !pointer.matches || this.matches(':hover') || video.matches(':focus-visible') || Boolean(document.fullscreenElement); };
+			this.addEventListener('pointerenter', controls, options);
+			this.addEventListener('pointerleave', controls, options);
+			this.addEventListener('focusin', controls, options);
+			this.addEventListener('focusout', () => queueMicrotask(controls), options);
+			pointer.addEventListener('change', controls, options);
+			document.addEventListener('fullscreenchange', controls, options);
 			document.addEventListener("visibilitychange", sync, options);
+			controls();
 			sync();
 		}
 		disconnectedCallback() {
@@ -105,6 +173,21 @@ function resolveMediaUrl(src: string): string {
 
 <style>
 	project-video-player { display: block; }
+	project-video-carousel { display: block; min-width: 0; }
+	ul.carousel {
+		position: relative; display: flex; gap: 1rem; overflow-x: auto;
+		scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+		padding-inline: 6%; scroll-padding-inline: 6%; scrollbar-width: none;
+		align-items: start;
+	}
+	ul.carousel::-webkit-scrollbar { display: none; }
+	.carousel > li { flex: 0 0 100%; min-width: 0; scroll-snap-align: center; opacity: 0.65; transition: opacity 250ms; }
+	.carousel > li[data-active="true"] { opacity: 1; }
+	.carousel-controls { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 0.75rem; }
+	.carousel-controls span { color: var(--color-muted); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+	.carousel-controls button { width: 2.75rem; height: 2.75rem; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-surface); color: var(--color-text); cursor: pointer; }
+	.carousel-controls button:disabled { opacity: 0.3; cursor: default; }
+	.carousel-controls button:focus-visible, ul.carousel:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
 	ul {
 		display: grid;
 		gap: 2rem;
