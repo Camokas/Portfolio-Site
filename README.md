@@ -10,6 +10,8 @@
 
 Тексты главной: `src/data/home.ts`. Контакты: `src/data/contactLinks.ts`.
 Направления: `src/data/directions.ts`. Работы: `src/content/projects/`.
+Все локальные файлы работы: `public/projects/имя-работы/`.
+В настройках любой тип медиа использует путь `projects/имя-работы/файл.ext`.
 
 Локальный просмотр: `server.bat` → 1, затем адрес из вывода сервера
 (обычно `http://localhost:4321/Portfolio-Site/`). Остановка: `server.bat` → 2.

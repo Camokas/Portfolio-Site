@@ -1,10 +1,11 @@
 ---
 import CollapsibleSection from "../ui/CollapsibleSection.astro";
+import { projectAssetUrl } from "../../data/projectAssetPaths.mjs";
 interface ShaderGraphItem { title: string; src: string; description?: string; }
 interface Props { items: ShaderGraphItem[]; sectionKey?: string; open?: boolean; }
 const { items, sectionKey = "shader-graphs", open = false } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const fileUrl = (src: string) => `${base}${src.replace(/^\/+/, "")}`;
+const fileUrl = (src: string) => projectAssetUrl(src, base);
 const viewerUrl = (src: string) => `${base}vendor/shader-graph/index.html?src=${encodeURIComponent(fileUrl(src))}`;
 ---
 

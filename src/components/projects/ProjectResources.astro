@@ -1,6 +1,7 @@
 ---
 import Icon from "../ui/Icon.astro";
 import CollapsibleSection from "../ui/CollapsibleSection.astro";
+import { projectAssetUrl } from "../../data/projectAssetPaths.mjs";
 
 interface DownloadItem {
 	label: string;
@@ -30,7 +31,7 @@ const linksId = `${sectionKey}-links-title`;
 const baseUrl = import.meta.env.BASE_URL;
 
 function resolveDownloadUrl(file: string): string {
-	return `${baseUrl}${file.replace(/^\/+/, "")}`;
+	return projectAssetUrl(file, baseUrl);
 }
 ---
 

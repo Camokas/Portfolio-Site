@@ -113,7 +113,7 @@
 | Имя, подпись, описание, тексты главной | `src/data/home.ts` |
 | Контактные ссылки | `src/data/contactLinks.ts` |
 | Названия, описания, порядок направлений | `src/data/directions.ts` |
-| Обложки, галерея, постеры видео | `src/assets/projects/имя-работы/` |
+| Обложки, галерея, постеры видео | `public/projects/имя-работы/` |
 | Модели, миниатюры моделей, видео, звук, архивы | `public/projects/имя-работы/` |
 | Общие цвета, шрифты, переменные оформления | `src/styles/global.css` |
 | Разметка главной | `src/pages/index.astro` |
@@ -124,7 +124,7 @@
 
 `dist/` — результат сборки, его не редактируют: изменения пропадут при следующей сборке.
 `node_modules/` и `.astro/` — служебные папки. Для наполнения они не нужны.
-Папки `public/models/` и `public/downloads/` с прежними примерами продолжают работать; переносить существующие файлы не обязательно.
+Все локальные медиа теперь лежат в `public/projects/имя-работы/`. Старые демонстрационные изображения, модели и скачивания перенесены туда.
 
 ## 3. Первая настоящая работа: пошагово
 
@@ -158,11 +158,11 @@ I created this worktable as a real-time environment asset.
 ```
 
 5. Поставьте настоящую дату работы. Это может быть дата завершения, а не загрузки на сайт.
-6. Создайте `src/assets/projects/worktable/` и положите туда обложку `cover.webp`.
+6. Создайте `public/projects/worktable/` и положите туда обложку `cover.webp`.
 7. Перед вторым `---` добавьте строку:
 
 ```yaml
-cover: "../../assets/projects/worktable/cover.webp"
+cover: "projects/worktable/cover.webp"
 ```
 
 8. Если хотите показать эту картинку и внутри страницы, добавьте галерею из раздела 7 и вставьте `<Gallery />` между абзацами после второго `---`. Обложка сама в галерею не добавляется.
@@ -199,7 +199,7 @@ models:
 
 ```yaml
 # gallery:
-#   - image: "../../assets/projects/my-project/render.webp"
+#   - image: "projects/my-project/render.webp"
 #     alt: "Описание"
 ```
 
@@ -207,7 +207,7 @@ models:
 
 ```yaml
 gallery:
-  - image: "../../assets/projects/my-project/render.webp"
+  - image: "projects/my-project/render.webp"
     alt: "Описание"
 ```
 
@@ -253,28 +253,23 @@ gallery:
 Название можно писать на русском или английском; техническое значение `direction` копируйте точно из таблицы.
 Интерфейс и язык страниц сейчас английские: русский текст отображается, но полноценное переключение языков не реализовано.
 
-## 6. Пути к файлам: два правила
+## 6. Единый путь к любому файлу проекта
 
-### Картинки, которые обрабатывает Astro
-
-Для `cover`, `gallery.image`, `videos.poster` используйте относительный путь от файла проекта:
-
-```yaml
-cover: "../../assets/projects/worktable/cover.webp"
-```
-
-Реальный файл: `src/assets/projects/worktable/cover.webp`.
-Два `../` поднимаются из `src/content/projects/` до `src/`.
-
-### Файлы из public
-
-Для `models.src`, `models.poster`, `videos.sources.src`, `audio.sources.src`, `downloads.file` путь начинается ПОСЛЕ `public/`:
+Для `cover`, `gallery.image`, `videos.poster`, `models.src`, `models.poster`,
+`videos.sources.src`, `audio.sources.src`, `downloads.file` и `shaderGraphs.src`
+используйте одно правило: `projects/имя-папки/имя-файла`.
+Сам файл положите в `public/projects/имя-папки/`.
 
 ```yaml
 src: "projects/worktable/model.glb"
 ```
 
 Реальный файл: `public/projects/worktable/model.glb`.
+Для изображения точно так же: `image: "projects/worktable/render.webp"`.
+Внутри папки проекта можно создавать подпапки, например `projects/worktable/images/front.webp`.
+Astro продолжает оптимизировать обложки, галерею и постеры видео автоматически.
+Сайт проверяет существование локальных файлов и не разрешает выход за пределы public,
+`..`, абсолютные пути, обратные слеши и специальные URL-символы в локальных путях.
 Не пишите `public/`, диск `C:`, обратные слеши `\` или `/Portfolio-Site/`: компоненты сами добавляют префикс сайта.
 Регистр важен: `Worktable.glb` и `worktable.glb` на GitHub Pages — разные имена.
 Внешние прямые HTTPS-адреса поддерживаются для видео, аудио, моделей и постеров моделей. Для моделей внешний сервер должен разрешать CORS.
@@ -284,10 +279,10 @@ src: "projects/worktable/model.glb"
 
 ```yaml
 gallery:
-  - image: "../../assets/projects/worktable/front.webp"
+  - image: "projects/worktable/front.webp"
     alt: "Wooden worktable viewed from the front"
     caption: "Final front view."
-  - image: "../../assets/projects/worktable/detail.webp"
+  - image: "projects/worktable/detail.webp"
     alt: "Close-up of the worn tabletop edges"
     caption: "Material detail."
 ```
@@ -329,7 +324,7 @@ models:
 videos:
   - title: "Worktable breakdown"
     caption: "Modeling and texturing process."
-    poster: "../../assets/projects/worktable/video-poster.webp"
+    poster: "projects/worktable/video-poster.webp"
     preload: "metadata"
     loop: false
     muted: false
@@ -559,7 +554,7 @@ const result = 42;
 
 ```powershell
 git status
-git add src/content/projects/worktable.mdx src/assets/projects/worktable public/projects/worktable
+git add src/content/projects/worktable.mdx public/projects/worktable
 git diff --cached --stat
 git commit -m "content: add worktable project"
 git push origin master

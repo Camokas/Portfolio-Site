@@ -1,5 +1,6 @@
 ---
 import CollapsibleSection from "../ui/CollapsibleSection.astro";
+import { projectAssetUrl } from "../../data/projectAssetPaths.mjs";
 
 interface ModelItem {
 	title: string;
@@ -19,7 +20,7 @@ interface Props {
 const { items, sectionKey = "models", open = false } = Astro.props;
 const baseUrl = import.meta.env.BASE_URL;
 const modelUrl = (src?: string) => src
-	? (/^https?:\/\//.test(src) ? src : `${baseUrl}${src.replace(/^\/+/, "")}`)
+	? projectAssetUrl(src, baseUrl)
 	: undefined;
 ---
 

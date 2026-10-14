@@ -1,5 +1,6 @@
 import { getImage } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
+import { projectAssetUrl } from "./projectAssetPaths.mjs";
 
 export interface PreviewMedia {
 	kind: "image" | "video" | "model" | "code";
@@ -10,8 +11,7 @@ export interface PreviewMedia {
 	code?: Pick<CollectionEntry<"projects">["data"]["codeSamples"][number], "code" | "language">;
 }
 
-const publicUrl = (src: string) => /^https?:\/\//.test(src)
-	? src : `${import.meta.env.BASE_URL}${src.replace(/^\/+/, "")}`;
+const publicUrl = (src: string) => projectAssetUrl(src, import.meta.env.BASE_URL);
 
 export async function projectPreviews(project: CollectionEntry<"projects">): Promise<PreviewMedia[]> {
 	const { data } = project;

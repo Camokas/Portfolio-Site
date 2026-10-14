@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from "astro";
 import CollapsibleSection from "../ui/CollapsibleSection.astro";
+import { projectAssetUrl } from "../../data/projectAssetPaths.mjs";
 
 interface VideoSource {
 	src: string;
@@ -29,9 +30,7 @@ const { items, sectionKey = "video", open = false } = Astro.props;
 const baseUrl = import.meta.env.BASE_URL;
 
 function resolveMediaUrl(src: string): string {
-	if (/^(?:https?:)?\/\//.test(src)) return src;
-
-	return `${baseUrl}${src.replace(/^\/+/, "")}`;
+	return projectAssetUrl(src, baseUrl);
 }
 ---
 
