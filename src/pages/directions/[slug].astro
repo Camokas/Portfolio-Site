@@ -56,7 +56,10 @@ const homeUrl = import.meta.env.BASE_URL;
 		</header>
 
 		<section class="projects" aria-labelledby="projects-title">
-			<h2 id="projects-title">Projects</h2>
+			<div class="projects-heading">
+				<h2 id="projects-title">Projects</h2>
+				<span class="project-count">{projects.length} {projects.length === 1 ? 'project' : 'projects'}</span>
+			</div>
 
 			{
 				projects.length > 0 ? (
@@ -75,7 +78,7 @@ const homeUrl = import.meta.env.BASE_URL;
 	.category-page {
 		width: min(calc(100% - 2rem), var(--content-width));
 		margin-inline: auto;
-		padding-block: clamp(2rem, 6vw, 5rem);
+		padding-block: clamp(1.5rem, 4vw, 3rem);
 	}
 
 	.back-link {
@@ -98,9 +101,12 @@ const homeUrl = import.meta.env.BASE_URL;
 
 	.category-header {
 		display: grid;
-		gap: 1.25rem;
-		max-width: 52rem;
-		padding-block: clamp(5rem, 12vw, 10rem);
+		gap: 1rem;
+		max-width: 48rem;
+		margin-inline: auto;
+		justify-items: center;
+		text-align: center;
+		padding-block: clamp(2.5rem, 6vw, 4.5rem);
 	}
 
 	.eyebrow {
@@ -117,13 +123,14 @@ const homeUrl = import.meta.env.BASE_URL;
 
 	h1 {
 		margin: 0;
-		font-size: clamp(2.75rem, 8vw, 6.5rem);
-		line-height: 0.95;
-		letter-spacing: -0.06em;
+		font-size: clamp(2.5rem, 6vw, 4.75rem);
+		line-height: 1.08;
+		letter-spacing: -0.045em;
+		overflow-wrap: anywhere;
 	}
 
 	.description {
-		max-width: 42rem;
+		max-width: 36rem;
 		margin: 0;
 		color: var(--color-muted);
 		font-size: clamp(1.05rem, 2vw, 1.35rem);
@@ -131,21 +138,41 @@ const homeUrl = import.meta.env.BASE_URL;
 	}
 
 	.projects {
-		padding-block: clamp(3rem, 8vw, 6rem);
+		padding-block: clamp(1.5rem, 3vw, 2.5rem);
 		border-top: 1px solid var(--color-border);
 	}
 
 	h2 {
 		margin: 0;
-		font-size: clamp(2rem, 5vw, 4rem);
-		line-height: 1;
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		line-height: 1.2;
 		letter-spacing: -0.04em;
 	}
 
 	.empty-message {
 		margin: 1.5rem 0 0;
+		padding: 2rem;
+		border-radius: 0.75rem;
+		background: var(--color-surface);
+		text-align: center;
 		color: var(--color-muted);
 		line-height: 1.6;
+	}
+
+	.projects-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+
+	.project-count {
+		color: var(--color-muted);
+		font-size: 0.85rem;
+		padding: 0.35rem 0.75rem;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
 	}
 
 </style>

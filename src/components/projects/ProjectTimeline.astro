@@ -42,14 +42,15 @@ const dateFormatter = new Intl.DateTimeFormat("en", {
 
 <style>
 	.project-timeline { margin-top: 1.5rem; }
-	.timeline-intro { margin: 0 0 2.5rem; color: var(--color-muted); font-size: 0.85rem; }
+	.timeline-intro { margin: 0 0 1.5rem; color: var(--color-muted); font-size: 0.85rem; line-height: 1.6; }
 	.timeline-list { position: relative; margin: 0; padding: 0 0 2rem; list-style: none; }
 	.timeline-list::before {
 		content: ""; position: absolute; top: 1rem; bottom: 0; left: 50%; width: 1px;
 		background: linear-gradient(var(--color-border), var(--color-muted) 20%, var(--color-border) 90%, transparent);
 	}
-	.timeline-entry { position: relative; padding-bottom: 2.5rem; }
-	.year-marker { position: relative; display: flex; justify-content: center; margin: 0 0 2rem; }
+	.timeline-entry { position: relative; padding-bottom: 2rem; }
+	.timeline-entry:last-child { padding-bottom: 0; }
+	.year-marker { position: relative; display: flex; justify-content: center; margin: 0 0 1.5rem; }
 	.year-marker span {
 		padding: 0.5rem 1rem; color: var(--color-accent); background: var(--color-background);
 		border: 1px solid var(--color-border); border-radius: 999px;
