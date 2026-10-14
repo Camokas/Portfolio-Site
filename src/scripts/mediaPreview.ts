@@ -1,10 +1,16 @@
 import type { PreviewMedia } from "../data/projectPreviews";
 
+// Общий интервал после первой смены (миллисекунды).
+const MEDIA_INTERVAL_MS = 5000;
+
 class MediaPreview extends HTMLElement {
 	items: PreviewMedia[] = [];
 	index = -1;
 	visible = false;
-	timer?: ReturnType<typeof setInterval>;
+	timer?: ReturnType<typeof setTimeout>;
+	// Каждая карточка получает свою первую задержку один раз при создании.
+	nextDelay = 1000 + Math.floor(Math.random() * 4001);
+	deadline = 0;
 	observer?: IntersectionObserver;
 	events?: AbortController;
 	failed = new Set<number>();
@@ -28,17 +34,30 @@ class MediaPreview extends HTMLElement {
 		this.observer.observe(this);
 	}
 	disconnectedCallback() {
-		clearInterval(this.timer); this.timer = undefined; this.observer?.disconnect(); this.events?.abort();
+		this.stopTimer(); this.observer?.disconnect(); this.events?.abort();
 		this.prepared.forEach((element) => this.release(element));
 		this.prepared.clear();
 	}
 	sync() {
 		this.updateVideo();
-		if (!this.running) { clearInterval(this.timer); this.timer = undefined; return; }
+		if (!this.running) { this.stopTimer(); return; }
 		this.preload();
-		if (this.items.length > 1 && !this.timer) {
-			this.timer = setInterval(() => this.advance(), 2000);
+		if (this.items.length > 1 && this.timer === undefined) {
+			this.deadline = performance.now() + this.nextDelay;
+			this.timer = setTimeout(() => {
+				this.timer = undefined;
+				this.advance();
+				this.nextDelay = MEDIA_INTERVAL_MS;
+				this.sync();
+			}, this.nextDelay);
 		}
+	}
+	stopTimer() {
+		if (this.timer === undefined) return;
+		// Продолжаем оставшееся время при возвращении карточки на экран.
+		this.nextDelay = Math.max(0, this.deadline - performance.now());
+		clearTimeout(this.timer);
+		this.timer = undefined;
 	}
 	updateVideo() {
 		this.prepared.forEach((element, index) => {
