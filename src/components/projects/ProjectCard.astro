@@ -37,7 +37,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 
 				<h3>{project.data.title}</h3>
 
-				{project.data.summary && <div class="summary-reveal"><p><span>{project.data.summary}</span></p></div>}
+				{project.data.summary && <project-summary class="summary-reveal"><p><span>{project.data.summary}</span></p></project-summary>}
 
 				<span class="project-action" aria-hidden="true">
 					View project <Icon name="arrow-right" size={17} />
@@ -46,6 +46,48 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 		</a>
 	</article>
 </li>
+
+<script>
+	class ProjectSummary extends HTMLElement {
+		events?: AbortController;
+		animation?: Animation;
+		shown = false;
+		connectedCallback() {
+			const card = this.closest(".project-card");
+			if (!card) return;
+			this.events?.abort(); this.events = new AbortController();
+			const options = { signal: this.events.signal };
+			const touch = matchMedia("(hover: none)");
+			const update = () => this.reveal(touch.matches || card.matches(":hover") || card.contains(document.activeElement));
+			card.addEventListener("mouseenter", update, options);
+			card.addEventListener("mouseleave", update, options);
+			card.addEventListener("focusin", update, options);
+			card.addEventListener("focusout", () => queueMicrotask(() => { if (this.isConnected) update(); }), options);
+			touch.addEventListener("change", update, options);
+			update();
+		}
+		reveal(show: boolean) {
+			if (show === this.shown) return;
+			this.shown = show;
+			const current = getComputedStyle(this);
+			const from = { height: current.height, opacity: current.opacity, transform: current.transform };
+			this.animation?.cancel();
+			const height = show ? `${this.querySelector("p")!.getBoundingClientRect().height}px` : "0px";
+			const to = { height, opacity: show ? "1" : "0", transform: show ? "translateY(0)" : "translateY(0.5rem)" };
+			const animation = this.animate([from, to], { duration: 450, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" });
+			this.animation = animation;
+			animation.onfinish = () => {
+				if (this.animation !== animation) return;
+				this.style.height = show ? "auto" : "0px";
+				this.style.opacity = to.opacity;
+				this.style.transform = to.transform;
+				animation.cancel(); this.animation = undefined;
+			};
+		}
+		disconnectedCallback() { this.events?.abort(); this.animation?.cancel(); }
+	}
+	if (!customElements.get("project-summary")) customElements.define("project-summary", ProjectSummary);
+</script>
 
 <style>
 	.project-item {
@@ -125,11 +167,11 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 		color: var(--color-muted);
 		line-height: 1.6;
 	}
-	.summary-reveal { display: grid; grid-template-rows: 0fr; opacity: 0; transform: translateY(0.5rem); transition: grid-template-rows 350ms ease, opacity 300ms ease, transform 350ms ease; }
+	.summary-reveal { display: block; height: 0; overflow: hidden; opacity: 0; transform: translateY(0.5rem); }
 	.summary-reveal p { min-height: 0; overflow: hidden; }
 	.summary-reveal span { display: -webkit-box; padding-top: 0.75rem; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-	.project-card:hover .summary-reveal, .project-card:focus-within .summary-reveal { grid-template-rows: 1fr; opacity: 1; transform: translateY(0); }
-	@media (hover: none) { .summary-reveal { grid-template-rows: 1fr; opacity: 1; transform: none; } }
+	.project-card:hover project-summary:not(:defined), .project-card:focus-within project-summary:not(:defined) { height: auto; opacity: 1; transform: none; }
+	@media (hover: none) { project-summary:not(:defined) { height: auto; opacity: 1; transform: none; } }
 
 	.project-action {
 		display: inline-flex;

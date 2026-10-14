@@ -14,6 +14,7 @@ interface VideoItem {
 	preload: "none" | "metadata" | "auto";
 	loop: boolean;
 	autoplay: boolean;
+	autoAspect: boolean;
 	muted: boolean;
 	sources: VideoSource[];
 }
@@ -42,6 +43,7 @@ function resolveMediaUrl(src: string): string {
 					<figure>
 						<project-video-player data-autoplay={String(item.autoplay)}>
 						<video
+							class:list={{ "auto-aspect": item.autoAspect }}
 							controls
 							playsinline
 							preload={item.preload}
@@ -127,11 +129,13 @@ function resolveMediaUrl(src: string): string {
 	}
 
 	figcaption {
+		/* Captions remain below the player's natural or fixed frame. */
 		display: grid;
 		gap: 0.35rem;
 		margin-top: 0.85rem;
 		line-height: 1.5;
 	}
+	video.auto-aspect { aspect-ratio: auto 16 / 9; height: auto; }
 
 	figcaption strong {
 		font-size: 0.95rem;

@@ -34,6 +34,7 @@ const projects = defineCollection({
 					preload: z.enum(["none", "metadata", "auto"]).default("metadata"),
 					loop: z.boolean().default(false),
 					autoplay: z.boolean().default(false),
+					autoAspect: z.boolean().default(false),
 					muted: z.boolean().default(false),
 					sources: z
 						.array(
