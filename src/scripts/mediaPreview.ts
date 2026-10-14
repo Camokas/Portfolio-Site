@@ -92,7 +92,6 @@ class MediaPreview extends HTMLElement {
 			.filter(index => !this.shownInCycle.has(index) && !this.failed.has(index));
 		if (!remaining.length) {
 			this.shownInCycle.clear();
-			if (this.index >= 0) this.shownInCycle.add(this.index);
 		}
 		const candidates = [...this.prepared.keys()]
 			.filter(index => index !== this.index && !this.shownInCycle.has(index));
