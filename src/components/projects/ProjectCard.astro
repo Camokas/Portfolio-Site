@@ -37,7 +37,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 
 				<h3>{project.data.title}</h3>
 
-				<p>{project.data.summary}</p>
+				{project.data.summary && <div class="summary-reveal"><p><span>{project.data.summary}</span></p></div>}
 
 				<span class="project-action" aria-hidden="true">
 					View project <Icon name="arrow-right" size={17} />
@@ -121,10 +121,15 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 	}
 
 	p {
-		margin: 0.75rem 0 0;
+		margin: 0;
 		color: var(--color-muted);
 		line-height: 1.6;
 	}
+	.summary-reveal { display: grid; grid-template-rows: 0fr; opacity: 0; transform: translateY(0.5rem); transition: grid-template-rows 350ms ease, opacity 300ms ease, transform 350ms ease; }
+	.summary-reveal p { min-height: 0; overflow: hidden; }
+	.summary-reveal span { display: -webkit-box; padding-top: 0.75rem; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+	.project-card:hover .summary-reveal, .project-card:focus-within .summary-reveal { grid-template-rows: 1fr; opacity: 1; transform: translateY(0); }
+	@media (hover: none) { .summary-reveal { grid-template-rows: 1fr; opacity: 1; transform: none; } }
 
 	.project-action {
 		display: inline-flex;

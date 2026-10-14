@@ -127,6 +127,11 @@ const projects = defineCollection({
 				}),
 			)
 			.default([]),
+		shaderGraphs: z.array(z.object({
+			title: z.string(),
+			src: z.string().regex(/\.(shadergraph|shadersubgraph)$/i, "Use a local .shadergraph or .shadersubgraph path").refine((value) => !/^(?:https?:)?\/\//.test(value), "Shader graphs must be hosted in public/"),
+			description: z.string().optional(),
+		})).default([]),
 		featured: z.boolean().default(false),
 		draft: z.boolean().default(false),
 		demo: z.boolean().default(false),

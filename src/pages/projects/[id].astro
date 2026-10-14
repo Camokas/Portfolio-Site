@@ -22,6 +22,8 @@ import Code from "../../components/projects/inline/Code.astro";
 import Resources from "../../components/projects/inline/Resources.astro";
 import Downloads from "../../components/projects/inline/Downloads.astro";
 import Links from "../../components/projects/inline/Links.astro";
+import ShaderGraph from "../../components/projects/inline/ShaderGraph.astro";
+import ProjectShaderGraphs from "../../components/projects/ProjectShaderGraphs.astro";
 
 export async function getStaticPaths() {
 	const projects = await getCollection("projects", ({ data }) => !data.draft);
@@ -39,7 +41,7 @@ interface Props {
 const { project } = Astro.props;
 const { Content } = await render(project);
 const inline = project.data.mediaLayout === "inline";
-const mediaComponents = { Gallery, Image: Gallery, Video, Audio, Models, Code, Resources, Downloads, Links };
+const mediaComponents = { Gallery, Image: Gallery, Video, Audio, Models, Code, Resources, Downloads, Links, ShaderGraph, ShaderGraphs: ShaderGraph };
 const direction = directions.find(
 	(item) => item.slug === project.data.direction,
 );
@@ -139,6 +141,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 				)
 			}
 
+			{!inline && project.data.shaderGraphs.length > 0 && <ProjectShaderGraphs items={project.data.shaderGraphs} />}
 			<div class="project-content">
 				<Content components={mediaComponents} />
 			</div>

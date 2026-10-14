@@ -1,0 +1,49 @@
+<!doctype html>
+<!-- Portfolio adapter for Stelios Petrakis' Shader Graph Viewer, GPL-3.0. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Shader Graph Viewer</title>
+  <link rel="stylesheet" href="style/style.css">
+  <link rel="stylesheet" href="portfolio.css">
+</head>
+<body class="page-portfolio">
+  <header>
+    <span id="graph-name">Shader Graph</span>
+    <button id="uploader-button" hidden>Open file</button>
+    <input id="uploader" type="file" accept=".shadergraph,.shadersubgraph" hidden>
+    <div id="zoom"></div>
+    <div class="tools">
+      <button id="fit" title="Fit the whole graph">Fit graph</button>
+      <button id="blackboard" disabled>Properties</button>
+      <button id="graph-inspector" disabled>Inspector</button>
+      <button id="reset" disabled title="Reset position">Reset</button>
+      <button id="fullscreen" disabled title="Fullscreen">Fullscreen</button>
+    </div>
+  </header>
+  <div id="canvas"><div class="container"></div></div>
+  <!-- Compatibility placeholders used by the upstream panel toggles; no remote library is loaded. -->
+  <button id="library" hidden aria-hidden="true" tabindex="-1"></button>
+  <div id="library-container" hidden></div>
+  <div id="blackboard-container">
+    <h5>Properties</h5>
+    <div class="property-list"><h6>Properties</h6><ul></ul></div>
+  </div>
+  <div id="inspector" class="close">
+    <h5>Graph Inspector</h5>
+    <nav><ul><li data-type="node">Node Settings</li><li data-type="graph" class="active">Graph Settings</li></ul></nav>
+    <div class="body"></div>
+  </div>
+  <p id="viewer-status" role="status">Loading shader graph…</p>
+  <footer>
+    <span>Drag to pan · Wheel to zoom · Select node to inspect</span>
+    <a href="NOTICE.md" target="_blank" rel="noopener">Viewer credits &amp; source</a>
+    <a href="LICENSE" target="_blank" rel="noopener">GPLv3 · No warranty</a>
+  </footer>
+  <script src="script.js"></script>
+  <script src="portfolio.js"></script>
+</body>
+</html>

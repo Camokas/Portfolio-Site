@@ -1,0 +1,57 @@
+---
+import CollapsibleSection from "../ui/CollapsibleSection.astro";
+interface ShaderGraphItem { title: string; src: string; description?: string; }
+interface Props { items: ShaderGraphItem[]; sectionKey?: string; open?: boolean; }
+const { items, sectionKey = "shader-graphs", open = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const fileUrl = (src: string) => `${base}${src.replace(/^\/+/, "")}`;
+const viewerUrl = (src: string) => `${base}vendor/shader-graph/index.html?src=${encodeURIComponent(fileUrl(src))}`;
+---
+
+<CollapsibleSection title="Shader Graph" icon="blend" count={items.length} section={sectionKey} open={open}>
+	<div class="graph-list">
+		{items.map((item) => <figure>
+			<figcaption>
+				<div><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}</div>
+				<div class="graph-links">
+					<a href={viewerUrl(item.src)} target="_blank" rel="noopener">Open viewer</a>
+					<a href={fileUrl(item.src)} download>Download graph</a>
+				</div>
+			</figcaption>
+			<shader-graph-viewer data-viewer-url={viewerUrl(item.src)}>
+				<iframe title={`Shader Graph: ${item.title}`} sandbox="allow-scripts allow-same-origin" allow="fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
+			</shader-graph-viewer>
+		</figure>)}
+	</div>
+</CollapsibleSection>
+
+<script>
+	class ShaderGraphViewer extends HTMLElement {
+		events?: AbortController;
+		connectedCallback() {
+			const section = this.closest("details");
+			const frame = this.querySelector("iframe");
+			if (!section || !frame) return;
+			this.events?.abort(); this.events = new AbortController();
+			const load = () => {
+				if (section.open && !frame.hasAttribute("src")) frame.src = this.dataset.viewerUrl!;
+			};
+			section.addEventListener("toggle", load, { signal: this.events.signal });
+			load();
+		}
+		disconnectedCallback() { this.events?.abort(); }
+	}
+	if (!customElements.get("shader-graph-viewer")) customElements.define("shader-graph-viewer", ShaderGraphViewer);
+</script>
+
+<style>
+	.graph-list { display: grid; gap: 2rem; }
+	figure { margin: 0; }
+	figcaption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+	h3 { margin: 0; font-size: 1rem; }
+	p { margin: 0.4rem 0 0; color: var(--color-muted); font-size: 0.85rem; }
+	.graph-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; font-size: 0.75rem; }
+	a { color: var(--color-text); text-underline-offset: 0.2rem; padding-block: 0.4rem; }
+	shader-graph-viewer { display: block; height: clamp(26rem, 65svh, 44rem); border: 1px solid var(--color-border); border-radius: 0.85rem; overflow: hidden; background: #141414; }
+	iframe { width: 100%; height: 100%; border: 0; display: block; }
+</style>
