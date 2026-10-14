@@ -15,6 +15,7 @@ class MediaPreview extends HTMLElement {
 	events?: AbortController;
 	failed = new Set<number>();
 	prepared = new Map<number, HTMLElement>();
+	shownInCycle = new Set<number>();
 	pending = new Set<number>();
 	get running() { return this.visible && !document.hidden && this.isConnected; }
 	connectedCallback() {
@@ -26,6 +27,7 @@ class MediaPreview extends HTMLElement {
 		const initial = this.querySelector<HTMLImageElement>("img.slide");
 		if (initial && this.items[0].kind === "image") {
 			this.prepared.set(0, initial); this.index = 0;
+			this.shownInCycle.add(0);
 		}
 		this.observer = new IntersectionObserver(([entry]) => {
 			this.visible = entry.isIntersecting;
@@ -85,7 +87,15 @@ class MediaPreview extends HTMLElement {
 	}
 	advance() {
 		if (!this.running) return;
-		const candidates = [...this.prepared.keys()].filter(index => index !== this.index);
+		// Finish every non-failed item before starting another random cycle.
+		const remaining = this.items.map((_, index) => index)
+			.filter(index => !this.shownInCycle.has(index) && !this.failed.has(index));
+		if (!remaining.length) {
+			this.shownInCycle.clear();
+			if (this.index >= 0) this.shownInCycle.add(this.index);
+		}
+		const candidates = [...this.prepared.keys()]
+			.filter(index => index !== this.index && !this.shownInCycle.has(index));
 		if (candidates.length) {
 			this.show(candidates[Math.floor(Math.random() * candidates.length)]);
 		}
@@ -109,6 +119,7 @@ class MediaPreview extends HTMLElement {
 		});
 		setTimeout(() => old.forEach((node) => node.remove()), 1250);
 		this.index = index;
+		this.shownInCycle.add(index);
 		this.updateVideo();
 	}
 	release(element: HTMLElement) {
