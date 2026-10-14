@@ -1,7 +1,7 @@
 import type { PreviewMedia } from "../data/projectPreviews";
 
 // Общий интервал после первой смены (миллисекунды).
-const MEDIA_INTERVAL_MS = 5000;
+const MEDIA_INTERVAL_MS = 3500;
 
 class MediaPreview extends HTMLElement {
 	items: PreviewMedia[] = [];
@@ -85,9 +85,9 @@ class MediaPreview extends HTMLElement {
 	}
 	advance() {
 		if (!this.running) return;
-		for (let step = 1; step <= this.items.length; step++) {
-			const next = (this.index + step) % this.items.length;
-			if (next !== this.index && this.prepared.has(next)) { this.show(next); break; }
+		const candidates = [...this.prepared.keys()].filter(index => index !== this.index);
+		if (candidates.length) {
+			this.show(candidates[Math.floor(Math.random() * candidates.length)]);
 		}
 		this.preload();
 	}

@@ -12,7 +12,7 @@ const ordered = [...projects].sort((a, b) =>
 );
 const yearOf = (project: CollectionEntry<"projects">) => project.data.date.getUTCFullYear();
 const dateFormatter = new Intl.DateTimeFormat("en", {
-	day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+	month: "long", year: "numeric", timeZone: "UTC",
 });
 ---
 

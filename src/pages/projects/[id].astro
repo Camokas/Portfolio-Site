@@ -55,7 +55,7 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 const formattedDate = project.data.date.toLocaleDateString("en", {
 	year: "numeric",
 	month: "long",
-	day: "numeric",
+	timeZone: "UTC",
 });
 ---
 
