@@ -13,6 +13,7 @@ interface VideoItem {
 	poster?: ImageMetadata;
 	preload: "none" | "metadata" | "auto";
 	loop: boolean;
+	autoplay: boolean;
 	muted: boolean;
 	sources: VideoSource[];
 }
@@ -37,6 +38,7 @@ function resolveMediaUrl(src: string): string {
 			items.map((item) => (
 				<li>
 					<figure>
+						<project-video-player data-autoplay={String(item.autoplay)}>
 						<video
 							controls
 							playsinline
@@ -53,6 +55,7 @@ function resolveMediaUrl(src: string): string {
 							Your browser does not support HTML video. You can
 							<a href={resolveMediaUrl(item.sources[0].src)}>open the video file</a>.
 						</video>
+						</project-video-player>
 
 						<figcaption>
 							<strong>{item.title}</strong>
@@ -65,7 +68,40 @@ function resolveMediaUrl(src: string): string {
 	</ul>
 </CollapsibleSection>
 
+<script>
+	class ProjectVideoPlayer extends HTMLElement {
+		events?: AbortController;
+		connectedCallback() {
+			const video = this.querySelector("video");
+			const section = this.closest("details");
+			if (!video || !section) return;
+			this.events?.abort();
+			this.events = new AbortController();
+			const options = { signal: this.events.signal };
+			// Explicitly set the property as well as the server-rendered muted attribute.
+			video.muted = video.defaultMuted;
+			const sync = () => {
+				const visible = section.open && !document.hidden;
+				video.autoplay = visible && this.dataset.autoplay === "true";
+				if (!visible) { video.pause(); return; }
+				if (video.autoplay) void video.play().catch(() => {
+					// Native controls remain available when browser autoplay is blocked.
+				});
+			};
+			section.addEventListener("toggle", sync, options);
+			document.addEventListener("visibilitychange", sync, options);
+			sync();
+		}
+		disconnectedCallback() {
+			this.events?.abort();
+			this.querySelector("video")?.pause();
+		}
+	}
+	if (!customElements.get("project-video-player")) customElements.define("project-video-player", ProjectVideoPlayer);
+</script>
+
 <style>
+	project-video-player { display: block; }
 	ul {
 		display: grid;
 		gap: 2rem;

@@ -9,6 +9,9 @@ tags:
 
 videos:
   - title: "Project demonstration"
+    autoplay: true
+    muted: true
+    loop: true
     sources:
       - src: "projects/FirstBuildest-SettingsPreviewShader/FirstBuildest-PreviewSettingsShader.mp4"
         type: "video/mp4"

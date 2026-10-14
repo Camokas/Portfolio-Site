@@ -31,6 +31,7 @@ demo: false
 #     poster: "../../assets/projects/my-project/video-poster.webp"
 #     preload: "metadata"
 #     loop: false
+#     autoplay: false
 #     muted: false
 #     sources:
 #       - src: "projects/my-project/demo.mp4"

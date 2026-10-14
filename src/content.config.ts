@@ -32,6 +32,7 @@ const projects = defineCollection({
 					poster: image().optional(),
 					preload: z.enum(["none", "metadata", "auto"]).default("metadata"),
 					loop: z.boolean().default(false),
+					autoplay: z.boolean().default(false),
 					muted: z.boolean().default(false),
 					sources: z
 						.array(
