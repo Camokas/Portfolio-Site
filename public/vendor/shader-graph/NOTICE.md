@@ -14,6 +14,7 @@ https://github.com/Camokas/Portfolio-Site/tree/master/public/vendor/shader-graph
 Portfolio modifications (2026-10-14):
 - New index.html, portfolio.css and portfolio.js, distributed under GPL-3.0.
 - Same-origin source-file loading, automatic fit-to-view, pointer-anchored zoom, compact controls.
+- Non-passive canvas wheel handling prevents zoom gestures from scrolling the parent page.
 - No submission, shared-preview service, public library or remote dependencies.
 - Source and license notices retained in the viewer interface.
 

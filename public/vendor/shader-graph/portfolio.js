@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Keep zoom anchored under the pointer after our fit-to-view changes the scale.
   // The upstream wheel handler calls this method, so its event wiring is preserved.
   window.PannerDragger.resize = function(delta, x, y) {
-    if (!this.shaderLoaded || !this.pageFocused || this.blackboard.hovering || this.inspector.hovering || this.isHoveringHeader || this.isPresenting) return false;
+    if (!this.shaderLoaded || this.blackboard.hovering || this.inspector.hovering || this.isHoveringHeader || this.isPresenting) return false;
     const previous = this.scaleFactor;
     const next = Math.max(this.minScaleFactor, Math.min(this.maxScaleFactor, previous * Math.exp((delta < 0 ? 1 : -1) * this.scaleStep)));
     const cursorX = x - this.containerElement.offsetLeft;
@@ -22,6 +22,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     this.updateTransform();
     return true;
   };
+  // Root wheel listeners can be passive by default. Capture the canvas gesture
+  // explicitly so it cannot also scroll the surrounding portfolio page.
+  window.addEventListener("wheel", event => {
+    if (!(event.target instanceof Element) || !event.target.closest("#canvas")) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (event.deltaY !== 0) window.PannerDragger.resize(event.deltaY, event.clientX, event.clientY);
+  }, { capture: true, passive: false });
   function fitGraph() {
     const nodes = [...container.querySelectorAll(".node")];
     if (!nodes.length) return;
