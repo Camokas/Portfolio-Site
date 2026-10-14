@@ -97,6 +97,8 @@ const projects = defineCollection({
 						"csharp",
 						"css",
 						"glsl",
+						"hlsl",
+						"shaderlab",
 						"html",
 						"js",
 						"json",
