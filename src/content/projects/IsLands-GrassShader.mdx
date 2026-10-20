@@ -1,9 +1,9 @@
 ---
-title: "Grass Shader"
+title: "Smoke Shader"
 mediaLayout: "inline"
-summary: "Texture2DArray & Noise-Based Animation."
+summary: "Animated Noise & Voronoi."
 direction: "shading"
-date: 2025-10-28
+date: 2026-12-03
 tags:
   - "Shader"
   - "Prototype"
@@ -16,23 +16,14 @@ videos:
     loop: true
     showInCards: true
     sources:
-      - src: "projects/IsLands-GrassShader/IsLands-GrassShad_1.mp4"
-        type: "video/mp4"
-  - title: ""
-    autoplay: true
-    autoAspect: true
-    muted: true
-    loop: true
-    showInCards: false
-    sources:
-      - src: "projects/IsLands-GrassShader/IsLands-GrassShad_2.mp4"
+      - src: "projects/IsLands-SmokeShader/IsLands-SmokeShader.mp4"
         type: "video/mp4"
 
 
 
 shaderGraphs:
   - title: "Graph"
-    src: "projects/IsLands-GrassShader/GrassShad.shadergraph"
+    src: "projects/IsLands-SmokeShader/SmokeShad.shadergraph"
     showInCards: false
     description: ""
 
@@ -42,8 +33,9 @@ demo: false
 ---
 
 
->  A further optimized billboard shader featuring sprite selection from a Texture2DArray, noise-driven animation designed to scale across thousands of instances, and a dithering effect around the selected block. Built to efficiently handle large numbers of animated sprites while minimizing script-based operations.
+>  A stylized smoke shader combining animated noise and Voronoi patterns to shape the smoke. Gradient mapping controls the color palette, while quantization creates a distinct stepped appearance. Billboard geometry automatically faces the camera.
+
+> The shader was ultimately not used in the final project. Looking back, I can see opportunities to improve its visual quality and have a clear idea of how I would approach a redesign.
 
 <Video index={1} group open />
-<Video index={2} group open />
 <ShaderGraph index={1} group open />
