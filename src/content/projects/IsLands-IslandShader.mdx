@@ -1,7 +1,7 @@
 ---
-title: "Block Atlas Shader"
+title: "Tree Billboard Shader"
 mediaLayout: "inline"
-summary: "Weather Response & Crouch Movement Visualization."
+summary: "Dithered Transparency & Camera Alignment."
 direction: "shading"
 date: 2025-02-07
 tags:
@@ -15,12 +15,13 @@ videos:
     muted: true
     loop: true
     sources:
-      - src: "projects/IsLands-IslandShader/IsLands-IslandShader.mp4"
+      - src: "projects/IsLands-TreeTransparentShader/IsLands-TreeTransparentShader.mp4"
         type: "video/mp4"
 
 shaderGraphs:
   - title: "Graph"
-    src: "projects/IsLands-IslandShader/DefIslandShad.shadergraph"
+    src: "projects/IsLands-TreeTransparentShader/TreeShad.shadergraph"
+    showInCards: false
     description: ""
 
 featured: true
@@ -29,7 +30,7 @@ demo: false
 ---
 
 
->  An example of shader integration with gameplay mechanics. Used since the early stages of development, the shader initially handled UV mapping and block texture atlas sampling. It was later expanded to support weather-driven effects and a pulsing visual indicator around the player, highlighting the movement restriction that prevents players from walking off block edges while crouching.
+>  The first fully developed shader combining billboard functionality with dithered transparency. It automatically aligned sprites to face the camera and used proximity-based dithering to gradually fade objects near the player. This solved character occlusion issues and provided a shader-based alternative to script-driven billboard rotation, eliminating the need for per-object rotation scripts.
 
 <Video index={1} group open />
 <ShaderGraph index={1} group open />
