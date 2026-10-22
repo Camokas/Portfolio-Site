@@ -4,7 +4,7 @@ import { z } from "astro/zod";
 import { directionSlugs } from "./data/directions";
 import { isProjectAssetPath, isHttpsMediaUrl } from "./data/projectAssetPaths.mjs";
 import { resolve, relative, isAbsolute, sep } from "node:path";
-import { realpathSync, statSync } from "node:fs";
+import { readFileSync, realpathSync, statSync } from "node:fs";
 
 const publicRoot = realpathSync(resolve('public'));
 const localAsset = z.string().refine(isProjectAssetPath, {
@@ -132,9 +132,15 @@ const projects = defineCollection({
 						"python",
 						"ts",
 					]),
-					code: z.string(),
+					code: z.string().optional(),
+					src: localAsset.optional(),
 					description: z.string().optional(),
-				}),
+				}).refine((sample) => Boolean(sample.code) !== Boolean(sample.src), {
+					message: "Use exactly one of code or src",
+				}).transform((sample) => ({
+					...sample,
+					code: sample.code ?? readFileSync(realpathSync(resolve(publicRoot, sample.src!)), "utf8"),
+				})),
 			)
 			.default([]),
 		models: z
