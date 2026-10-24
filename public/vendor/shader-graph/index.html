@@ -5,10 +5,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; media-src 'none'; frame-src 'none'; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
   <title>Shader Graph Viewer</title>
-  <link rel="stylesheet" href="style/style.css">
-  <link rel="stylesheet" href="portfolio.css">
+  <link rel="stylesheet" href="style/style.css" integrity="sha384-rTObCxxBHrue/jhsIdO65pi1EEw3Pl+zQXy9yNiUiLWxTfg183/bH2eDqshusTU9" crossorigin="anonymous">
+  <link rel="stylesheet" href="portfolio.css" integrity="sha384-HNhpnUEcYB58hpKLB4+EpfxG4xhMb0TLVmSTWf+Ei7m2COwuHnBQqOVHX45WQLVb" crossorigin="anonymous">
 </head>
 <body class="page-portfolio">
   <header>
@@ -43,7 +44,7 @@
     <a href="NOTICE.md" target="_blank" rel="noopener">Viewer credits &amp; source</a>
     <a href="LICENSE" target="_blank" rel="noopener">GPLv3 · No warranty</a>
   </footer>
-  <script src="script.js"></script>
-  <script src="portfolio.js"></script>
+  <script src="script.js" integrity="sha384-4PQyICktVVppPxPN4jn+GVItcgU0bxPy9RLrqPXkcr4toC6A+W/MQL7wjoaPzeD5" crossorigin="anonymous"></script>
+  <script src="portfolio.js" integrity="sha384-jiBkour6wmQGmLiRbf1Izh5Vh325/L4X4j2Xt4aE5EH+j9dbP7cJDyvrwBWcePIX" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -14,6 +14,7 @@ const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site).href :
 
 <meta name="description" content={description} />
 <meta name="author" content="Daniil Doroshkin" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
 <meta name="theme-color" content="#0e0e0e" />
 {noindex && <meta name="robots" content="noindex, follow" />}
 {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
