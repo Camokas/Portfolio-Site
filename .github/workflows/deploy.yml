@@ -30,10 +30,12 @@ jobs:
         run: npm audit --audit-level=high
       - name: Run tests
         run: node --test tests/*.test.mjs
-      - name: Install, build and upload Astro site
-        uses: withastro/action@a8b97df764791eb61fbf3338ef713b0e61ae05c5 # v6
+      - name: Build Astro site
+        run: npm run build
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
-          node-version: 24
+          path: dist/
 
   deploy:
     needs: build
