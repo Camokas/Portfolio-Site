@@ -3,6 +3,7 @@ import MediaPreview from "./MediaPreview.astro";
 import { projectPreviews } from "../../data/projectPreviews";
 import type { CollectionEntry } from "astro:content";
 import Icon from "../ui/Icon.astro";
+import { translateExact } from "../../data/translations";
 
 interface Props {
 	project: CollectionEntry<"projects">;
@@ -16,12 +17,16 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 	month: "short",
 	timeZone: "UTC",
 });
+const englishSearch = `${project.data.title} ${project.data.summary} ${project.data.tags.join(" ")}`;
+const russianSearch = [project.data.title, project.data.summary, ...project.data.tags]
+	.map((value) => translateExact(value.trim(), "ru"))
+	.join(" ");
 ---
 
 <li class="project-item"
 	data-project-card
 	data-title={project.data.title}
-	data-search={`${project.data.title} ${project.data.summary} ${project.data.tags.join(" ")}`}
+	data-search={`${englishSearch} ${russianSearch}`}
 	data-direction={project.data.direction}
 	data-date={project.data.date.getTime()}
 >
@@ -31,7 +36,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 
 			<div class="project-content">
 				<div class="project-meta">
-					<time datetime={project.data.date.toISOString()}>{formattedDate}</time>
+					<time datetime={project.data.date.toISOString()} data-date-format="month-short">{formattedDate}</time>
 
 					{project.data.demo && <span>Demo</span>}
 				</div>

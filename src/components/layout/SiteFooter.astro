@@ -34,7 +34,7 @@ const formattedCommitDate = buildCommit
 					data-api-url={commitsApiUrl}
 					data-repository-url={repositoryUrl}
 				>
-					<time datetime={buildCommit?.date} data-latest-commit-date>
+					<time datetime={buildCommit?.date} data-latest-commit-date data-date-format="commit">
 						{formattedCommitDate}
 					</time>
 				</a>

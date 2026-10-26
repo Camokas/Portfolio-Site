@@ -82,7 +82,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 					<p class="eyebrow">
 						<Icon name={direction.icon} size={15} /> {direction.title}
 					</p>
-					<time datetime={project.data.date.toISOString()}>{formattedDate}</time>
+					<time datetime={project.data.date.toISOString()} data-date-format="month-long">{formattedDate}</time>
 
 					{
 						project.data.tags.length > 0 && (

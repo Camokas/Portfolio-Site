@@ -18,8 +18,17 @@ const baseUrl = import.meta.env.BASE_URL;
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} data-language={lang}>
 	<head>
+		<script is:inline>
+			try {
+				const savedLanguage = localStorage.getItem("portfolio-language");
+				if (savedLanguage === "ru" || savedLanguage === "en") {
+					document.documentElement.lang = savedLanguage;
+					document.documentElement.dataset.language = savedLanguage;
+				}
+			} catch { /* English remains the safe default. */ }
+		</script>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
@@ -36,5 +45,6 @@ const baseUrl = import.meta.env.BASE_URL;
 		<SiteHeader />
 		<slot />
 		<SiteFooter />
+		<script src="../scripts/language.ts"></script>
 	</body>
 </html>

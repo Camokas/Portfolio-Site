@@ -1,5 +1,6 @@
 ---
 import Icon from "../ui/Icon.astro";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
 
 const baseUrl = import.meta.env.BASE_URL;
 const directionsUrl = `${baseUrl}#directions`;
@@ -15,6 +16,7 @@ const isProjectsPage = Astro.url.pathname.startsWith(projectsUrl);
 			Camoka<span aria-hidden="true">.</span>
 		</a>
 
+		<div class="header-actions">
 		<nav aria-label="Primary navigation">
 			<a
 				class="nav-link"
@@ -46,6 +48,8 @@ const isProjectsPage = Astro.url.pathname.startsWith(projectsUrl);
 				Projects
 			</a>
 		</nav>
+		<LanguageSwitcher />
+		</div>
 	</div>
 </header>
 
@@ -87,6 +91,12 @@ const isProjectsPage = Astro.url.pathname.startsWith(projectsUrl);
 		gap: clamp(0.65rem, 3vw, 1.5rem);
 	}
 
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: clamp(0.75rem, 2.5vw, 1.5rem);
+	}
+
 	.nav-link {
 		min-height: 2.75rem;
 		min-width: 2.75rem;
@@ -114,6 +124,14 @@ const isProjectsPage = Astro.url.pathname.startsWith(projectsUrl);
 	}
 
 	@media (max-width: 32rem) {
+		.header-inner {
+			gap: 0.65rem;
+		}
+
+		.header-actions,
+		nav {
+			gap: 0.35rem;
+		}
 		.nav-link {
 			gap: 0;
 			font-size: 0;

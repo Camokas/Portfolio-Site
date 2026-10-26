@@ -1,0 +1,71 @@
+<div class="language-switcher" role="group" aria-label="Choose site language">
+	<span class="language-slider" aria-hidden="true"></span>
+	<button type="button" data-language="en" aria-label="Switch to English" aria-pressed="true">EN</button>
+	<button type="button" data-language="ru" aria-label="Switch to Russian" aria-pressed="false">RU</button>
+</div>
+
+<style>
+	.language-switcher {
+		position: relative;
+		display: grid;
+		grid-template-columns: repeat(2, 2.45rem);
+		flex: none;
+		padding: 0.2rem;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--color-surface) 86%, transparent);
+	}
+
+	.language-slider {
+		position: absolute;
+		inset: 0.2rem auto 0.2rem 0.2rem;
+		width: 2.45rem;
+		border-radius: 999px;
+		background: var(--color-text);
+		box-shadow: 0 0.2rem 0.7rem rgb(0 0 0 / 0.25);
+		transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	:global(html[lang="ru"]) .language-slider {
+		transform: translateX(100%);
+	}
+
+	button {
+		position: relative;
+		z-index: 1;
+		min-width: 0;
+		min-height: 2.15rem;
+		padding: 0;
+		color: var(--color-muted);
+		font: inherit;
+		font-size: 0.68rem;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		border: 0;
+		border-radius: 999px;
+		background: transparent;
+		cursor: pointer;
+		transition: color 180ms ease;
+	}
+
+	button[aria-pressed="true"] {
+		color: var(--color-background);
+		cursor: default;
+	}
+
+	button:hover:not([aria-pressed="true"]) {
+		color: var(--color-text);
+	}
+
+	button:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 0.2rem;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.language-slider,
+		button {
+			transition: none;
+		}
+	}
+</style>

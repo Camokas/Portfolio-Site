@@ -26,7 +26,7 @@ const dateFormatter = new Intl.DateTimeFormat("en", {
 				)}
 				<div class="timeline-row">
 					<span class="timeline-dot" aria-hidden="true"></span>
-					<time class="timeline-date" datetime={project.data.date.toISOString()}>
+					<time class="timeline-date" datetime={project.data.date.toISOString()} data-date-format="month-long">
 						{dateFormatter.format(project.data.date)}
 					</time>
 					<div class="timeline-card">
