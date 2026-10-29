@@ -6,6 +6,7 @@ test('all media share a project-relative public path', () => {
   for (const name of ['cover.webp', 'demo.mp4', 'sound.mp3', 'mesh.glb', 'graph.shadergraph', 'files/source.zip']) {
     assert.equal(isProjectAssetPath(`projects/my-project/${name}`), true);
   }
+	assert.equal(isProjectAssetPath('projects/Shaders/IsLands/My Project/demo.webm'), true);
 });
 test('reject traversal, absolute paths, schemes and encoded separators', () => {
   for (const value of ['../file.png', '/projects/a/file.png', 'projects/a/../file.png', 'projects/a/%2e%2e/file.png',

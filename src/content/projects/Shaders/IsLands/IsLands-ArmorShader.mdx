@@ -1,9 +1,9 @@
 ---
-title: "Worm Sand Shader"
+title: "Armor Smelting Shader"
 mediaLayout: "inline"
-summary: "A specialized shader visualizing sand movement caused by an enemy while hidden."
+summary: "A shader for visualizing the armor smelting process."
 direction: "shading"
-date: 2026-03-18
+date: 2026-03-29
 tags:
   - "Shader"
   - "Prototype"
@@ -16,7 +16,7 @@ videos:
     loop: true
     showInCards: true
     sources:
-      - src: "projects/IsLands-WormSandShader/IsLands-WormSand_1.webm"
+      - src: "projects/Shaders/IsLands/IsLands-ArmorShader/IsLands-ArmorShader_1.webm"
         type: "video/mp4"
   - title: ""
     autoplay: true
@@ -25,14 +25,14 @@ videos:
     loop: true
     showInCards: false
     sources:
-      - src: "projects/IsLands-WormSandShader/IsLands-WormSand_2.webm"
+      - src: "projects/Shaders/IsLands/IsLands-ArmorShader/IsLands-ArmorShader_2.webm"
         type: "video/mp4"
 
 
 
 shaderGraphs:
   - title: "Graph"
-    src: "projects/IsLands-WormSandShader/DesertWormHiddenSandShad.shadergraph"
+    src: "projects/Shaders/IsLands/IsLands-ArmorShader/ArmorPreviewImageShad.shadergraph"
     showInCards: false
     description: ""
     
@@ -42,7 +42,7 @@ demo: false
 ---
 
 
->  Combines flipbook animation, pixelated noise, and a circular mask, along with damage feedback and highlighting effects. Designed to visually communicate the enemy's behavior and hidden state.
+>  Dynamically modifies the image based on progress using noise, gradients, masks, and conditional branching. Preserves the pixel-art aesthetic while providing clear visual feedback in the UI.
 
 <Video index={1} group open />
 <Video index={2} group open />

@@ -8,9 +8,9 @@ test('Unity JSON stream preserves braces and escaped quotes in text', () => {
   assert.throws(() => graphObjects('{"broken":'));
 });
 test('real graphs produce static SVG nodes and connections without scripts', () => {
-  for (const path of ['projects/FirstBuildest-SettingsPreviewShader/SettPreviewShad.shadergraph',
-    'projects/FirstBuildest-CustomTreeShader/TestLeavesShad.shadergraph',
-    'projects/ToTheSky2-NoiseCloudsShader/MenuSkyShader.shadergraph']) {
+  for (const path of ['projects/Shaders/FirstBuildest/FirstBuildest-SettingsPreviewShader/SettPreviewShad.shadergraph',
+    'projects/Shaders/FirstBuildest/FirstBuildest-CustomTreeShader/TestLeavesShad.shadergraph',
+    'projects/Shaders/ToTheSky2/ToTheSky2-NoiseCloudsShader/MenuSkyShader.shadergraph']) {
     const image = shaderGraphPreview(path);
     const svg = decodeURIComponent(image.split(',')[1]);
     assert.match(svg, /<path d="M/);
