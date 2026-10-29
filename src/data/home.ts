@@ -16,7 +16,7 @@ export const home = {
 	showLess: "Show less",
 	directionsKicker: "What I explore",
 	directionsTitle: "Creative Directions",
-	directionsDescription: "Nine areas bringing together development, visual art, sound, motion, and interactive experiments.",
+	directionsDescription: "Eight areas bringing together development, visual art, sound, motion, and interactive experiments.",
 	contactKicker: "Get in touch",
 	contactTitle: "Contact",
 	contactDescription: "For now, GitHub is the best place to follow my work and the development of this portfolio. More contact methods can be added here later.",

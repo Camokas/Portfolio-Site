@@ -7,7 +7,6 @@ export const directionSlugs = [
 	"drawing",
 	"video-editing",
 	"motion-design",
-	"programming",
 	"animation",
 	"shading",
 ] as const;
@@ -57,12 +56,6 @@ export const directions = [
 		title: "Motion Design",
 		description: "Motion graphics, titles, and animated design.",
 		icon: "wand-sparkles",
-	},
-	{
-		slug: "programming",
-		title: "Programming",
-		description: "Applications, tools, experiments, and source code.",
-		icon: "code-2",
 	},
 	{
 		slug: "animation",
