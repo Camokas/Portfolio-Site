@@ -6,6 +6,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "prepare:videos": "node scripts/prepare-video-previews.mjs",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",

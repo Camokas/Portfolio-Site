@@ -1,4 +1,5 @@
 import type { PreviewMedia } from "../data/projectPreviews";
+import { localizedMediaUrl } from "./localizedMediaClient";
 
 // Общий интервал после первой смены (миллисекунды).
 const MEDIA_INTERVAL_MS = 3500;
@@ -24,6 +25,24 @@ class MediaPreview extends HTMLElement {
 		this.events = new AbortController();
 		const options = { signal: this.events.signal };
 		document.addEventListener("visibilitychange", () => this.sync(), options);
+		document.addEventListener("portfolio:language-change", () => {
+			for (const element of this.prepared.values()) {
+				if (element instanceof HTMLImageElement) {
+					const src = localizedMediaUrl(element.src);
+					if (element.src !== new URL(src, document.baseURI).href) element.src = src;
+				}
+				if (element instanceof HTMLVideoElement) {
+					let changed = false;
+					for (const source of element.querySelectorAll("source")) {
+						const src = localizedMediaUrl(source.src);
+						if (source.src !== new URL(src, document.baseURI).href) { source.src = src; changed = true; }
+					}
+					if (element.poster) element.poster = localizedMediaUrl(element.poster);
+					if (changed) element.load();
+				}
+			}
+			this.updateVideo();
+		}, options);
 		const initial = this.querySelector<HTMLImageElement>("img.slide");
 		if (initial && (this.items[0].kind === "image" || this.items[0].kind === "shaderGraph")) {
 			this.prepared.set(0, initial); this.index = 0;
@@ -135,9 +154,9 @@ class MediaPreview extends HTMLElement {
 			const video = document.createElement("video");
 			video.muted = true; video.defaultMuted = true; video.playsInline = true; video.loop = true;
 			video.preload = "auto"; video.tabIndex = -1; video.setAttribute("aria-hidden", "true");
-			if (item.poster) video.poster = item.poster;
+			if (item.poster) video.poster = localizedMediaUrl(item.poster);
 			for (const source of item.sources ?? []) {
-				const node = document.createElement("source"); node.src = source.src; node.type = source.type; video.append(node);
+				const node = document.createElement("source"); node.src = localizedMediaUrl(source.src); node.type = source.type; video.append(node);
 			}
 			try { await this.ready(video, "loadeddata"); return video; }
 			catch {
@@ -153,7 +172,7 @@ class MediaPreview extends HTMLElement {
 	}
 	async image(src: string) {
 		const image = new Image(); image.alt = ""; image.decoding = "async";
-		const loaded = this.ready(image, "load"); image.src = src; await loaded; return image;
+		const loaded = this.ready(image, "load"); image.src = localizedMediaUrl(src); await loaded; return image;
 	}
 	ready(element: HTMLImageElement | HTMLVideoElement, event: string): Promise<void> {
 		return new Promise((resolve, reject) => {

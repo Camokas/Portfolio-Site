@@ -2,6 +2,7 @@ import { getImage } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 import { projectAssetUrl } from "./projectAssetPaths.mjs";
 import { shaderGraphPreview } from "./shaderGraphPreview.mjs";
+import { videoPresentation } from "./videoPresentation";
 
 export interface PreviewMedia {
 	kind: "image" | "video" | "model" | "code" | "shaderGraph";
@@ -27,7 +28,7 @@ export async function projectPreviews(project: CollectionEntry<"projects">): Pro
 		if (!video.showInCards) continue;
 		previews.push({ kind: "video", src: publicUrl(video.sources[0].src),
 			sources: video.sources.map((source) => ({ ...source, src: publicUrl(source.src) })),
-			poster: video.poster ? (await getImage({ src: video.poster, width: Math.min(800, video.poster.width) })).src : undefined,
+			poster: video.poster ? (await getImage({ src: video.poster, width: Math.min(800, video.poster.width) })).src : videoPresentation(video.sources[0].src, import.meta.env.BASE_URL)?.poster,
 			label: video.title });
 	}
 	for (const model of data.models) {

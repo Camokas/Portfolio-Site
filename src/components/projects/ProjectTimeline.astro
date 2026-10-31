@@ -29,12 +29,12 @@ const rails = periods.map(item => {
 	<p class="timeline-intro">Projects ordered by start date · periods share the same calendar</p>
 	<p class="timeline-note">Spacing adapts to the cards; distances are not a time scale.</p>
 	<div class="timeline-grid">
-		{rails.map(({side,lane,start,end,index}) => <div class:list={["period-rail",{"on-left":side===1}]} aria-hidden="true"
+		{rails.map(({side,lane,start,end,index}) => <div class:list={["period-rail",{"on-left":side===1}]} data-period={index} aria-hidden="true"
 			style={`grid-row: ${end} / ${start}; --lane: ${lane}; --mobile-lane: ${index}`}><i></i><i></i></div>)}
 		{dates.map((value,index) => {
 			const date=new Date(value), year=date.getUTCFullYear();
 			const showYear=index===0 || new Date(dates[index-1]).getUTCFullYear()!==year;
-			return <div class="calendar-marker" style={`grid-row: ${index*2+1}`}>
+			return <div class="calendar-marker" data-row={index*2+1} style={`grid-row: ${index*2+1}`}>
 				{showYear && <span class="year-marker">{year}</span>}
 				<time datetime={date.toISOString()} data-date-format="month-long">{formatter.format(date)}</time>
 			</div>;
@@ -45,7 +45,9 @@ const rails = periods.map(item => {
 			const items=ordered.filter((project,i) => month(project.data.dateEnd ?? project.data.date)===value && i%2===side);
 			return items.length>0 && <div class:list={["timeline-bucket",{"on-left":side===1}]}
 				style={`--row: ${index*2+1}; --mobile-row: ${index*2+1+side}`}>
-				{items.map(project => <div class="timeline-card" style={`--order: ${ordered.indexOf(project)}`}>
+				{items.map(project => <div class="timeline-card" data-period={ordered.indexOf(project)}
+					data-start={row(project.data.date)} data-end={row(project.data.dateEnd ?? project.data.date)}
+					style={`--order: ${ordered.indexOf(project)}`}>
 					<div class="mobile-date"><ProjectDate date={project.data.date} dateEnd={project.data.dateEnd} short /></div>
 					<span class="card-connector" aria-hidden="true"></span>
 					{project.data.dateEnd && <span class="period-label">Project period</span>}
@@ -55,6 +57,25 @@ const rails = periods.map(item => {
 		}))}
 	</div>
 </div>
+<script>
+	for (const timeline of document.querySelectorAll<HTMLElement>(".project-timeline")) {
+		const highlight = (card: HTMLElement | null) => {
+			timeline.querySelectorAll<HTMLElement>(".period-rail").forEach(rail => {
+				rail.toggleAttribute("data-active", !!card && rail.dataset.period === card.dataset.period);
+			});
+			timeline.querySelectorAll<HTMLElement>(".calendar-marker").forEach(marker => {
+				marker.toggleAttribute("data-active", !!card && (marker.dataset.row === card.dataset.start || marker.dataset.row === card.dataset.end));
+			});
+			timeline.toggleAttribute("data-period-active", !!card);
+		};
+		for (const card of timeline.querySelectorAll<HTMLElement>(".timeline-card")) {
+			card.addEventListener("pointerenter", () => highlight(card));
+			card.addEventListener("pointerleave", () => highlight(timeline.querySelector<HTMLElement>(".timeline-card:focus-within")));
+			card.addEventListener("focusin", () => highlight(card));
+			card.addEventListener("focusout", () => queueMicrotask(() => highlight(timeline.querySelector<HTMLElement>(".timeline-card:focus-within, .timeline-card:hover"))));
+		}
+	}
+</script>
 <style>
 .project-timeline{margin-top:1.5rem}
 .timeline-intro,.timeline-note{color:var(--color-muted);line-height:1.6}
@@ -79,6 +100,13 @@ const rails = periods.map(item => {
 .period-rail.on-left{justify-self:start;margin-right:0;margin-left:calc(16px + var(--lane)*8px)}
 .period-rail i{position:absolute;width:10px;height:2px;background:var(--color-accent);left:-6px}
 .period-rail i:first-child{top:0}.period-rail i:last-child{bottom:0}
+.period-rail{transition:opacity 220ms ease,filter 220ms ease}
+.project-timeline[data-period-active] .period-rail{opacity:.15}
+.project-timeline .period-rail[data-active]{opacity:1;filter:drop-shadow(0 0 4px var(--color-accent))}
+.calendar-marker time,.year-marker{transition:color 220ms ease,border-color 220ms ease}
+.calendar-marker[data-active] time{color:var(--color-accent)}
+.calendar-marker[data-active] .year-marker{border-color:var(--color-accent)}
+.timeline-card:hover .period-label,.timeline-card:focus-within .period-label{color:var(--color-text)}
 @media(max-width:48rem){
 .timeline-grid{display:flex;flex-direction:column;gap:2rem;padding-left:1.25rem}
 .timeline-grid::before{left:.25rem;top:0}

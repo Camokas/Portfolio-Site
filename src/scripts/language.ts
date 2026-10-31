@@ -1,28 +1,24 @@
 import { russianTranslations, type SiteLanguage } from "../data/translations";
 import { contentReferences } from "./contentReferences";
+import { localizedMediaUrl } from "./localizedMediaClient";
 
 const STORAGE_KEY = "portfolio-language";
-const mediaPairs: { en: string; ru: string }[] = JSON.parse(document.getElementById("localized-media")?.dataset.versions || "[]");
 function localizeMedia(language: SiteLanguage): void {
 	const attributes = ["src", "poster", "href", "data-full-src", "data-src", "srcset"];
-	const base = import.meta.env.BASE_URL;
 	for (const element of document.querySelectorAll("img, source, video, audio, a, [data-full-src], [data-src], model-viewer")) {
 		let reload = false;
 		for (const attribute of attributes) {
 			const value = element.getAttribute(attribute);
 			if (!value) continue;
-			for (const pair of mediaPairs) {
-				const matches = [pair.en, pair.ru].some(path => {
-					const stem = path.split("/").pop()!.replace(/\.[^.]+$/, "");
-					return value.includes(base + path) || (value.includes("/_astro/") && value.includes("/" + stem + "."));
-				});
-				if (!matches) continue;
-				const target = base + pair[language];
-				if (value !== target) {
-					element.setAttribute(attribute, target);
-					if (attribute === "src") reload = true;
-				}
-				break;
+			const target = attribute === "srcset" && !value.startsWith("data:")
+				? value.split(",").map(candidate => {
+					const [url, ...descriptors] = candidate.trim().split(/\s+/);
+					return [localizedMediaUrl(url, language), ...descriptors].join(" ");
+				}).join(", ")
+				: localizedMediaUrl(value, language);
+			if (value !== target) {
+				element.setAttribute(attribute, target);
+				if (attribute === "src") reload = true;
 			}
 		}
 		if (reload) {

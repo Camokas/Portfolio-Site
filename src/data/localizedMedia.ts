@@ -1,5 +1,6 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
+import videoMetadata from "./videoMetadata.json";
 
 export function localizedMedia() {
 	const files: string[] = [];
@@ -12,9 +13,14 @@ export function localizedMedia() {
 	}
 	scan("public");
 	const available = new Set(files);
-	return files.flatMap(path => {
+	const pairs = files.flatMap(path => {
 		if (!/ENVer\.[^.]+$/i.test(path)) return [];
 		const ru = path.replace(/ENVer(?=\.[^.]+$)/i, "RUVer");
 		return available.has(ru) ? [{ en: path, ru }] : [];
 	});
+	const videos = videoMetadata as Record<string, {poster:string}>;
+	return [...pairs, ...pairs.flatMap(pair => {
+		const en = videos[pair.en]?.poster, ru = videos[pair.ru]?.poster;
+		return en && ru ? [{en,ru}] : [];
+	})];
 }
