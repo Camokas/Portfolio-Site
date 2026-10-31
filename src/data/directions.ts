@@ -9,6 +9,8 @@ export const directionSlugs = [
 	"motion-design",
 	"animation",
 	"shading",
+	"social-networks",
+	"software",
 ] as const;
 
 export type DirectionSlug = (typeof directionSlugs)[number];
@@ -21,6 +23,18 @@ export interface Direction {
 }
 
 export const directions = [
+	{
+		slug: "social-networks",
+		title: "Social Networks",
+		description: "Video blogging, community building, and creative work across platforms.",
+		icon: "clapperboard",
+	},
+	{
+		slug: "software",
+		title: "Software I Use",
+		description: "The tools behind my projects and creative workflow.",
+		icon: "box",
+	},
 	{
 		slug: "game-development",
 		title: "Game Development",

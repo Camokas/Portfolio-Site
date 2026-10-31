@@ -57,6 +57,21 @@ main[id] { scroll-margin-top: 5rem; }
 }
 .skip-link:focus { transform: translateY(0); }
 
+a[data-planned-href][aria-disabled="true"] {
+	color: var(--color-text-muted, #aaa);
+	text-decoration: underline dotted;
+	text-underline-offset: 0.2em;
+	cursor: default;
+	overflow-wrap: anywhere;
+}
+a[data-planned-href][aria-disabled="true"]::after {
+	content: " (coming soon)";
+	font-size: 0.85em;
+}
+html[lang="ru"] a[data-planned-href][aria-disabled="true"]::after {
+	content: " (скоро)";
+}
+
 @media (prefers-reduced-motion: reduce) {
 	*, *::before, *::after {
 		animation-duration: 0.01ms !important;
