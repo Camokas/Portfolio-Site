@@ -1,4 +1,4 @@
-// Reveal whole editorial units once. The HTML is visible without JavaScript.
+// Hide only units below the viewport; content above it always stays visible.
 const preference = matchMedia("(prefers-reduced-motion: reduce)");
 const targets = [...document.querySelectorAll<HTMLElement>([
 	"main .section-heading", "main .direction-grid > li", "main .about",
@@ -10,7 +10,10 @@ const animations = new Map<HTMLElement, Animation>();
 let observer: IntersectionObserver | undefined;
 
 function reveal(element: HTMLElement, animate = true, delay = 0): void {
-	observer?.unobserve(element);
+	if (!animate) {
+		animations.get(element)?.cancel();
+		animations.delete(element);
+	}
 	if (!element.hasAttribute("data-reveal-pending")) return;
 	element.removeAttribute("data-reveal-pending");
 	if (!animate || preference.matches || !element.animate) return;
@@ -25,6 +28,7 @@ function reveal(element: HTMLElement, animate = true, delay = 0): void {
 }
 function revealAll(): void {
 	observer?.disconnect();
+	observer = undefined;
 	for (const element of targets) reveal(element, false);
 	for (const animation of animations.values()) animation.cancel();
 	animations.clear();
@@ -32,20 +36,29 @@ function revealAll(): void {
 if (!preference.matches && "IntersectionObserver" in window) {
 	try {
 		observer = new IntersectionObserver(entries => {
+			if (!observer || preference.matches) return;
 			let incoming = 0;
 			for (const entry of entries) {
-				if (!entry.isIntersecting) continue;
 				const element = entry.target as HTMLElement;
+				if (!entry.isIntersecting) {
+					if (entry.boundingClientRect.top >= (entry.rootBounds?.bottom ?? innerHeight)) {
+						if (!element.contains(document.activeElement)) {
+							animations.get(element)?.cancel();
+							animations.delete(element);
+							element.setAttribute("data-reveal-pending", "");
+						}
+					} else reveal(element, false);
+					continue;
+				}
 				// A small, bounded stagger only for grids; text/media pairs move together.
 				const grid = element.matches(".direction-grid > li, .project-grid > li");
 				reveal(element, true, grid ? Math.min(incoming++ * 40, 80) : 0);
 			}
-		}, {threshold: 0, rootMargin: "0px 0px -28px 0px"});
+		}, {threshold: 0});
 		for (const element of targets) {
 			const bounds = element.getBoundingClientRect();
 			// Never conceal the first screen or content above the restored scroll position.
-			if (bounds.height && bounds.top < innerHeight) continue;
-			element.setAttribute("data-reveal-pending", "");
+			if (!bounds.height || bounds.top >= innerHeight) element.setAttribute("data-reveal-pending", "");
 			observer.observe(element);
 		}
 	} catch { revealAll(); }
@@ -66,3 +79,29 @@ window.addEventListener("hashchange", revealAnchor);
 window.addEventListener("beforeprint", revealAll);
 preference.addEventListener("change", revealAll);
 revealAnchor();
+
+// Home/End, anchors, and scrollbar drags can skip an entire viewport between
+// observer samples. Reconcile only those jumps, rather than scanning on every tick.
+let previousY = scrollY;
+let jumpFrame = 0;
+const reconcileJump = () => {
+	jumpFrame = 0;
+	if (!observer || preference.matches) return;
+	const bounds = targets.map(element => ({element, rect:element.getBoundingClientRect()}));
+	for (const {element,rect} of bounds) {
+		if (rect.height && rect.top < innerHeight) reveal(element, false);
+		else if (!element.contains(document.activeElement)) {
+			animations.get(element)?.cancel();
+			animations.delete(element);
+			element.setAttribute("data-reveal-pending", "");
+		}
+	}
+};
+addEventListener("scroll", () => {
+	const jumped = Math.abs(scrollY - previousY) > innerHeight * .6;
+	previousY = scrollY;
+	if (jumped && !jumpFrame) jumpFrame = requestAnimationFrame(reconcileJump);
+}, {passive:true});
+addEventListener("resize", () => {
+	if (!jumpFrame) jumpFrame = requestAnimationFrame(reconcileJump);
+}, {passive:true});

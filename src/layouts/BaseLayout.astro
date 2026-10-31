@@ -3,6 +3,7 @@ import "../styles/global.css";
 import SiteFooter from "../components/layout/SiteFooter.astro";
 import SiteHeader from "../components/layout/SiteHeader.astro";
 import PageMetadata from "../components/layout/PageMetadata.astro";
+import BackToTop from "../components/layout/BackToTop.astro";
 
 interface Props {
 	title: string;
@@ -52,6 +53,7 @@ const referenceTargets = Object.fromEntries(referenceProjects.map(project => [pr
 		<SiteHeader />
 		<slot />
 		<SiteFooter />
+		<BackToTop />
 		<div hidden id="localized-media" data-versions={JSON.stringify(mediaVersions)}></div>
 		<div hidden id="content-references" data-targets={JSON.stringify(referenceTargets)}></div>
 		<script src="../scripts/language.ts"></script>
