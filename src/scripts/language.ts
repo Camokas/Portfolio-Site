@@ -1,4 +1,5 @@
 import { russianTranslations, type SiteLanguage } from "../data/translations";
+import { contentReferences } from "./contentReferences";
 
 const STORAGE_KEY = "portfolio-language";
 const mediaPairs: { en: string; ru: string }[] = JSON.parse(document.getElementById("localized-media")?.dataset.versions || "[]");
@@ -99,7 +100,7 @@ function preserveWhitespace(source: string, translated: string): string {
 }
 
 function translateTextNode(node: Text, language: SiteLanguage): void {
-	if (!node.parentElement || ignoredParents.has(node.parentElement.tagName) || node.parentElement.closest("[data-i18n-ignore]")) return;
+	if (!node.parentElement || ignoredParents.has(node.parentElement.tagName) || node.parentElement.closest("[data-i18n-ignore], [data-reference-text]")) return;
 	if (!originalText.has(node)) originalText.set(node, node.data);
 	const source = originalText.get(node) ?? node.data;
 	const trimmed = source.trim();
@@ -141,6 +142,7 @@ function formatDates(root: Document | Element, language: SiteLanguage): void {
 
 function applyLanguage(root: Document | Element = document): void {
 	const language = (document.documentElement.lang === "ru" ? "ru" : "en") satisfies SiteLanguage;
+	contentReferences(language);
 	const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 	let node = walker.nextNode();
 	while (node) {

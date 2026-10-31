@@ -1,5 +1,5 @@
 // Build the layout before rendering: no client-side DOM moving or layout flash.
-const mediaNames = new Set(['Video', 'Gallery', 'Image', 'Models', 'Audio', 'Code', 'ShaderGraph', 'ShaderGraphs', 'Resources', 'Downloads', 'Links']);
+const mediaNames = new Set(['Video', 'Gallery', 'Image', 'Models', 'Audio', 'Code', 'ShaderGraph', 'ShaderGraphs', 'Resources', 'Downloads', 'Links', 'StoryPanel']);
 const proseTypes = new Set(['paragraph', 'heading', 'blockquote', 'list', 'code', 'table']);
 const wrapper = (className, children) => ({
   type: 'mdxJsxFlowElement', name: 'div',
@@ -11,6 +11,12 @@ export default function remarkMediaGroups() {
   return (tree) => {
     const result = [];
     for (const node of tree.children) {
+      // A transcript directly after grouped media belongs beside its video.
+      const lastRow = result.at(-1);
+      if (node.type === 'mdxJsxFlowElement' && node.name === 'details' && lastRow?.data?.mediaGroup && lastRow.children.length === 2) {
+        lastRow.children[0].children.push(node);
+        continue;
+      }
       const attribute = node.type === 'mdxJsxFlowElement' && mediaNames.has(node.name)
         ? node.attributes.find(item => item.name === 'group') : undefined;
       const grouped = attribute && (attribute.value === null || attribute.value === 'true' ||
@@ -68,6 +74,10 @@ export default function remarkMediaGroups() {
         children.splice(index + 1, 1);
         index--;
       }
+    }
+    let visualRow = 0;
+    for (const row of result.filter(item => item.data?.mediaGroup && item.children.length === 2)) {
+      if (visualRow++ % 2 === 1) row.attributes[0].value += ' is-reversed';
     }
     tree.children = result;
   };

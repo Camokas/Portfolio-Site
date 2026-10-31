@@ -38,6 +38,21 @@ test('group=false and unrelated components remain unchanged', () => {
   assert.equal(result[1], video);
 });
 
+test('editorial groups alternate, while full-width media does not consume a side', () => {
+  const result = transform([text('First'), media('Gallery'), {type:'thematicBreak'}, media('Video'), text('Second'), media('StoryPanel')]);
+  const groups = result.filter(node => node.data?.mediaGroup);
+  assert.equal(groups[0].attributes[0].value, 'project-media-group');
+  assert.equal(groups[1].attributes[0].value, 'project-media-group media-only');
+  assert.equal(groups[2].attributes[0].value, 'project-media-group is-reversed');
+});
+
+test('a transcript stays in the text column beside its selected video', () => {
+  const transcript = {type:'mdxJsxFlowElement', name:'details', attributes:[], children:[]};
+  const result = transform([text('Short description'), media('Video'), transcript]);
+  assert.equal(result.length, 1);
+  assert.equal(result[0].children[0].children.at(-1), transcript);
+});
+
 test('adjacent selected videos become one carousel, preserving other media', () => {
   const first = media('Video'), second = media('Video');
   first.attributes.push({ type: 'mdxJsxAttribute', name: 'index', value: { type: 'mdxJsxAttributeValueExpression', value: '1' } });

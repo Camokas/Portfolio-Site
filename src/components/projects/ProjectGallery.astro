@@ -22,7 +22,7 @@ const { items, projectTitle, sectionKey = "gallery", open = false } = Astro.prop
 
 <CollapsibleSection title="Selected visuals" icon="images" count={items.length} section={sectionKey} open={open}>
 	<project-gallery class="project-gallery">
-		<ul>
+		<ul class:list={{ single: items.length === 1 }}>
 		{
 			items.map((item, index) => (
 				<li>
@@ -115,6 +115,7 @@ const { items, projectTitle, sectionKey = "gallery", open = false } = Astro.prop
 		padding: 0;
 		list-style: none;
 	}
+	ul.single { grid-template-columns: minmax(0, 1fr); }
 
 	figure {
 		margin: 0;
@@ -127,9 +128,9 @@ const { items, projectTitle, sectionKey = "gallery", open = false } = Astro.prop
 		padding: 0;
 		overflow: hidden;
 		color: var(--color-text);
-		border: 1px solid var(--color-border);
-		border-radius: 1rem;
-		background: var(--color-surface);
+		border: 0;
+		border-radius: 0.4rem;
+		background: transparent;
 		cursor: zoom-in;
 	}
 
@@ -143,6 +144,8 @@ const { items, projectTitle, sectionKey = "gallery", open = false } = Astro.prop
 		display: block;
 		width: 100%;
 		height: auto;
+		max-height: 75svh;
+		object-fit: contain;
 		transition:
 			transform 300ms ease,
 			filter 300ms ease;

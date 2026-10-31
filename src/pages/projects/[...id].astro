@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectDate from "../../components/projects/ProjectDate.astro";
+import StoryPanel from "../../components/projects/StoryPanel.astro";
 import ProjectGallery from "../../components/projects/ProjectGallery.astro";
 import ProjectVideo from "../../components/projects/ProjectVideo.astro";
 import ProjectAudio from "../../components/projects/ProjectAudio.astro";
@@ -42,7 +43,7 @@ interface Props {
 const { project } = Astro.props;
 const { Content } = await render(project);
 const inline = project.data.mediaLayout === "inline";
-const mediaComponents = { Gallery, Image: Gallery, Video, Audio, Models, Code, Resources, Downloads, Links, ShaderGraph, ShaderGraphs: ShaderGraph };
+const mediaComponents = { StoryPanel, Gallery, Image: Gallery, Video, Audio, Models, Code, Resources, Downloads, Links, ShaderGraph, ShaderGraphs: ShaderGraph };
 const direction = directions.find(
 	(item) => item.slug === project.data.direction,
 );
@@ -169,13 +170,13 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 
 	.project-header {
 		display: grid;
-		gap: 1.5rem;
-		max-width: 50rem;
+		gap: 1.1rem;
+		max-width: 70rem;
 		margin-inline: auto;
-		justify-items: center;
-		text-align: center;
+		justify-items: start;
+		text-align: left;
 		padding-top: clamp(2rem, 5vw, 4rem);
-		padding-bottom: clamp(2rem, 4vw, 2.5rem);
+		padding-bottom: clamp(2.5rem, 6vw, 5rem);
 	}
 
 	.project-meta,
@@ -184,7 +185,7 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 		align-items: center;
 		flex-wrap: wrap;
 		gap: 0.75rem;
-		justify-content: center;
+		justify-content: flex-start;
 	}
 
 	.eyebrow,
@@ -213,7 +214,7 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 	h1 {
 		max-width: 20ch;
 		margin: 0;
-		font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+		font-size: clamp(2rem, 4.3vw, 3.5rem);
 		line-height: 1.08;
 		letter-spacing: -0.045em;
 		overflow-wrap: anywhere;
@@ -223,13 +224,14 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 		max-width: 40rem;
 		margin: 0;
 		color: var(--color-muted);
-		font-size: clamp(1.05rem, 2vw, 1.35rem);
+		font-size: clamp(1rem, 1.5vw, 1.15rem);
 		line-height: 1.6;
 	}
 
 	.project-meta {
 		color: var(--color-muted);
-		font-size: 0.85rem;
+		font-size: 0.75rem;
+		gap: .6rem 1rem;
 	}
 
 	.project-meta ul {
@@ -239,18 +241,21 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 	}
 
 	.project-meta li {
-		padding: 0.35rem 0.65rem;
-		border: 1px solid var(--color-border);
-		border-radius: 999px;
+		padding: 0;
+		color: var(--color-muted);
+		font-size: .72rem;
 	}
+	.project-meta ul { gap: .5rem .9rem; }
+	.project-meta :global(.date-range) { border: 0; padding: 0; background: none; }
+	.project-meta .eyebrow { font-size: .65rem; letter-spacing: .08em; }
 
 	.project-content {
 		max-width: 70rem;
 		margin-inline: auto;
 		padding-block: 2rem;
 		border-top: 1px solid var(--color-border);
-		font-size: 1.05rem;
-		line-height: 1.8;
+		font-size: 1rem;
+		line-height: 1.75;
 	}
 
 	.project-content.is-inline {
@@ -271,10 +276,13 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 	.project-content :global(.project-media-group) {
 		display: grid;
 		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-		align-items: start;
+		align-items: center;
 		gap: clamp(1.5rem, 4vw, 3rem);
-		margin-block: 2.5rem;
+		margin-block: clamp(2.5rem, 6vw, 5rem);
 	}
+	.project-content :global(.project-media-group.is-reversed) { grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); }
+	.project-content :global(.is-reversed > .project-group-text) { grid-column: 2; grid-row: 1; }
+	.project-content :global(.is-reversed > .project-group-media) { grid-column: 1; grid-row: 1; }
 
 	.project-content :global(.project-media-group.media-only) {
 		grid-template-columns: minmax(0, 1fr);
@@ -291,12 +299,15 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 		.project-content :global(.project-media-group) {
 			grid-template-columns: minmax(0, 1fr);
 		}
+		.project-content :global(.project-media-group.is-reversed) { grid-template-columns: minmax(0, 1fr); }
+		.project-content :global(.is-reversed > .project-group-text),
+		.project-content :global(.is-reversed > .project-group-media) { grid-column: auto; grid-row: auto; }
 	}
 
 	.project-content :global(h2) {
 		margin: 3rem 0 1rem;
-		font-size: clamp(1.6rem, 4vw, 2.5rem);
-		line-height: 1.15;
+		font-size: clamp(1.4rem, 2.7vw, 2rem);
+		line-height: 1.25;
 		letter-spacing: -0.03em;
 	}
 

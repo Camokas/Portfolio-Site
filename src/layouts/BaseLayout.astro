@@ -17,6 +17,9 @@ const { title, description, lang = "en", type, publishedAt, noindex } = Astro.pr
 const baseUrl = import.meta.env.BASE_URL;
 import { localizedMedia } from "../data/localizedMedia";
 const mediaVersions = localizedMedia();
+import { getCollection } from "astro:content";
+const referenceProjects = await getCollection("projects", ({data}) => !data.draft);
+const referenceTargets = Object.fromEntries(referenceProjects.map(project => [project.id.toLowerCase(), baseUrl + "projects/" + project.id + "/"]));
 ---
 
 <!doctype html>
@@ -50,6 +53,7 @@ const mediaVersions = localizedMedia();
 		<slot />
 		<SiteFooter />
 		<div hidden id="localized-media" data-versions={JSON.stringify(mediaVersions)}></div>
+		<div hidden id="content-references" data-targets={JSON.stringify(referenceTargets)}></div>
 		<script src="../scripts/language.ts"></script>
 	</body>
 </html>
