@@ -6,6 +6,7 @@ export type SiteLanguage = "en" | "ru";
  */
 export const russianTranslations: Record<string, string> = {
 	"Camoka's Portfolio": "Портфолио Camoka",
+	"Development, visual art, sound, motion, and the ideas that connect them.": "Разработка, визуальное искусство, звук, движение и идеи, которые их объединяют.",
 	"Camoka's multimedia portfolio featuring creative and development projects.": "Мультимедийное портфолио Camoka с творческими проектами и разработками.",
 	"Skip to content": "Перейти к содержанию",
 	"Camoka — home": "Camoka — главная",

@@ -58,7 +58,7 @@ const href = `${import.meta.env.BASE_URL}directions/${slug}/`;
 	.direction-copy {
 		position: relative;
 		z-index: 1;
-		background: linear-gradient(rgb(14 14 14 / 0.55), rgb(14 14 14 / 0.9));
+		background: linear-gradient(rgb(14 14 14 / 0.72), rgb(14 14 14 / 0.94));
 		display: grid;
 		grid-template-rows: auto 1fr auto;
 		gap: 1.25rem;
@@ -79,7 +79,7 @@ const href = `${import.meta.env.BASE_URL}directions/${slug}/`;
 	}
 
 	.direction-number {
-		color: var(--color-accent);
+		color: var(--color-muted);
 		font-size: 0.75rem;
 		font-weight: 700;
 		letter-spacing: 0.12em;
@@ -116,13 +116,14 @@ const href = `${import.meta.env.BASE_URL}directions/${slug}/`;
 	h3 {
 		align-self: end;
 		margin: 0;
-		font-size: 1.5rem;
-		line-height: 1.15;
+		font-size: clamp(1.15rem, 1.7vw, 1.4rem);
+		line-height: 1.25;
 	}
 
 	p {
 		margin: 0;
 		color: var(--color-muted);
 		line-height: 1.6;
+		font-size: .9rem;
 	}
 </style>
