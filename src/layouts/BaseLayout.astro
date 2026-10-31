@@ -15,19 +15,23 @@ interface Props {
 
 const { title, description, lang = "en", type, publishedAt, noindex } = Astro.props;
 const baseUrl = import.meta.env.BASE_URL;
+import { localizedMedia } from "../data/localizedMedia";
+const mediaVersions = localizedMedia();
 ---
 
 <!doctype html>
 <html lang={lang} data-language={lang}>
 	<head>
 		<script is:inline>
-			try {
-				const savedLanguage = localStorage.getItem("portfolio-language");
-				if (savedLanguage === "ru" || savedLanguage === "en") {
-					document.documentElement.lang = savedLanguage;
-					document.documentElement.dataset.language = savedLanguage;
-				}
-			} catch { /* English remains the safe default. */ }
+			let savedLanguage;
+			try { savedLanguage = localStorage.getItem("portfolio-language"); } catch {}
+			const preferred = (navigator.languages || [navigator.language])
+				.map(value => value.toLowerCase().split("-")[0])
+				.find(value => value === "en" || value === "ru") || "en";
+			const language = savedLanguage === "ru" || savedLanguage === "en" ? savedLanguage : preferred;
+			document.documentElement.lang = language;
+			document.documentElement.dataset.language = language;
+			try { localStorage.setItem("portfolio-language", language); } catch {}
 		</script>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -45,6 +49,7 @@ const baseUrl = import.meta.env.BASE_URL;
 		<SiteHeader />
 		<slot />
 		<SiteFooter />
+		<div hidden id="localized-media" data-versions={JSON.stringify(mediaVersions)}></div>
 		<script src="../scripts/language.ts"></script>
 	</body>
 </html>
