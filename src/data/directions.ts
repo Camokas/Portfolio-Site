@@ -24,18 +24,6 @@ export interface Direction {
 
 export const directions = [
 	{
-		slug: "social-networks",
-		title: "Social Networks",
-		description: "Video blogging, community building, and creative work across platforms.",
-		icon: "clapperboard",
-	},
-	{
-		slug: "software",
-		title: "Software I Use",
-		description: "The tools behind my projects and creative workflow.",
-		icon: "box",
-	},
-	{
 		slug: "game-development",
 		title: "Game Development",
 		description: "Games, prototypes, mechanics, and interactive systems.",
@@ -82,5 +70,17 @@ export const directions = [
 		title: "Shading",
 		description: "Materials, shaders, and real-time visual effects.",
 		icon: "blend",
+	},
+	{
+		slug: "social-networks",
+		title: "Social Networks",
+		description: "Video blogging, community building, and creative work across platforms.",
+		icon: "clapperboard",
+	},
+	{
+		slug: "software",
+		title: "Software I Use",
+		description: "The tools behind my projects and creative workflow.",
+		icon: "box",
 	},
 ] satisfies readonly Direction[];

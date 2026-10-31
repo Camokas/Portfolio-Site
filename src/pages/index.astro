@@ -76,7 +76,7 @@ const mediaByProject = await Promise.all(projects.map(async (project) => ({
 
 			<ul class="direction-grid">
 				{
-					directions.map((direction, index) => (
+					directions.filter(direction => direction.slug !== "software").map((direction, index) => (
 						<DirectionCard
 							numberLabel={String(index + 1).padStart(2, "0")}
 							title={direction.title}
@@ -87,6 +87,25 @@ const mediaByProject = await Promise.all(projects.map(async (project) => ({
 						/>
 					))
 				}
+			</ul>
+		</section>
+
+		<section id="software" class="software-section" aria-labelledby="software-title">
+			<div class="section-heading">
+				<h2 id="software-title">Software I Use</h2>
+				<p class="section-description">The tools behind my projects and creative workflow.</p>
+			</div>
+			<ul class="direction-grid">
+				{directions.filter(direction => direction.slug === "software").map(direction => (
+					<DirectionCard
+						numberLabel="↗"
+						title={direction.title}
+						description={direction.description}
+						slug={direction.slug}
+						icon={direction.icon}
+						previews={mediaByProject.filter(project => project.direction === direction.slug).flatMap(project => project.items)}
+					/>
+				))}
 			</ul>
 		</section>
 
@@ -287,6 +306,12 @@ const mediaByProject = await Promise.all(projects.map(async (project) => ({
 	.directions {
 		scroll-margin-top: 4.5rem;
 		padding-block: clamp(2.5rem, 7vw, 6rem);
+	}
+
+	.software-section {
+		padding-block: clamp(2.5rem, 6vw, 5rem);
+		border-top: 1px solid var(--color-border);
+		scroll-margin-top: 4.5rem;
 	}
 
 	.section-heading {
