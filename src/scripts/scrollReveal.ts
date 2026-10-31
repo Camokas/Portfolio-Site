@@ -6,36 +6,39 @@ const targets = [...document.querySelectorAll<HTMLElement>([
 	".project-content > .project-media-group", ".timeline-card > ul",
 	".project-grid > li",
 ].join(","))];
-const animations = new Map<HTMLElement, Animation>();
+const animations = new Set<HTMLElement>();
 let observer: IntersectionObserver | undefined;
+// Use pixels: vertical percentages in rootMargin are based on root width.
+const revealLine = () => Math.round(innerHeight * .6);
+function stopAnimation(element: HTMLElement): void {
+	element.removeAttribute("data-reveal-animating");
+	element.style.removeProperty("--reveal-delay");
+	animations.delete(element);
+}
 
 function reveal(element: HTMLElement, animate = true, delay = 0): void {
 	if (!animate) {
-		animations.get(element)?.cancel();
-		animations.delete(element);
+		stopAnimation(element);
 	}
 	if (!element.hasAttribute("data-reveal-pending")) return;
 	element.removeAttribute("data-reveal-pending");
-	if (!animate || preference.matches || !element.animate) return;
-	try {
-		const animation = element.animate([
-			{opacity: 0, transform: "translateY(22px)"},
-			{opacity: .35, transform: "translateY(12px)", offset: .4},
-			{opacity: 1, transform: "translateY(0)"},
-		], {duration: 1100, delay, easing: "cubic-bezier(.22,.45,.25,1)", fill: "both"});
-		animations.set(element, animation);
-		animation.onfinish = () => { animations.delete(element); animation.cancel(); };
-	} catch { /* A failed effect must never hide the content. */ }
+	if (!animate || preference.matches) return;
+	element.style.setProperty("--reveal-delay", `${delay}ms`);
+	element.setAttribute("data-reveal-animating", "");
+	animations.add(element);
 }
 function revealAll(): void {
 	observer?.disconnect();
 	observer = undefined;
 	for (const element of targets) reveal(element, false);
-	for (const animation of animations.values()) animation.cancel();
+	for (const element of animations) stopAnimation(element);
 	animations.clear();
 }
 if (!preference.matches && "IntersectionObserver" in window) {
 	try {
+		const observe = () => {
+		if (preference.matches) return;
+		observer?.disconnect();
 		observer = new IntersectionObserver(entries => {
 			if (!observer || preference.matches) return;
 			let incoming = 0;
@@ -44,8 +47,7 @@ if (!preference.matches && "IntersectionObserver" in window) {
 				if (!entry.isIntersecting) {
 					if (entry.boundingClientRect.top >= (entry.rootBounds?.bottom ?? innerHeight)) {
 						if (!element.contains(document.activeElement)) {
-							animations.get(element)?.cancel();
-							animations.delete(element);
+							stopAnimation(element);
 							element.setAttribute("data-reveal-pending", "");
 						}
 					} else reveal(element, false);
@@ -55,19 +57,25 @@ if (!preference.matches && "IntersectionObserver" in window) {
 				const grid = element.matches(".direction-grid > li, .project-grid > li");
 				reveal(element, true, grid ? Math.min(incoming++ * 40, 80) : 0);
 			}
-		}, {threshold: 0});
+		}, {threshold: 0, rootMargin: `0px 0px -${innerHeight - revealLine()}px 0px`});
+		for (const element of targets) observer.observe(element);
+		};
 		for (const element of targets) {
 			const bounds = element.getBoundingClientRect();
 			// Never conceal the first screen or content above the restored scroll position.
 			if (!bounds.height || bounds.top >= innerHeight) element.setAttribute("data-reveal-pending", "");
-			observer.observe(element);
 		}
+		observe();
+		addEventListener("resize", observe, {passive:true});
 	} catch { revealAll(); }
 }
 document.addEventListener("focusin", event => {
 	if (!(event.target instanceof Element)) return;
 	const element = event.target.closest<HTMLElement>("[data-reveal-pending]");
 	if (element) reveal(element, false);
+});
+document.addEventListener("animationend", event => {
+	if (event.animationName === "portfolio-reveal" && event.target instanceof HTMLElement) stopAnimation(event.target);
 });
 const revealAnchor = () => {
 	try {
@@ -90,18 +98,25 @@ const reconcileJump = () => {
 	if (!observer || preference.matches) return;
 	const bounds = targets.map(element => ({element, rect:element.getBoundingClientRect()}));
 	for (const {element,rect} of bounds) {
-		if (rect.height && rect.top < innerHeight) reveal(element, false);
+		if (rect.height && rect.top <= 0) reveal(element, false);
+		else if (rect.height && rect.top < revealLine()) reveal(element);
 		else if (!element.contains(document.activeElement)) {
-			animations.get(element)?.cancel();
-			animations.delete(element);
+			stopAnimation(element);
 			element.setAttribute("data-reveal-pending", "");
 		}
 	}
 };
 addEventListener("scroll", () => {
 	const jumped = Math.abs(scrollY - previousY) > innerHeight * .6;
+	const atEnd = scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
 	previousY = scrollY;
 	if (jumped && !jumpFrame) jumpFrame = requestAnimationFrame(reconcileJump);
+	// Short final sections must remain reachable even if they cannot reach the trigger line.
+	if (atEnd && observer) {
+		for (const element of targets) {
+			if (element.hasAttribute("data-reveal-pending") && element.getBoundingClientRect().top < innerHeight) reveal(element);
+		}
+	}
 }, {passive:true});
 addEventListener("resize", () => {
 	if (!jumpFrame) jumpFrame = requestAnimationFrame(reconcileJump);
