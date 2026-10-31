@@ -32,6 +32,7 @@ const projects = defineCollection({
 		summary: z.string(),
 		direction: z.enum(directionSlugs),
 		date: z.coerce.date(),
+		dateEnd: z.coerce.date().optional(),
 		tags: z.array(z.string()).default([]),
 		cover: projectImage.optional(),
 		coverShowInCards: z.boolean().default(true),
@@ -167,6 +168,9 @@ const projects = defineCollection({
 		featured: z.boolean().default(false),
 		draft: z.boolean().default(false),
 		demo: z.boolean().default(false),
+	}).refine(project => !project.dateEnd || project.dateEnd >= project.date, {
+		message: "dateEnd must be on or after date",
+		path: ["dateEnd"],
 	});
 	},
 });

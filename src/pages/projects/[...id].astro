@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectDate from "../../components/projects/ProjectDate.astro";
 import ProjectGallery from "../../components/projects/ProjectGallery.astro";
 import ProjectVideo from "../../components/projects/ProjectVideo.astro";
 import ProjectAudio from "../../components/projects/ProjectAudio.astro";
@@ -52,11 +53,6 @@ if (!direction) {
 
 const baseUrl = import.meta.env.BASE_URL;
 const directionUrl = `${baseUrl}directions/${direction.slug}/`;
-const formattedDate = project.data.date.toLocaleDateString("en", {
-	year: "numeric",
-	month: "long",
-	timeZone: "UTC",
-});
 ---
 
 <BaseLayout
@@ -82,7 +78,7 @@ const formattedDate = project.data.date.toLocaleDateString("en", {
 					<p class="eyebrow">
 						<Icon name={direction.icon} size={15} /> {direction.title}
 					</p>
-					<time datetime={project.data.date.toISOString()} data-date-format="month-long">{formattedDate}</time>
+					<ProjectDate date={project.data.date} dateEnd={project.data.dateEnd} />
 
 					{
 						project.data.tags.length > 0 && (

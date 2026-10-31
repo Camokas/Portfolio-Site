@@ -1,5 +1,6 @@
 ---
 import MediaPreview from "./MediaPreview.astro";
+import ProjectDate from "./ProjectDate.astro";
 import { projectPreviews } from "../../data/projectPreviews";
 import type { CollectionEntry } from "astro:content";
 import Icon from "../ui/Icon.astro";
@@ -12,11 +13,6 @@ interface Props {
 const { project } = Astro.props;
 const previews = await projectPreviews(project);
 const projectUrl = `${import.meta.env.BASE_URL}projects/${project.id}/`;
-const formattedDate = project.data.date.toLocaleDateString("en", {
-	year: "numeric",
-	month: "short",
-	timeZone: "UTC",
-});
 const englishSearch = `${project.data.title} ${project.data.summary} ${project.data.tags.join(" ")}`;
 const russianSearch = [project.data.title, project.data.summary, ...project.data.tags]
 	.map((value) => translateExact(value.trim(), "ru"))
@@ -36,7 +32,7 @@ const russianSearch = [project.data.title, project.data.summary, ...project.data
 
 			<div class="project-content">
 				<div class="project-meta">
-					<time datetime={project.data.date.toISOString()} data-date-format="month-short">{formattedDate}</time>
+					<ProjectDate date={project.data.date} dateEnd={project.data.dateEnd} short />
 
 					{project.data.demo && <span>Demo</span>}
 				</div>

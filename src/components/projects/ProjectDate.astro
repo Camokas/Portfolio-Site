@@ -1,0 +1,13 @@
+---
+interface Props {
+	date: Date;
+	dateEnd?: Date;
+	short?: boolean;
+}
+const { date, dateEnd, short = false } = Astro.props;
+const format = short ? "month-short" : "month-long";
+const formatter = new Intl.DateTimeFormat("en", {
+	year: "numeric", month: short ? "short" : "long", timeZone: "UTC",
+});
+---
+<span class="project-date"><time datetime={date.toISOString()} data-date-format={format}>{formatter.format(date)}</time>{dateEnd && <> – <time datetime={dateEnd.toISOString()} data-date-format={format}>{formatter.format(dateEnd)}</time></>}</span>
