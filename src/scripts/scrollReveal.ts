@@ -19,9 +19,10 @@ function reveal(element: HTMLElement, animate = true, delay = 0): void {
 	if (!animate || preference.matches || !element.animate) return;
 	try {
 		const animation = element.animate([
-			{opacity: 0, transform: "translateY(14px)"},
+			{opacity: 0, transform: "translateY(22px)"},
+			{opacity: .35, transform: "translateY(12px)", offset: .4},
 			{opacity: 1, transform: "translateY(0)"},
-		], {duration: 520, delay, easing: "cubic-bezier(.2,.7,.2,1)", fill: "both"});
+		], {duration: 1100, delay, easing: "cubic-bezier(.22,.45,.25,1)", fill: "both"});
 		animations.set(element, animation);
 		animation.onfinish = () => { animations.delete(element); animation.cancel(); };
 	} catch { /* A failed effect must never hide the content. */ }
