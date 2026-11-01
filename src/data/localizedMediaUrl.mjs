@@ -11,7 +11,18 @@ export function createMediaResolver(pairs, baseUrl) {
   return (value, language) => {
     if (!value || /^(data:|blob:)/.test(value)) return value;
     let path;
-    try { path = decodeURIComponent(new URL(value, 'https://portfolio.invalid' + base).pathname); }
+    try {
+      let url = new URL(value, 'https://portfolio.invalid' + base);
+      // Astro development images wrap the original /@fs/ URL in ?href=.
+      if (url.pathname.replace(/\/$/, '') === base + '_image' && url.searchParams.has('href')) {
+        url = new URL(url.searchParams.get('href'), url);
+      }
+      path = decodeURIComponent(url.pathname);
+      if (path.includes('/@fs/')) {
+        const publicIndex = path.lastIndexOf('/public/');
+        if (publicIndex >= 0) path = base + path.slice(publicIndex + '/public/'.length);
+      }
+    }
     catch { return value; }
     let pair = direct.get(path);
     if (!pair && path.startsWith(base + '_astro/')) {
