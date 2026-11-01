@@ -5,6 +5,20 @@ export type SiteLanguage = "en" | "ru";
  * whenever new interface or project copy should also be available in Russian.
  */
 export const russianTranslations: Record<string, string> = {
+	"Game Highlights Era": "Период игровых нарезок",
+	"Early CS:GO montages: music synchronisation, tracking, masks, and my first steps in video editing.": "Ранние мувики по CS:GO: синхронизация с музыкой, трекинг, маски и первые шаги в видеомонтаже.",
+	"CS:GO montage · excerpt 1": "Мувик по CS:GO · фрагмент 1",
+	"CS:GO montage · excerpt 2": "Мувик по CS:GO · фрагмент 2",
+	"CS:GO montage · full video": "Мувик по CS:GO · полное видео",
+	"Published February 2021 · selected excerpt.": "Опубликовано в феврале 2021 · избранный фрагмент.",
+	"Published April 2021 · full video.": "Опубликовано в апреле 2021 · полное видео.",
+	"Where I started": "С чего я начинал",
+	"CS:GO montages were an early way to learn editing through something I loved. I recorded gameplay, picked highlights from hours of footage, and cut them to music for myself and friends. I handled the recording and editing myself; a typical montage took about a day.": "Мувики по CS:GO стали способом учиться монтажу через любимое увлечение. Я записывал игру, отбирал лучшие моменты из часов материала и монтировал их под музыку для себя и друзей. Записью и монтажом занимался самостоятельно; обычно на ролик уходил день.",
+	"Timing, tracking, and masks": "Тайминг, трекинг и маски",
+	"I focused on precise musical timing and making each kill feel impactful. One technique I explored was cutting out the kill feed from a screenshot, tracking it to the defeated opponent, and adding effects in After Effects.": "Главными были точная синхронизация с музыкой и выразительность каждого убийства. Один из приёмов — вырезать киллфид со скриншота, привязать его трекингом к убитому противнику и добавить эффекты в After Effects.",
+	"A foundation for later work": "Основа для дальнейшей работы",
+	"I selected and cut footage mainly in Vegas Pro while learning Premiere Pro and After Effects. Tracking, masks, and built-in effects gave me a foundation I still use. A weak PC pushed me to optimise recording and work with low game settings.": "Отбирал и нарезал материал преимущественно в Vegas Pro, параллельно осваивая Premiere Pro и After Effects. Трекинг, маски и встроенные эффекты дали основу, которой пользуюсь до сих пор. Слабый ПК заставлял оптимизировать запись и играть на низких настройках графики.",
+	"As I played less, I moved on to editing other kinds of footage. These selected videos were published in February and April 2021, after the main period shown above.": "Со временем я стал меньше играть и перешёл к монтажу других исходников. Представленные видео были опубликованы в феврале и апреле 2021 года — после основного периода, указанного выше.",
 	"Channel formats": "Форматы канала",
 	"Original soundtrack visualisers": "Визуализаторы собственной музыки",
 	"Trailer for itch.io": "Трейлер для itch.io",

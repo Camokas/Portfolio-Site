@@ -358,5 +358,23 @@
     "height": 1920,
     "poster": "projects/VideoEditing/Camoka_YouTube_Channel/TopViewsVideos/_previews/57a6f41c5eff3eb8.webp",
     "hash": "57a6f41c5eff3eb8e2179ae4af7dc10a8b33cabad08fcf531fca8a101a44cd70"
+  },
+  "projects/VideoEditing/GameHighlights/GameHighlight_Full_VideoEditing_3.mp4": {
+    "width": 1920,
+    "height": 1080,
+    "poster": "projects/VideoEditing/GameHighlights/_previews/a2dbdfe969bcbd28.webp",
+    "hash": "a2dbdfe969bcbd28e4039786b5fa76b7e14a2fe7f02f59b6d0f7776d6209fa07"
+  },
+  "projects/VideoEditing/GameHighlights/GameHighlight_VideoEditing_1.mp4": {
+    "width": 1500,
+    "height": 1500,
+    "poster": "projects/VideoEditing/GameHighlights/_previews/5e98e32128d5b4e0.webp",
+    "hash": "5e98e32128d5b4e0a81df6a13dab370e8d55e82bfcd5cf770497cb490ae2af4d"
+  },
+  "projects/VideoEditing/GameHighlights/GameHighlight_VideoEditing_2.mp4": {
+    "width": 1500,
+    "height": 1500,
+    "poster": "projects/VideoEditing/GameHighlights/_previews/f662c23fe1d5bf96.webp",
+    "hash": "f662c23fe1d5bf963cce17de4ff1b6f9eff5bbf79603f1d30496dcd4d84c53c0"
   }
 }
