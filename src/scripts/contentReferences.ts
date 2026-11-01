@@ -8,6 +8,7 @@ const terms: Record<string, string> = {
 	"After Effects": "software/after-effects", "Premiere Pro": "software/premiere-pro",
 	"Media Encoder": "software/media-encoder", "OBS": "software/obs",
 	"Camoka GameDev Telegram Channel": "socialnetworks/camoka-gamedev-telegram-channel",
+	"Telegram Channel GameDev": "socialnetworks/camoka-gamedev-telegram-channel",
 };
 const pattern = new RegExp(Object.keys(terms).sort((a,b)=>b.length-a.length).join("|"), "g");
 
