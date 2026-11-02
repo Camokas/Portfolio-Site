@@ -32,7 +32,7 @@ const russianSearch = [project.data.title, project.data.summary, ...project.data
 
 			<div class="project-content">
 				<div class="project-meta">
-					<ProjectDate date={project.data.date} dateEnd={project.data.dateEnd} short />
+					<ProjectDate date={project.data.date} dateEnd={project.data.dateEnd} approximate={project.data.dateApproximate} short />
 
 					{project.data.demo && <span>Demo</span>}
 				</div>

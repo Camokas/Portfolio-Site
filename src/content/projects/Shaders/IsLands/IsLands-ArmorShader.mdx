@@ -6,7 +6,7 @@ direction: "shading"
 date: 2026-03-29
 tags:
   - "Shader"
-  - "Prototype"
+  - "Used in a project"
 
 videos:
   - title: ""
@@ -17,7 +17,7 @@ videos:
     showInCards: true
     sources:
       - src: "projects/Shaders/IsLands/IsLands-ArmorShader/IsLands-ArmorShader_1.webm"
-        type: "video/mp4"
+        type: "video/webm"
   - title: ""
     autoplay: true
     autoAspect: true
@@ -26,7 +26,7 @@ videos:
     showInCards: false
     sources:
       - src: "projects/Shaders/IsLands/IsLands-ArmorShader/IsLands-ArmorShader_2.webm"
-        type: "video/mp4"
+        type: "video/webm"
 
 
 
@@ -39,11 +39,13 @@ shaderGraphs:
 featured: true
 draft: false
 demo: false
+dateApproximate: true
 ---
 
-
->  Dynamically modifies the image based on progress using noise, gradients, masks, and conditional branching. Preserves the pixel-art aesthetic while providing clear visual feedback in the UI.
+In IsLands, different materials could form armour with its own properties and texture. This shader visualises that process: bright orange-red pixels reveal the new armour, then cool down to leave its finished texture.
 
 <Video index={1} group open />
+
 <Video index={2} group open />
+
 <ShaderGraph index={1} group open />

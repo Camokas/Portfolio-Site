@@ -10,6 +10,20 @@ export interface ContactLink {
 
 export const contactLinks = [
 	{
+		label: "Email",
+		detail: "burtsagain06@gmail.com",
+		description: "Project enquiries and collaboration.",
+		href: "mailto:burtsagain06@gmail.com",
+		icon: "mail",
+	},
+	{
+		label: "Telegram",
+		detail: "@TheCamoka",
+		description: "Send me a direct message.",
+		href: "https://t.me/TheCamoka",
+		icon: "external-link",
+	},
+	{
 		label: "GitHub profile",
 		detail: "@Camokas",
 		description: "Code, experiments, and public repositories.",

@@ -10,6 +10,7 @@ const viewerUrl = (src: string) => `${base}vendor/shader-graph/index.html?src=${
 ---
 
 <CollapsibleSection title="Shader Graph" icon="blend" count={items.length} section={sectionKey} open={open}>
+	<p class="archive-note">Archived graphs may differ from the versions shown in the videos.</p>
 	<div class="graph-list">
 		{items.map((item) => <figure>
 			<figcaption>
@@ -47,6 +48,7 @@ const viewerUrl = (src: string) => `${base}vendor/shader-graph/index.html?src=${
 
 <style>
 	.graph-list { display: grid; gap: 2rem; }
+	.archive-note { margin: 0 0 1rem; }
 	figure { margin: 0; }
 	figcaption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
 	h3 { margin: 0; font-size: 1rem; }

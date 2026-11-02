@@ -2,9 +2,13 @@
 import Icon from "../ui/Icon.astro";
 import type { IconName } from "../../data/icons";
 const panels = {
+  "release": {
+    icon: "layout-grid", label: "Release workflow",
+    items: [["Build", "Package the version"], ["Explain", "Write the changelog"], ["Publish", "Artwork, posts & videos"]],
+  },
   "commissioned": {
     icon: "clapperboard", label: "Workload · approximate, from memory",
-    items: [["20–25", "Completed edits"], ["2–8 h", "Source gameplay per video"], ["15–20 min", "Typical finished video"]],
+    items: [["20–25", "Long-form videos"], ["2–8 h", "Source gameplay per video"], ["15–20 min", "Typical finished video"]],
   },
   "youtube-channel": {
     icon: "clapperboard", label: "Channel formats",
@@ -160,19 +164,19 @@ const panels = {
   },
   "camera": {
     "icon": "images",
-    "label": "The recording setup evolved",
+    "label": "Filming a monitor",
     "items": [
       [
-        "01",
-        "Realme C55"
+        "Scene",
+        "Choose readable gameplay"
       ],
       [
-        "02",
-        "Poco X6 Pro 5G"
+        "Light",
+        "Simple lamps & flash"
       ],
       [
-        "03",
-        "Pixel 7 Pro"
+        "Capture",
+        "Film the monitor"
       ]
     ]
   },

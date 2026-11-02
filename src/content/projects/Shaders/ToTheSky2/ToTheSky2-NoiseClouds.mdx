@@ -1,12 +1,12 @@
 ---
 title: "Noise Clouds"
 mediaLayout: "inline"
-summary: "A procedural stylized cloud shader for a mobile game."
+summary: "Stylised clouds for the mobile game ToTheSky2, driven by a seamless noise texture."
 direction: "shading"
 date: 2024-07-06
 tags:
   - "Shader"
-  - "Prototype"
+  - "Used in a project"
 
 videos:
   - title: ""
@@ -16,7 +16,7 @@ videos:
     loop: true
     sources:
       - src: "projects/Shaders/ToTheSky2/ToTheSky2-NoiseCloudsShader/ToTheSky2-CloudsShader.webm"
-        type: "video/mp4"
+        type: "video/webm"
   - title: ""
     autoplay: true
     autoAspect: true
@@ -25,7 +25,7 @@ videos:
     showInCards: false
     sources:
       - src: "projects/Shaders/ToTheSky2/ToTheSky2-NoiseCloudsShader/ToTheSky2-CloudsShaderSettings.webm"
-        type: "video/mp4"
+        type: "video/webm"
 
 
 
@@ -38,11 +38,13 @@ shaderGraphs:
 featured: true
 draft: false
 demo: false
+dateApproximate: true
 ---
 
-
->  Designed to provide visual variety and seamless cloud patterns. The shader's noise was later baked to improve performance on mobile devices. The original shader offered flexible customization options, with plans to use it for dynamically adjusting cloud coverage in the scene.
+I replaced procedural noise with a seamless Perlin texture I found. This ran much better on my test phone, while the shader kept its adjustable cloud parameters. The second clip shows those controls.
 
 <Video index={1} group open />
+
 <Video index={2} group open />
+
 <ShaderGraph index={1} group open />

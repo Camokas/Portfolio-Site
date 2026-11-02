@@ -6,7 +6,7 @@ direction: "shading"
 date: 2025-08-19
 tags:
   - "Shader"
-  - "Prototype"
+  - "Used in a project"
 
 videos:
   - title: ""
@@ -16,7 +16,7 @@ videos:
     loop: true
     sources:
       - src: "projects/Shaders/IsLands/IsLands-IslandShader/IsLands-IslandShader.webm"
-        type: "video/mp4"
+        type: "video/webm"
 
 shaderGraphs:
   - title: "Graph"
@@ -27,10 +27,13 @@ shaderGraphs:
 featured: true
 draft: false
 demo: false
+dateApproximate: true
 ---
 
+The block shader samples a texture atlas and changes the material with the weather. Rain increases metallic response and lowers roughness; snow uses the opposite adjustment and an unfinished pixel-noise snow covering.
 
->  An example of shader integration with gameplay mechanics. Used since the early stages of development, the shader initially handled UV mapping and block texture atlas sampling. It was later expanded to support weather-driven effects and a pulsing visual indicator around the player, highlighting the movement restriction that prevents players from walking off block edges while crouching.
+The crouching indicator highlights the surface the player can walk on. It visualises the movement restriction; the shader does not enforce it.
 
 <Video index={1} group open />
+
 <ShaderGraph index={1} group open />

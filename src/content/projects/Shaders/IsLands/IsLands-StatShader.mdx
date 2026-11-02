@@ -6,7 +6,7 @@ direction: "shading"
 date: 2026-03-10
 tags:
   - "Shader"
-  - "Prototype"
+  - "Used in a project"
 
 videos:
   - title: ""
@@ -17,7 +17,7 @@ videos:
     showInCards: true
     sources:
       - src: "projects/Shaders/IsLands/IsLands-PlayerStatShader/IsLands-PlayerStatShader_1.webm"
-        type: "video/mp4"
+        type: "video/webm"
   - title: ""
     autoplay: true
     autoAspect: true
@@ -26,7 +26,7 @@ videos:
     showInCards: false
     sources:
       - src: "projects/Shaders/IsLands/IsLands-PlayerStatShader/IsLands-PlayerStatShader_2.webm"
-        type: "video/mp4"
+        type: "video/webm"
 
 
 
@@ -39,11 +39,13 @@ shaderGraphs:
 featured: true
 draft: false
 demo: false
+dateApproximate: true
 ---
 
-
->  Supports customizable fill levels, indicator types, colors, tiling, and wave animations using custom Shader Graph subgraphs.
+One shader serves different in-game indicators, including health, hunger, armour, and freezing, with adjustable palettes and fill levels. Subgraphs share the repeated modified sine-wave logic between indicators.
 
 <Video index={1} group open />
+
 <Video index={2} group open />
+
 <ShaderGraph index={1} group open />

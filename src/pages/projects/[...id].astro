@@ -79,7 +79,7 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 					<p class="eyebrow">
 						<Icon name={direction.icon} size={15} /> {direction.title}
 					</p>
-					<ProjectDate date={project.data.date} dateEnd={project.data.dateEnd} />
+					<ProjectDate date={project.data.date} dateEnd={project.data.dateEnd} approximate={project.data.dateApproximate} />
 
 					{
 						project.data.tags.length > 0 && (

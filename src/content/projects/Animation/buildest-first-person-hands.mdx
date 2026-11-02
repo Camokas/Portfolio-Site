@@ -31,21 +31,20 @@ videos:
         type: "video/webm"
 ---
 
-## Idle, walking & running
+## Modelling and movement
 
-First-person hand animations for standing still, walking, and running in Buildest.
+I modelled and animated the hands in Blender, then imported them into Unity. The movement includes procedural shake with manual adjustments.
 
 <Video index={1} group open />
 
 ## Falling
 
-Hand animation during a fall.
+The fall animation is connected to the player state. Values from the movement code adjust the timing so changes in physical speed can slightly change the animation pace.
 
 <Video index={2} group open />
 
 ## Animator graph
 
-Transitions are configured around movement speed, landing state, and fall height.
+I tuned the values sent to Animator for transitions between idle, movement, falling, and landing. This let the animations respond to movement without relying only on abrupt state switches.
 
 <Image index={1} group open />
-

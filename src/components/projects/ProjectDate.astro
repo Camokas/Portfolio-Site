@@ -3,14 +3,15 @@ interface Props {
 	date: Date;
 	dateEnd?: Date;
 	short?: boolean;
+	approximate?: boolean;
 }
-const { date, dateEnd, short = false } = Astro.props;
+const { date, dateEnd, short = false, approximate = false } = Astro.props;
 const format = short ? "month-short" : "month-long";
 const formatter = new Intl.DateTimeFormat("en", {
 	year: "numeric", month: short ? "short" : "long", timeZone: "UTC",
 });
 ---
-<span class:list={["project-date", {"date-range": dateEnd}]}><time datetime={date.toISOString()} data-date-format={format}>{formatter.format(date)}</time>{dateEnd && <><span class="range-link" aria-hidden="true">–</span><time datetime={dateEnd.toISOString()} data-date-format={format}>{formatter.format(dateEnd)}</time></>}</span>
+<span class:list={["project-date", {"date-range": dateEnd}]}>{approximate && <span title="Approximate first creation date">~</span>}<time datetime={date.toISOString()} data-date-format={format}>{formatter.format(date)}</time>{dateEnd && <><span class="range-link" aria-hidden="true">–</span><time datetime={dateEnd.toISOString()} data-date-format={format}>{formatter.format(dateEnd)}</time></>}</span>
 
 <style>
 	.project-date { display: inline-flex; align-items: center; flex-wrap: wrap; gap: .35rem .5rem; min-width: 0; line-height: 1.6; }

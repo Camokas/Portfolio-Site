@@ -6,7 +6,7 @@ direction: "shading"
 date: 2025-10-28
 tags:
   - "Shader"
-  - "Prototype"
+  - "Used in a project"
 
 videos:
   - title: ""
@@ -17,7 +17,7 @@ videos:
     showInCards: true
     sources:
       - src: "projects/Shaders/IsLands/IsLands-GrassShader/IsLands-GrassShad_1.webm"
-        type: "video/mp4"
+        type: "video/webm"
   - title: ""
     autoplay: true
     autoAspect: true
@@ -26,7 +26,7 @@ videos:
     showInCards: false
     sources:
       - src: "projects/Shaders/IsLands/IsLands-GrassShader/IsLands-GrassShad_2.webm"
-        type: "video/mp4"
+        type: "video/webm"
 
 
 
@@ -39,11 +39,13 @@ shaderGraphs:
 featured: true
 draft: false
 demo: false
+dateApproximate: true
 ---
 
-
->  A further optimized billboard shader featuring sprite selection from a Texture2DArray, noise-driven animation designed to scale across thousands of instances, and a dithering effect around the selected block. Built to efficiently handle large numbers of animated sprites while minimizing script-based operations.
+I used noise to select grass variants from a Texture2DArray: smaller grass in low-value areas and larger grass in higher-value areas, with intermediate sizes between them. This creates patches of density rather than a completely random mixture. I also adjusted material settings to encourage batching.
 
 <Video index={1} group open />
+
 <Video index={2} group open />
+
 <ShaderGraph index={1} group open />

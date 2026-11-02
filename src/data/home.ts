@@ -7,10 +7,10 @@ export const home = {
 	name: "Camoka",
 	alias: "or Daniil Doroshkin",
 	aboutTitle: "About this portfolio",
-	aboutPreview: "A multidisciplinary collection of creative and development work.",
+	aboutPreview: "Game development, video editing, and 3D modelling.",
 	aboutParagraphs: [
-		"I work across software development and digital art, combining technical experiments with visual storytelling, sound, motion, and interactive ideas.",
-		"This portfolio brings together finished projects, prototypes, studies, and works in progress from every direction I explore.",
+		"I build games, edit video, and create 3D models. My experience also includes motion graphics, shaders, original music, and running channels around my projects.",
+		"Much of this work grew out of personal projects. I like refining how things move and look, and organising complex work so I can keep improving it.",
 	],
 	readMore: "Read more",
 	showLess: "Show less",
@@ -19,5 +19,5 @@ export const home = {
 	directionsDescription: "Development, visual art, sound, motion, and the ideas that connect them.",
 	contactKicker: "Get in touch",
 	contactTitle: "Contact",
-	contactDescription: "For now, GitHub is the best place to follow my work and the development of this portfolio. More contact methods can be added here later.",
+	contactDescription: "For project enquiries, email me or send a message on Telegram.",
 };

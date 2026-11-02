@@ -32,6 +32,7 @@ const projects = defineCollection({
 		summary: z.string(),
 		direction: z.enum(directionSlugs),
 		date: z.coerce.date(),
+		dateApproximate: z.boolean().default(false),
 		dateEnd: z.coerce.date().optional(),
 		tags: z.array(z.string()).default([]),
 		cover: projectImage.optional(),

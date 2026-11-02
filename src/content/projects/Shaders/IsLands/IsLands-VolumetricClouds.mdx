@@ -6,7 +6,7 @@ direction: "shading"
 date: 2025-09-10
 tags:
   - "Shader"
-  - "Prototype"
+  - "Experiment"
 
 videos:
   - title: ""
@@ -16,7 +16,7 @@ videos:
     loop: true
     sources:
       - src: "projects/Shaders/IsLands/IsLands-VolumetricClouds/IsLands-VolumetricClouds.webm"
-        type: "video/mp4"
+        type: "video/webm"
 
 shaderGraphs:
   - title: "Graph"
@@ -27,10 +27,11 @@ shaderGraphs:
 featured: true
 draft: false
 demo: false
+dateApproximate: true
 ---
 
-
->  Created using Shader Graph with custom HLSL functions. During development, I explored techniques from various tutorials and applied what I learned to implement and fine-tune cloud density, lighting, and light absorption within the volume. Ultimately, the shader remained an experimental prototype and was not used in the final project.
+A tutorial-based experiment with raymarched clouds in Shader Graph and HLSL functions. I explored the effect for IsLands but did not use it in the project: the rendering cost and visual result were still unsatisfactory.
 
 <Video index={1} group open />
+
 <ShaderGraph index={1} group open />

@@ -3,10 +3,10 @@ title: "Smoke Shader"
 mediaLayout: "inline"
 summary: "Animated Noise & Voronoi."
 direction: "shading"
-date: 2026-12-03
+date: 2025-10-01
 tags:
   - "Shader"
-  - "Prototype"
+  - "Experiment"
 
 videos:
   - title: ""
@@ -17,7 +17,7 @@ videos:
     showInCards: true
     sources:
       - src: "projects/Shaders/IsLands/IsLands-SmokeShader/IsLands-SmokeShader.webm"
-        type: "video/mp4"
+        type: "video/webm"
 
 
 
@@ -30,12 +30,13 @@ shaderGraphs:
 featured: true
 draft: false
 demo: false
+dateApproximate: true
 ---
 
+An experiment with animated noise and Voronoi patterns for stylised smoke. I left it out of the project because I was not satisfied with the result.
 
->  A stylized smoke shader combining animated noise and Voronoi patterns to shape the smoke. Gradient mapping controls the color palette, while quantization creates a distinct stepped appearance. Billboard geometry automatically faces the camera.
-
-> The shader was ultimately not used in the final project. Looking back, I can see opportunities to improve its visual quality and have a clear idea of how I would approach a redesign.
+Looking back, the pixelation is inconsistent across the graph: some branches keep smooth detail while others become blocky. Applying the same pixel resolution throughout would make the effect more coherent.
 
 <Video index={1} group open />
+
 <ShaderGraph index={1} group open />

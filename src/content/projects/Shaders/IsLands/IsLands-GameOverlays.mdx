@@ -6,7 +6,7 @@ direction: "shading"
 date: 2026-03-09
 tags:
   - "Shader"
-  - "Prototype"
+  - "Used in a project"
 
 videos:
   - title: ""
@@ -17,7 +17,7 @@ videos:
     showInCards: true
     sources:
       - src: "projects/Shaders/IsLands/IsLands-GameOverlays/IsLands-HealthOverlay.webm"
-        type: "video/mp4"
+        type: "video/webm"
   - title: ""
     autoplay: true
     autoAspect: true
@@ -26,7 +26,7 @@ videos:
     showInCards: true
     sources:
       - src: "projects/Shaders/IsLands/IsLands-GameOverlays/IsLands-FreezeOverlay.webm"
-        type: "video/mp4"
+        type: "video/webm"
   - title: ""
     autoplay: true
     autoAspect: true
@@ -35,7 +35,7 @@ videos:
     showInCards: true
     sources:
       - src: "projects/Shaders/IsLands/IsLands-GameOverlays/IsLands-FireOverlay.webm"
-        type: "video/mp4"
+        type: "video/webm"
 
 
 
@@ -48,12 +48,15 @@ shaderGraphs:
 featured: true
 draft: false
 demo: false
+dateApproximate: true
 ---
 
-
->  A screen-space shader for visualizing cold, fire, and player health. Uses pixelated masks, noise, gradients, procedural hearts, and a heartbeat waveform. A hunger effect was also implemented, but neither it nor the fire effect was used in the final version.
+The health and freezing overlays were connected to the corresponding player states. I also explored fire and hunger effects, but those versions were not used in the final implementation.
 
 <Video index={1} group open />
+
 <Video index={2} group open />
+
 <Video index={3} group open />
+
 <ShaderGraph index={1} group open />

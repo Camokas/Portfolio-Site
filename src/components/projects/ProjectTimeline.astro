@@ -48,7 +48,7 @@ const rails = periods.map(item => {
 				{items.map(project => <div class="timeline-card" data-period={ordered.indexOf(project)}
 					data-start={row(project.data.date)} data-end={row(project.data.dateEnd ?? project.data.date)}
 					style={`--order: ${ordered.indexOf(project)}`}>
-					<div class="mobile-date"><ProjectDate date={project.data.date} dateEnd={project.data.dateEnd} short /></div>
+					<div class="mobile-date"><ProjectDate date={project.data.date} dateEnd={project.data.dateEnd} approximate={project.data.dateApproximate} short /></div>
 					<span class="card-connector" aria-hidden="true"></span>
 					{project.data.dateEnd && <span class="period-label">Project period</span>}
 					<ul aria-label={`Project: ${project.data.title}`}><ProjectCard project={project}/></ul>
