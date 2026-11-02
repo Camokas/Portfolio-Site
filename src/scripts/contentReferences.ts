@@ -7,6 +7,14 @@ const terms: Record<string, string> = {
 	"Adobe Audition": "software/adobe-audition", "Audition": "software/adobe-audition",
 	"After Effects": "software/after-effects", "Premiere Pro": "software/premiere-pro",
 	"Media Encoder": "software/media-encoder", "OBS": "software/obs",
+	"Premiere": "software/premiere-pro", "Blender": "software/blender",
+	"Unity": "software/unity", "Unreal Engine 4": "software/unreal-engine-4",
+	"Substance Painter": "software/substance-painter", "Photoshop": "software/photoshop",
+	"Cinema 4D": "software/cinema-4d", "MagicaVoxel": "software/magica-voxel",
+	"VEGAS Pro": "software/vegas-pro", "Vegas": "software/vegas-pro",
+	"CapCut": "software/capcut", "Audacity": "software/audacity", "FL Studio": "software/fl-studio",
+	"Visual Studio": "software/visual-studio", "VS Code": "software/vs-code",
+	"GitHub Desktop": "software/github-desktop", "Obsidian": "software/obsidian",
 	"Camoka GameDev Telegram Channel": "socialnetworks/camoka-gamedev-telegram-channel",
 	"Telegram Channel GameDev": "socialnetworks/camoka-gamedev-telegram-channel",
 };
@@ -14,6 +22,7 @@ const pattern = new RegExp(Object.keys(terms).sort((a,b)=>b.length-a.length).joi
 
 export function contentReferences(language: SiteLanguage): void {
 	for (const paragraph of document.querySelectorAll<HTMLElement>(".project-content p")) {
+		if (paragraph.closest("a")) continue;
 		if (!sourceText.has(paragraph)) {
 			if (paragraph.children.length) continue;
 			const source = paragraph.textContent || "";
@@ -31,7 +40,7 @@ export function contentReferences(language: SiteLanguage): void {
 		for (const match of text.matchAll(pattern)) {
 			fragment.append(document.createTextNode(text.slice(offset, match.index)));
 			const href = destinations[terms[match[0]]];
-			if (href) {
+			if (href && new URL(href, document.baseURI).pathname !== location.pathname) {
 				const link = document.createElement("a");
 				link.href = href; link.textContent = match[0];
 				fragment.append(link);

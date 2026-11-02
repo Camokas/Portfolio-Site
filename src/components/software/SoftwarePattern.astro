@@ -1,0 +1,38 @@
+---
+import { softwareLogo } from "../../data/software";
+interface Props { slugs: string[]; }
+const { slugs } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<software-pattern aria-hidden="true" style={slugs.length === 1 ? `--software-logo:url('${softwareLogo(slugs[0], base)}')` : undefined}>
+	<div class:list={["pattern", { tiled: slugs.length === 1 }]}>
+		{slugs.length > 1 && Array.from({length: 24}, (_, index) => <img src={softwareLogo(slugs[index % slugs.length], base)} alt="" width="44" height="44" loading="lazy" />)}
+	</div>
+</software-pattern>
+<script>
+	const visible = new Set<Element>();
+	const update = () => {
+		for (const element of visible) element.toggleAttribute("data-running", !document.hidden);
+	};
+	if ("IntersectionObserver" in window) {
+		const observer = new IntersectionObserver(entries => {
+			for (const entry of entries) {
+				if (entry.isIntersecting) visible.add(entry.target);
+				else { visible.delete(entry.target); entry.target.removeAttribute("data-running"); }
+			}
+			update();
+		});
+		document.querySelectorAll("software-pattern").forEach(element => observer.observe(element));
+		document.addEventListener("visibilitychange", update);
+	}
+</script>
+<style>
+software-pattern{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit}
+.pattern{position:absolute;inset:-65%;opacity:.10;transform:rotate(-14deg);animation:software-drift 70s linear infinite;animation-play-state:paused;filter:brightness(0) invert(1)}
+.tiled{background-image:var(--software-logo);background-size:92px 92px;background-repeat:repeat}
+.pattern:not(.tiled){display:grid;grid-template-columns:repeat(6,1fr);gap:2.5rem;align-content:center;justify-items:center;padding:15%}
+software-pattern[data-running] .pattern{animation-play-state:running}
+@keyframes software-drift{from{transform:rotate(-14deg) translate3d(0,0,0)}to{transform:rotate(-14deg) translate3d(-92px,-92px,0)}}
+@media(prefers-reduced-motion:reduce){.pattern{animation:none}}
+@media print{.pattern{animation:none;opacity:.04}}
+</style>

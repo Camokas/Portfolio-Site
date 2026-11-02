@@ -5,6 +5,7 @@ const targets = [...document.querySelectorAll<HTMLElement>([
 	"main .contact-heading", "main .contact-content",
 	".project-content > .project-media-group", ".timeline-card > ul",
 	".project-grid > li",
+	".software-grid > li", ".software-story",
 ].join(","))];
 const animations = new Map<HTMLElement, Animation>();
 let observer: IntersectionObserver | undefined;

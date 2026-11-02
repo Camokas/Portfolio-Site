@@ -3,6 +3,8 @@ import Icon from "../ui/Icon.astro";
 import type { IconName } from "../../data/icons";
 import MediaPreview from "../projects/MediaPreview.astro";
 import type { PreviewMedia } from "../../data/projectPreviews";
+import SoftwarePattern from "../software/SoftwarePattern.astro";
+import { software } from "../../data/software";
 
 interface Props {
 	numberLabel: string;
@@ -20,6 +22,7 @@ const href = `${import.meta.env.BASE_URL}directions/${slug}/`;
 
 <li class="direction-item">
 	<div class="direction-card">
+		{slug === "software" && <SoftwarePattern slugs={software.map(tool => tool.slug)} />}
 		{previews.length > 0 && <MediaPreview items={previews} />}
 		<a class="direction-copy" href={href}>
 		<div class="direction-marker" aria-hidden="true">

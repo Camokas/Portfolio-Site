@@ -1,0 +1,24 @@
+---
+import { software, softwareGroups } from "../../data/software";
+import SoftwareCard from "./SoftwareCard.astro";
+---
+<nav class="group-links" aria-label="Software groups">
+	{softwareGroups.map(group => <a href={`#software-${group.id}`}>{group.title.en}</a>)}
+</nav>
+<div class="software-catalog">
+	{softwareGroups.map(group => <section class="software-group" id={`software-${group.id}`} aria-labelledby={`heading-${group.id}`}>
+		<div class="section-heading"><h2 id={`heading-${group.id}`}>{group.title.en}</h2></div>
+		<ul class="software-grid">{software.filter(tool => tool.group === group.id).map(tool => <SoftwareCard tool={tool} />)}</ul>
+	</section>)}
+</div>
+<style>
+.group-links{display:flex;gap:.6rem 1.1rem;flex-wrap:wrap;justify-content:center;margin:0 auto 2rem;max-width:52rem}
+.group-links a{font-size:.8rem;line-height:1.6;color:var(--color-muted);text-decoration:none;text-underline-offset:.3rem}
+.group-links a:hover,.group-links a:focus-visible{color:var(--color-text);text-decoration:underline}
+.software-catalog{display:grid;gap:3.5rem;padding-block:1rem 3rem}
+.software-group{scroll-margin-top:6rem;min-width:0}
+h2{margin:0 0 1.25rem;font-size:clamp(1.35rem,3vw,1.8rem);line-height:1.35;letter-spacing:-.025em}
+.software-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;padding:0;margin:0;list-style:none}
+@media(max-width:60rem){.software-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:36rem){.software-grid{grid-template-columns:minmax(0,1fr)}.group-links{justify-content:flex-start}}
+</style>

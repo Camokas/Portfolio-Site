@@ -19,8 +19,12 @@ const baseUrl = import.meta.env.BASE_URL;
 import { localizedMedia } from "../data/localizedMedia";
 const mediaVersions = localizedMedia();
 import { getCollection } from "astro:content";
+import { software, softwareUrl } from "../data/software";
 const referenceProjects = await getCollection("projects", ({data}) => !data.draft);
-const referenceTargets = Object.fromEntries(referenceProjects.map(project => [project.id.toLowerCase(), baseUrl + "projects/" + project.id + "/"]));
+const referenceTargets = Object.fromEntries([
+	...referenceProjects.map(project => [project.id.toLowerCase(), baseUrl + "projects/" + project.id + "/"]),
+	...software.map(tool => ["software/" + tool.slug, softwareUrl(tool.slug, baseUrl)]),
+]);
 ---
 
 <!doctype html>

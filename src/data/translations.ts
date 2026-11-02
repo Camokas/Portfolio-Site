@@ -1,3 +1,4 @@
+import { softwareTranslations } from "./software";
 export type SiteLanguage = "en" | "ru";
 
 /**
@@ -5,6 +6,17 @@ export type SiteLanguage = "en" | "ru";
  * whenever new interface or project copy should also be available in Russian.
  */
 export const russianTranslations: Record<string, string> = {
+	...softwareTranslations,
+	"My toolkit": "Мои инструменты",
+	"Software groups": "Группы программ",
+	"In use": "Использую",
+	"Occasional use": "Использую иногда",
+	"Used previously": "Использовал раньше",
+	"Learning": "Осваиваю",
+	"First used": "Знакомство",
+	"How I use it": "Как использую",
+	"Tasks in my workflow": "Задачи в моём процессе",
+	"Selected work using this tool": "Примеры применения",
 	"Commissioned Video Editing": "Монтаж на заказ",
 	"Turning hours of gameplay into focused YouTube videos: selecting moments, shaping the pace, and refining cuts with client feedback.": "Из многочасового геймплея — в цельные YouTube-ролики: отбор моментов, работа с темпом и доработка монтажа по обратной связи заказчика.",
 	"Workload · approximate, from memory": "Объём работы · приблизительно, по памяти",
