@@ -8,6 +8,8 @@ export interface PreviewMedia {
 	kind: "image" | "video" | "model" | "code" | "shaderGraph";
 	src: string;
 	poster?: string;
+	width?: number;
+	height?: number;
 	sources?: { src: string; type: string }[];
 	label: string;
 	code?: Pick<CollectionEntry<"projects">["data"]["codeSamples"][number], "code" | "language">;
@@ -26,7 +28,8 @@ export async function projectPreviews(project: CollectionEntry<"projects">): Pro
 	})));
 	for (const video of data.videos) {
 		if (!video.showInCards) continue;
-		previews.push({ kind: "video", src: publicUrl(video.sources[0].src),
+		const dimensions = videoPresentation(video.sources[0].src, import.meta.env.BASE_URL);
+		previews.push({ width: dimensions?.width, height: dimensions?.height, kind: "video", src: publicUrl(video.sources[0].src),
 			sources: video.sources.map((source) => ({ ...source, src: publicUrl(source.src) })),
 			poster: video.poster ? (await getImage({ src: video.poster, width: Math.min(800, video.poster.width) })).src : videoPresentation(video.sources[0].src, import.meta.env.BASE_URL)?.poster,
 			label: video.title });

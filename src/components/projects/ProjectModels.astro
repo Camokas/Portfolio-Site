@@ -146,13 +146,11 @@ const modelUrl = (src?: string) => src
 				if (!this.isConnected) return;
 				try {
 					const previews = await import("../../scripts/modelPreview");
-					const canvas = await previews.createModelPreview(this.dataset.modelSrc ?? "", 384 / 320, false);
-					try {
-						if (!this.isConnected || thumbnail.getAttribute("src")) return;
-						thumbnail.src = canvas.toDataURL("image/png"); thumbnail.hidden = false;
-						const placeholder = thumbnail.parentElement?.querySelector<HTMLElement>("[data-model-thumbnail-placeholder]");
-						if (placeholder) placeholder.hidden = true;
-					} finally { previews.releaseModelPreview(canvas); }
+					const image = await previews.modelThumbnail(this.dataset.modelSrc ?? "", 384 / 320);
+					if (!this.isConnected || thumbnail.getAttribute("src")) return;
+					thumbnail.src = image; thumbnail.hidden = false;
+					const placeholder = thumbnail.parentElement?.querySelector<HTMLElement>("[data-model-thumbnail-placeholder]");
+					if (placeholder) placeholder.hidden = true;
 				} catch { this.thumbnailPending = false; }
 			};
 			modelPreparationQueue = modelPreparationQueue.then(prepare, prepare);
