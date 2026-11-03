@@ -41,7 +41,7 @@ export const software: Software[] = [
 		slug: "blender", title: "Blender", group: "3d", status: "In use", firstUsed: t("~2020", "~2020"),
 		summary: t("My main 3D tool for original models, UVs, animation, and game-ready exports.", "Основной 3D-инструмент: собственные модели, UV, анимации и подготовка объектов для игр."),
 		experience: [
-			t("I model from references, simplify meshes, check topology and normals, and prepare UVs with automatic tools and manual refinement. I also edit existing models and create animations. Plugins speed up the process, while the modelling decisions remain mine; I do not use AI for my 3D modelling.", "Моделирую по референсам, упрощаю сетки, проверяю топологию и нормали, готовлю UV автоматическими инструментами с ручной доработкой. Также редактирую готовые модели и создаю анимации. Плагины ускоряют процесс, но решения по моделированию принимаю сам; ИИ для 3D-моделирования не использую."),
+			t("I model from references, simplify meshes, check topology and normals, and prepare UVs with automatic tools and manual refinement. I also edit existing models and create animations. Plugins speed up the process, while the modelling decisions remain mine; I do not use AI for my 3D modelling. I regularly use Mirror, Array, Boolean, Subdivision Surface, and Remesh, along with smooth shading and physics simulations.", "Моделирую по референсам, упрощаю сетки, проверяю топологию и нормали, готовлю UV автоматическими инструментами с ручной доработкой. Также редактирую готовые модели и создаю анимации. Плагины ускоряют процесс, но решения по моделированию принимаю сам; ИИ для 3D-моделирования не использую. Регулярно использую Mirror, Array, Boolean, Subdivision Surface и Remesh, а также сглаживание поверхностей и физические симуляции."),
 			t("My current workflow can continue into Substance Painter, then back to Blender to inspect textures under different lighting. Modelling and UV work are stronger areas for me than baking, skeletal animation, or advanced material work.", "Мой текущий процесс может продолжаться в Substance Painter, после чего я проверяю текстуры в Blender под разным освещением. Моделирование и UV освоены увереннее, чем запекание, скелетная анимация и сложная работа с материалами."),
 		], focus: [t("Modelling & topology", "Моделирование и топология"), t("UV preparation", "Подготовка UV"), t("Animation & export", "Анимация и экспорт")],
 		projectIds: ["animation/buildest-first-person-hands"],
@@ -49,7 +49,7 @@ export const software: Software[] = [
 	{
 		slug: "substance-painter", title: "Adobe Substance Painter", group: "3d", status: "Learning", firstUsed: t("~2026", "~2026"),
 		summary: t("Layer-based texturing for my models, with a particular interest in PS1-style work.", "Послойное текстурирование своих моделей с особым интересом к стилистике PS1."),
-		experience: [t("I started in August 2026 to make texturing more comfortable than my earlier Blender and Photoshop workflow. I combine materials, masks, and decals on a model and export the resulting textures. I can texture a straightforward model independently; building my own materials and deeper settings are still areas I am learning.", "Начал в августе 2026, чтобы сделать текстурирование удобнее прежнего процесса в Blender и Photoshop. Сочетаю материалы, маски и декали на модели, затем экспортирую текстуры. Несложную модель могу протекстурировать самостоятельно; создание своих материалов и глубокие настройки ещё осваиваю.")],
+		experience: [t("I started in August 2026 to improve my texturing workflow. I use built-in and free third-party materials, adjust them in detail, and combine them with masks and decals. I can texture a straightforward model independently; creating materials from scratch and deeper settings are still areas I am learning.", "Начал в августе 2026, чтобы улучшить процесс текстурирования. Использую встроенные и бесплатные сторонние материалы, детально настраиваю их и смешиваю с помощью масок и декалей. Несложную модель могу протекстурировать самостоятельно; создание материалов с нуля и глубокие настройки ещё осваиваю.")],
 		focus: [t("Layers & masks", "Слои и маски"), t("Material blending", "Смешивание материалов"), t("Texture export", "Экспорт текстур")],
 	},
 	{
@@ -59,7 +59,7 @@ export const software: Software[] = [
 		focus: [t("Simple models", "Простые модели"), t("Simulation experiments", "Эксперименты с симуляциями"), t("Still renders", "Статичные рендеры")],
 	},
 	{
-		slug: "magica-voxel", title: "MagicaVoxel", group: "3d", status: "Used previously",
+		slug: "magica-voxel", title: "MagicaVoxel", group: "3d", status: "Used previously", firstUsed: t("~2020", "~2020"),
 		summary: t("Small voxel models, basic colouring, and experiments with the built-in renderer.", "Небольшие воксельные модели, базовая покраска и эксперименты со встроенным рендером."),
 		experience: [t("I discovered MagicaVoxel shortly after Cinema 4D. Its accessible tools let me make small original voxel objects after a few lessons. I liked the style and renderer, but the meshes from my export workflow needed more simplification than I wanted. I now prefer Blender for this work.", "Познакомился с MagicaVoxel вскоре после Cinema 4D. После нескольких уроков доступные инструменты позволяли создавать небольшие собственные воксельные объекты. Нравились стиль и рендер, но сетки после моего экспорта требовали лишнего упрощения. Сейчас для таких задач предпочитаю Blender.")],
 		focus: [t("Voxel modelling", "Воксельное моделирование"), t("Basic colouring", "Базовая покраска"), t("Export", "Экспорт")],
@@ -81,7 +81,7 @@ export const software: Software[] = [
 		projectIds: ["motiondesign/telegram-channel-promo", "motiondesign/nullstudio-animated-intros", "videoediting/camoka-youtube-gamedev"],
 	},
 	{
-		slug: "media-encoder", title: "Adobe Media Encoder", group: "video", status: "In use",
+		slug: "media-encoder", title: "Adobe Media Encoder", group: "video", status: "In use", firstUsed: t("~2020", "~2020"),
 		summary: t("Export queues, presets, and format conversion throughout my Adobe editing workflow.", "Очереди экспорта, пресеты и преобразование форматов в моём монтажном процессе Adobe."),
 		experience: [t("I started using Media Encoder soon after After Effects. It handles exports from AE and Premiere, queues, alternate versions, and source conversion. I choose settings for the intended platform and adjust file size, render time, and compatibility to the task.", "Начал пользоваться Media Encoder вскоре после After Effects. Через него вывожу AE и Premiere, собираю очереди, разные версии и перекодирую исходники. Подбираю настройки под площадку и задачу: вес файла, время вывода и совместимость.")],
 		focus: [t("Export queues", "Очереди экспорта"), t("Presets & formats", "Пресеты и форматы"), t("Transcoding", "Перекодирование")],
@@ -101,9 +101,9 @@ export const software: Software[] = [
 		focus: [t("Quick assembly", "Быстрая сборка"), t("Subtitles", "Субтитры")],
 	},
 	{
-		slug: "photoshop", title: "Adobe Photoshop", group: "graphics-audio", status: "In use",
+		slug: "photoshop", title: "Adobe Photoshop", group: "graphics-audio", status: "In use", firstUsed: t("~2018", "~2018"),
 		summary: t("Thumbnails, graphics, textures, interfaces, and image compositing.", "Обложки, графика, текстуры, интерфейсы и композиции из изображений."),
-		experience: [t("Photoshop is my usual tool for image work: selections, masks, retouching, composition, text, and colour. I often assemble and rework source images into a final design; pixel art is something I also create from scratch. I use it alongside my video and game workflows.", "Photoshop — мой привычный инструмент для изображений: выделение, маски, ретушь, композиция, текст и цвет. Часто собираю и перерабатываю исходники в итоговое оформление; пиксель-арт также создаю с нуля. Использую его вместе с монтажными и игровыми инструментами.")],
+		experience: [t("Thumbnails and video covers are my most practised image task. I work with selections, masks, retouching, text, colour, and composition to combine and rework source images. I also make pixel art from scratch and prepare graphics, textures, and interfaces for my projects.", "Больше всего опыта у меня в обложках и превью видео. Работаю с выделением, масками, ретушью, текстом, цветом и композицией, собирая и перерабатывая исходные изображения. Также создаю пиксель-арт с нуля и готовлю графику, текстуры и интерфейсы для проектов.")],
 		focus: [t("Image compositing", "Композиция изображений"), t("Thumbnails & graphics", "Обложки и графика"), t("Pixel art", "Пиксель-арт")],
 	},
 	{
@@ -122,7 +122,7 @@ export const software: Software[] = [
 	{
 		slug: "fl-studio", title: "FL Studio", group: "graphics-audio", status: "In use", firstUsed: t("~2019–2020", "~2019–2020"),
 		summary: t("Simple original electronic music, composed by ear for my projects.", "Несложная собственная электронная музыка, которую пишу на слух для проектов."),
-		experience: [t("I explored FL Studio around 2019–2020 and began learning more actively in 2024 with Adventure for Buildest. I build my own melodies and arrangements, experiment with synthesisers, and automate parameters. I do not rely on ready-made loops. My approach is intuitive; music theory and detailed synth design are still limited areas.", "Познакомился с FL Studio примерно в 2019–2020, а активнее начал изучать в 2024 с треком Adventure для Buildest. Собираю свои мелодии и аранжировки, экспериментирую с синтезаторами и автоматизацией параметров. Готовые лупы не использую. Подход интуитивный; музыкальной теории и глубокого знания синтезаторов пока немного.")],
+		experience: [t("I explored FL Studio around 2019–2020 and began learning more actively in 2024 with Adventure for Buildest The Game. I build my own melodies and arrangements, experiment with synthesisers, and automate parameters. I do not rely on ready-made loops. My approach is intuitive; music theory and detailed synth design are still limited areas.", "Познакомился с FL Studio примерно в 2019–2020, а активнее начал изучать в 2024 с треком Adventure для Buildest The Game. Собираю свои мелодии и аранжировки, экспериментирую с синтезаторами и автоматизацией параметров. Готовые лупы не использую. Подход интуитивный; музыкальной теории и глубокого знания синтезаторов пока немного.")],
 		focus: [t("Original melodies", "Собственные мелодии"), t("Electronic arrangements", "Электронные аранжировки"), t("Parameter automation", "Автоматизация параметров")],
 		projectIds: ["videoediting/camoka-youtube-gamedev"],
 	},
@@ -146,7 +146,7 @@ export const software: Software[] = [
 		focus: [t("Small-file edits", "Правки небольших файлов"), t("Basic extensions", "Базовые расширения")],
 	},
 	{
-		slug: "github-desktop", title: "GitHub Desktop", group: "workflow", status: "In use",
+		slug: "github-desktop", title: "GitHub Desktop", group: "workflow", status: "In use", firstUsed: t("~2022", "~2022"),
 		summary: t("Version history and GitHub publishing for mostly solo projects.", "История версий и отправка на GitHub преимущественно одиночных проектов."),
 		experience: [t("I discovered GitHub Desktop after starting Unity and Visual Studio. I create repositories, review changes, commit, and push to GitHub instead of keeping manual copies of every project version. Most work has been solo in the main branch; my experience with branches and merges is basic, and team workflows are less familiar.", "Открыл GitHub Desktop после знакомства с Unity и Visual Studio. Создаю репозитории, просматриваю изменения, делаю коммиты и отправляю их на GitHub вместо ручных копий каждой версии проекта. Работал преимущественно один в основной ветке; с ветками и слияниями знаком базово, командные процессы освоены меньше.")],
 		focus: [t("Version history", "История версий"), t("Commits & push", "Коммиты и push"), t("Solo projects", "Одиночные проекты")],
@@ -154,7 +154,7 @@ export const software: Software[] = [
 	{
 		slug: "obsidian", title: "Obsidian", group: "workflow", status: "In use", firstUsed: t("~2023", "~2023"),
 		summary: t("Detailed planning, notes, and logs for my work.", "Подробное планирование, заметки и логи моей работы."),
-		experience: [t("I use Obsidian to keep plans, notes, and logs together. It is one of my preferred tools for organising work and keeping track of details, with a few simple plugins supporting the process.", "В Obsidian собираю планы, заметки и логи. Это один из любимых инструментов для организации работы и сохранения деталей; дополнительно использую несколько простых плагинов.")],
+		experience: [t("I organise logs, tasks, personal notes, and plans in folders, and often use the graph and Canvas. Advanced Canvas extends my visual planning, while Bases Gantt helps me arrange tasks on a calendar and Gantt chart.", "Разбиваю логи, задачи, личные заметки и планы по папкам, часто использую граф и Canvas. Advanced Canvas расширяет визуальное планирование, а Bases Gantt помогает размещать задачи в календаре и на диаграмме Ганта.")],
 		focus: [t("Planning", "Планирование"), t("Notes & logs", "Заметки и логи")],
 	},
 ];

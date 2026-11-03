@@ -42,7 +42,7 @@ demo: false
 dateApproximate: true
 ---
 
-I used noise to select grass variants from a Texture2DArray: smaller grass in low-value areas and larger grass in higher-value areas, with intermediate sizes between them. This creates patches of density rather than a completely random mixture. I also adjusted material settings to encourage batching.
+I drew separate grass images for a Texture2DArray. Noise selects smaller variants in low-value areas and larger variants in higher-value areas, with sizes between them. This creates patches of density rather than a completely random mixture. I also adjusted material settings to encourage batching.
 
 <Video index={1} group open />
 
