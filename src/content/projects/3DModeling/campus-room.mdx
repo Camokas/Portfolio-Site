@@ -1,0 +1,36 @@
+---
+title: "Campus Room"
+summary: "A detailed recreation of a real dormitory room for a horror-game location: measured proportions, cloth simulation, UVs, and pivots for moving parts."
+direction: "3d-modeling"
+date: 2024-02-01
+mediaLayout: "inline"
+cover: "projects/3DModeling/CampusRoom/overview.png"
+tags: ["Blender", "Environment", "High-poly"]
+draft: false
+demo: false
+models:
+  - title: "Campus Room"
+    description: "Explore the complete scene"
+    kind: "glb"
+    src: "projects/3DModeling/CampusRoom/CampusRoom.glb"
+    poster: "projects/3DModeling/CampusRoom/overview.png"
+    showInCards: false
+---
+
+## Rebuilding a real room
+
+In February 2024, I began recreating a real dormitory room as the main location for a horror game. I took measurements down to centimetres, drew plans, and checked distances inside Blender with a measurement add-on. I modelled every object from scratch.
+
+Beyond the room itself, I recreated the beds, wardrobe, window and radiator with pipes, lighting, sockets, cable cover, and skirting boards. I paid particular attention to small construction details: hinges, handles, shelves, and a door with its frame, lock, opening mechanism, and a key shaped to fit the keyhole.
+
+<Models index={1} group open />
+
+## Cloth, UVs & moving parts
+
+I created the pillows, blankets, mattresses, and mattress cover through physical simulation, baked the results, and refined the shapes with sculpting. Unwrapping the large number of objects was another substantial part of the work; the exported scene retains UV coordinates on every mesh.
+
+I placed pivots for opening and moving parts so I could test their motion in Blender and make later animation in Unity easier. The intended location was interactive; this page presents the modelling work rather than a finished game implementation.
+
+## An unfinished modelling study
+
+The scene remains largely high-poly, and optimisation was only started, especially for the simulated fabric. Final textures, the desk and work area, nearby cabinets and their contents, and the refrigerator were not completed. I briefly tried ready-made materials to check the appearance; the scene shown here has no final texture set.
