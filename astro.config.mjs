@@ -19,7 +19,8 @@ export default defineConfig({
 				"object-src 'none'",
 				"form-action 'none'",
 				"frame-src 'self'",
-				"connect-src 'self' https://api.github.com",
+				// GLTFLoader reads embedded GLB textures via fetch(blob:...).
+				"connect-src 'self' blob: https://api.github.com",
 				"font-src 'self'",
 				"img-src 'self' data: blob:",
 				"media-src 'self' https: blob:",
