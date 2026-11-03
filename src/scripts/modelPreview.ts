@@ -127,6 +127,7 @@ function stop(state: State, snapshot = true) {
   }
   slot.renderer.domElement.remove(); slot.state = undefined; state.slot = undefined;
  }
+ state.image.hidden = false;
  state.active = false; state.last = 0; active.delete(state);
  if (!active.size) { if (timer !== undefined) clearTimeout(timer); timer = undefined; if (frame) cancelAnimationFrame(frame); frame = 0; }
  prune();
@@ -155,7 +156,10 @@ function tick(time: number) {
  for (const state of [...active]) {
   if (!state.element.isConnected) { stop(state, false); continue; }
   state.elapsed += state.last ? Math.min(time - state.last, 200) : 0; state.last = time;
-  if (state.resource && state.slot) render(state.slot, state.resource, state.aspect, state.distance, Math.min(1, state.elapsed / state.duration));
+  if (state.resource && state.slot) {
+   render(state.slot, state.resource, state.aspect, state.distance, Math.min(1, state.elapsed / state.duration));
+   state.image.hidden = true;
+  }
  }
  const cost = performance.now() - start;
  if (cost > 16) slowFrames++; else slowFrames = Math.max(0, slowFrames - 1);
