@@ -1,0 +1,82 @@
+---
+title: "TrashToCash · Recycling Props"
+summary: "Low-poly scrap, discarded objects, and a workbench for a recycling-game prototype, with detailed UVs and worn, pixelated textures."
+direction: "3d-modeling"
+date: 2026-09-15
+dateApproximate: true
+mediaLayout: "inline"
+tags: ["PS1", "Low-poly", "TrashToCash"]
+featured: true
+draft: false
+demo: false
+models:
+  - title: "Aluminium Scrap"
+    kind: "glb"
+    src: "projects/3DModeling/TrashToCash/Materials/AluminumScrap/AluminumScrap.glb"
+    showInCards: true
+  - title: "Copper Scrap"
+    kind: "glb"
+    src: "projects/3DModeling/TrashToCash/Materials/CopperScrap/CopperScrap.glb"
+    showInCards: true
+  - title: "Plastic Scrap"
+    kind: "glb"
+    src: "projects/3DModeling/TrashToCash/Materials/PlasticScrap/PlasticScrap.glb"
+    showInCards: true
+  - title: "Workbench"
+    kind: "glb"
+    src: "projects/3DModeling/TrashToCash/Workspaces/WorkTable/Worktable.glb"
+    showInCards: true
+  - title: "Plastic Bottle"
+    kind: "glb"
+    src: "projects/3DModeling/TrashToCash/Objects/PlasticBottle/PlasticBottle.glb"
+    showInCards: false
+  - title: "Copper Cable"
+    kind: "glb"
+    src: "projects/3DModeling/TrashToCash/Objects/NetworkCable/NetworkCable.glb"
+    showInCards: false
+  - title: "Aluminium Can"
+    kind: "glb"
+    src: "projects/3DModeling/TrashToCash/Objects/AluminumCan/AluminumCan.glb"
+    showInCards: false
+  - title: "Scrap Container"
+    kind: "glb"
+    src: "projects/3DModeling/TrashToCash/Containers/Container.glb"
+    showInCards: false
+  - title: "Box of Discarded Items"
+    kind: "glb"
+    src: "projects/3DModeling/TrashToCash/TrashBoxs/TrashBox.glb"
+    showInCards: false
+---
+
+## Scrap with a recognisable character
+
+The most interesting task was making each resource look like a crooked, fused mass of recognisable objects while still reading as one material. I explored the shapes through generated image references and, for some models, physical simulations that brought the pieces together in irregular arrangements.
+
+I gave the UVs and texturing more time than in Misform. The palette is a little brighter, with more sand, rust, dirt, and dust: I wanted the objects to feel worn and used.
+
+<Models indices={[1, 2, 3]} group open />
+
+## The workbench
+
+The workbench is my favourite individual prop in this set, despite its simple form. It was the place where the player dismantled discarded items into resources.
+
+I made these models around mid-September 2026, after first building the game with engine primitives. All nine models shown here were used in the prototype; the larger project remained unfinished.
+
+<Models index={4} group open />
+
+## From discarded objects to resources
+
+A plastic bottle yielded plastic, a copper cable yielded plastic and copper, and an aluminium can yielded aluminium. The player dismantled them at the workbench, collected the resulting materials in a container, and sold them.
+
+The game was intended to grow from an old hangar and a small patch of land into a recycling enterprise, with new equipment, rearranged work areas, and gradual automation. These models supported the initial sorting and dismantling loop.
+
+<Models indices={[5, 6, 7]} group open />
+
+## Containers & surface work
+
+I modelled and unwrapped the objects in Blender and textured them in Substance Painter. I started with supplied Substance materials and some lettering and sticker textures, then substantially adjusted and combined them. AI-generated images served as references for the forms.
+
+I kept the geometry economical because the game was designed to have hundreds of these objects in a scene at once. The low-poly forms and pixelated textures remained the basis of the style.
+
+<Models indices={[8, 9]} group />
+
