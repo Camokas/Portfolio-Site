@@ -151,6 +151,7 @@ const projects = defineCollection({
 					title: z.string(),
 					description: z.string().optional(),
 					kind: z.enum(["demo", "glb"]).default("demo"),
+					presentation: z.enum(["object", "interior"]).default("object"),
 					showInCards: z.boolean().default(true),
 					src: mediaAsset.optional(),
 					poster: mediaAsset.optional(),

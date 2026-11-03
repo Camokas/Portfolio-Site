@@ -6,6 +6,7 @@ interface ModelItem {
 	title: string;
 	description?: string;
 	kind: "demo" | "glb";
+	presentation?: "object" | "interior";
 	src?: string;
 	poster?: string;
 	autoRotate: boolean;
@@ -41,7 +42,7 @@ const modelUrl = (src?: string) => src
 						<span>{item.kind === "demo" ? "Demo scene" : "glTF / GLB"}</span>
 					</summary>
 
-					<project-model-viewer data-auto-rotate={String(item.autoRotate)} data-model-src={modelUrl(item.src)}>
+					<project-model-viewer data-auto-rotate={String(item.autoRotate)} data-model-src={modelUrl(item.src)} data-presentation={item.presentation}>
 						<div
 							class="model-viewport"
 							data-model-viewport
@@ -223,6 +224,7 @@ const modelUrl = (src?: string) => src
 					import("three/addons/controls/OrbitControls.js"),
 				]);
 
+				const interior = this.dataset.presentation === "interior";
 				const scene = new THREE.Scene();
 				if (!this.isConnected) { this.initialized = false; return; }
 				const disposeScene = () => {
@@ -274,8 +276,8 @@ const modelUrl = (src?: string) => src
 					scene.add(wrapper);
 				}
 
-				const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-				const defaultCameraPosition = new THREE.Vector3(3.6, 2.5, 4.6);
+				const camera = new THREE.PerspectiveCamera(42, 1, interior ? 0.005 : 0.1, 100);
+				const defaultCameraPosition = new THREE.Vector3(3.6, interior ? 4.5 : 2.5, 4.6);
 				camera.position.copy(defaultCameraPosition);
 
 				stage = "graphics";
@@ -287,6 +289,15 @@ const modelUrl = (src?: string) => src
 				releaseResources = () => { disposeScene(); renderer.dispose(); };
 				renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 				renderer.outputColorSpace = THREE.SRGBColorSpace;
+				if (interior) {
+					renderer.toneMapping = THREE.ACESFilmicToneMapping;
+					renderer.toneMappingExposure = 1;
+					renderer.shadowMap.enabled = true;
+					renderer.shadowMap.type = THREE.PCFShadowMap;
+					// Room geometry is static: calculate shadows once, not on every orbit frame.
+					renderer.shadowMap.autoUpdate = clips.length > 0;
+					renderer.shadowMap.needsUpdate = true;
+				}
 				renderer.domElement.setAttribute("aria-label", "Interactive 3D canvas");
 				viewport.append(renderer.domElement);
 				status.hidden = true;
@@ -296,6 +307,25 @@ const modelUrl = (src?: string) => src
 				const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
 				keyLight.position.set(4, 6, 3);
 				scene.add(hemisphereLight, keyLight);
+				if (interior) {
+					hemisphereLight.intensity = 1.2;
+					keyLight.intensity = 3;
+					keyLight.position.set(3, 5, 4);
+					keyLight.castShadow = true;
+					keyLight.shadow.mapSize.set(1024, 1024);
+					Object.assign(keyLight.shadow.camera, {left: -2, right: 2, top: 2, bottom: -2, near: 0.1, far: 20});
+					keyLight.shadow.camera.updateProjectionMatrix();
+					keyLight.shadow.normalBias = 0.005;
+					loadedModel?.traverse(node => {
+						if (!(node instanceof THREE.Mesh)) return;
+						node.castShadow = node.receiveShadow = true;
+						for (const material of Array.isArray(node.material) ? node.material : [node.material]) {
+							if (material instanceof THREE.MeshStandardMaterial && !material.map) {
+								material.color.set(0x9c9993); material.metalness = 0; material.roughness = 0.9; material.shadowSide = THREE.FrontSide;
+							}
+						}
+					});
+				}
 
 				const geometry = new THREE.IcosahedronGeometry(1.25, 2);
 				const material = new THREE.MeshStandardMaterial({
@@ -318,7 +348,7 @@ const modelUrl = (src?: string) => src
 					if (node instanceof THREE.Mesh) originalMaterials.set(node, node.material);
 				});
 				const neutralMaterial = new THREE.MeshStandardMaterial({
-					color: 0xbdbdbd, metalness: 0, roughness: 0.75, side: THREE.DoubleSide,
+					color: 0xbdbdbd, metalness: 0, roughness: 0.75, side: interior ? THREE.FrontSide : THREE.DoubleSide,
 				});
 				const wireframeMaterial = new THREE.MeshBasicMaterial({
 					color: 0xe8e8e8, wireframe: true,
@@ -339,7 +369,7 @@ const modelUrl = (src?: string) => src
 				const checkerTexture = new THREE.CanvasTexture(checkerCanvas);
 				checkerTexture.colorSpace = THREE.SRGBColorSpace;
 				checkerTexture.wrapS = checkerTexture.wrapT = THREE.RepeatWrapping;
-				const checkerMaterial = new THREE.MeshBasicMaterial({ map: checkerTexture, side: THREE.DoubleSide });
+				const checkerMaterial = new THREE.MeshBasicMaterial({ map: checkerTexture, side: interior ? THREE.FrontSide : THREE.DoubleSide });
 				const applyDisplayMode = () => {
 					const mode = displayMode?.value ?? "original";
 					originalMaterials.forEach((original, mesh) => {
@@ -476,20 +506,21 @@ const modelUrl = (src?: string) => src
 
 				const grid = new THREE.GridHelper(8, 16, 0x444444, 0x242424);
 				grid.position.y = -1.3;
+				grid.visible = !interior;
 				scene.add(grid);
 
 				scene.updateMatrixWorld(true);
 				const framedSize = new THREE.Box3().setFromObject(loadedModel ?? object).getSize(new THREE.Vector3());
 				const cameraDirection = defaultCameraPosition.clone().normalize();
 				const fitCamera = (aspect: number) => {
-					defaultCameraPosition.copy(cameraDirection).multiplyScalar(previewDistance(framedSize, aspect, camera.fov, true));
+					defaultCameraPosition.copy(cameraDirection).multiplyScalar(previewDistance(framedSize, aspect, camera.fov, true, cameraDirection.toArray()));
 					camera.position.copy(defaultCameraPosition);
 				};
 				let cameraInteracted = false;
 				const controls = new OrbitControls(camera, renderer.domElement);
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.06;
-				controls.minDistance = 0.7;
+				controls.minDistance = interior ? 0.05 : 0.7;
 				controls.maxDistance = 10;
 				controls.target.set(0, 0, 0);
 
@@ -674,7 +705,7 @@ const modelUrl = (src?: string) => src
 						edges.visible = false;
 						renderer.setSize(384, 320, false);
 						camera.aspect = 384 / 320;
-						camera.position.copy(cameraDirection).multiplyScalar(previewDistance(framedSize, camera.aspect, camera.fov));
+						camera.position.copy(cameraDirection).multiplyScalar(previewDistance(framedSize, camera.aspect, camera.fov, false, cameraDirection.toArray()));
 						camera.lookAt(0, 0, 0);
 						camera.updateProjectionMatrix();
 						renderer.render(scene, camera);
@@ -683,7 +714,7 @@ const modelUrl = (src?: string) => src
 						preview.getContext("2d")?.drawImage(canvas, 0, 0, 384, 320);
 						thumbnail.src = preview.toDataURL("image/png");
 						scene.background = previousBackground;
-						grid.visible = true;
+						grid.visible = !interior;
 						edges.visible = true;
 						camera.position.copy(previousPosition);
 						camera.aspect = previousAspect;

@@ -1,6 +1,5 @@
 // Fit the projected bounds, including depth; independent of model units.
-export function previewDistance(size, aspect, fov = 42, orbit = false) {
-  const direction = [3.6, 2.5, 4.6];
+export function previewDistance(size, aspect, fov = 42, orbit = false, direction = [3.6, 2.5, 4.6]) {
   const length = Math.hypot(...direction);
   const forward = direction.map(n => n / length);
   const horizontal = Math.hypot(forward[0], forward[2]);
