@@ -309,6 +309,13 @@ const modelUrl = (src?: string) => src
 				scene.add(hemisphereLight, keyLight);
 				if (interior) {
 					hemisphereLight.intensity = 1.2;
+					// Fill the cutaway interior from several sides without extra shadow maps.
+					const fillLight = new THREE.DirectionalLight(0xf2f5ff, 1.1);
+					fillLight.position.set(-4, 3, -3);
+					const sideLight = new THREE.DirectionalLight(0xfff1df, 0.75);
+					sideLight.position.set(4, 1, -4);
+					const ambientFill = new THREE.AmbientLight(0xffffff, 0.35);
+					scene.add(fillLight, sideLight, ambientFill);
 					keyLight.intensity = 3;
 					keyLight.position.set(3, 5, 4);
 					keyLight.castShadow = true;
