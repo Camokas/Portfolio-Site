@@ -29,9 +29,6 @@ const initialImage = first?.kind === "image" || first?.kind === "shaderGraph" ? 
 	.preview-layers { position: absolute; inset: 0; }
 	media-preview :global(.slide) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
 	media-preview :global(.slide.active) { opacity: 1; }
-	media-preview :global(.model-still), media-preview :global(.model-live-canvas) { position: absolute; inset: 0; width: 100%; height: 100%; }
-	media-preview :global(.model-still) { object-fit: contain; }
-	media-preview :global(.model-still.model-frozen) { object-fit: fill; }
 	media-preview :global(.slide.model) { object-fit: contain; padding: 0.35rem; }
 	media-preview :global(.slide.graph-preview) { object-fit: contain; background: #10161c; padding: 0.5rem; }
 	media-preview :global(.slide.code-preview) { overflow: hidden; padding: 1rem; background: #0d1117; }

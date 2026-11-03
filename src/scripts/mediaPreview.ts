@@ -1,52 +1,14 @@
 import type { PreviewMedia } from "../data/projectPreviews";
 import { localizedMediaUrl } from "./localizedMediaClient";
-import { choosePreviewMotion } from "./previewBudget.mjs";
 
 // Общий интервал после первой смены (миллисекунды).
 const MEDIA_INTERVAL_MS = 3500;
 let modelModule: typeof import("./modelPreview") | undefined;
-const controllers = new Set<MediaPreview>();
-const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-const coarsePointer = matchMedia("(pointer: coarse)");
-function refreshPlayback() {
- const candidates = [...controllers].flatMap(owner => {
-  const element = owner.prepared.get(owner.index), item = owner.items[owner.index];
-  if (!owner.running || !element || !item || (item.kind !== "model" && !(element instanceof HTMLVideoElement))) return [];
-  const rect = owner.getBoundingClientRect();
-  return [{id: owner, kind: element instanceof HTMLVideoElement ? "video" : "model", pixels: (item.width ?? Infinity) * (item.height ?? Infinity),
-   engaged: owner.hovered || owner.focused, visible: owner.visibleFraction, priority: owner.visibleFraction * 10 - Math.abs((rect.top + rect.bottom) / 2 - innerHeight / 2) / Math.max(innerHeight, 1)}];
- });
- const selected = choosePreviewMotion(candidates, {limit: coarsePointer.matches || navigator.hardwareConcurrency <= 4 ? 1 : 2,
-  reduced: reducedMotion.matches, saveData: (navigator as Navigator & {connection?: {saveData?: boolean}}).connection?.saveData});
- // Stop old owners before handing their GPU/video slot to another card.
- for (const owner of controllers) for (const [index, element] of owner.prepared) {
-  if (selected.has(owner) && index === owner.index) continue;
-  modelModule?.updateModelPreview(element, false);
-  if (element instanceof HTMLVideoElement) {
-   element.pause();
-   if (!owner.running && element.querySelector("source")) { element.replaceChildren(); element.load(); }
-  }
- }
- for (const owner of selected as Set<MediaPreview>) {
-  const element = owner.prepared.get(owner.index)!;
-  if (element instanceof HTMLVideoElement) {
-   if (!element.querySelector("source")) {
-    for (const source of owner.items[owner.index].sources ?? []) { const node = document.createElement("source"); node.src = localizedMediaUrl(source.src); node.type = source.type; element.append(node); }
-   }
-   if (element.paused) void element.play().catch(() => {});
-  } else modelModule?.updateModelPreview(element, true);
- }
-}
-reducedMotion.addEventListener("change", refreshPlayback);
-coarsePointer.addEventListener("change", refreshPlayback);
 
 class MediaPreview extends HTMLElement {
 	items: PreviewMedia[] = [];
 	index = -1;
 	visible = false;
-	visibleFraction = 0;
-	hovered = false;
-	focused = false;
 	timer?: ReturnType<typeof setTimeout>;
 	// Каждая карточка получает свою первую задержку один раз при создании.
 	nextDelay = 1000 + Math.floor(Math.random() * 4001);
@@ -61,14 +23,8 @@ class MediaPreview extends HTMLElement {
 	connectedCallback() {
 		this.items = JSON.parse(this.dataset.items ?? "[]");
 		if (!this.items.length) return;
-		controllers.add(this);
 		this.events = new AbortController();
 		const options = { signal: this.events.signal };
-		const card = this.parentElement!;
-		card.addEventListener("pointerenter", () => { this.hovered = true; refreshPlayback(); }, options);
-		card.addEventListener("pointerleave", () => { this.hovered = false; refreshPlayback(); }, options);
-		card.addEventListener("focusin", () => { this.focused = true; refreshPlayback(); }, options);
-		card.addEventListener("focusout", () => { this.focused = false; refreshPlayback(); }, options);
 		document.addEventListener("visibilitychange", () => this.sync(), options);
 		document.addEventListener("portfolio:language-change", () => {
 			for (const element of this.prepared.values()) {
@@ -95,17 +51,14 @@ class MediaPreview extends HTMLElement {
 		}
 		this.observer = new IntersectionObserver(([entry]) => {
 			this.visible = entry.isIntersecting;
-			this.visibleFraction = entry.intersectionRatio;
 			this.sync();
-		}, { threshold: [0, 0.05, 0.35, 0.65, 0.95] });
+		}, { threshold: 0.05 });
 		this.observer.observe(this);
 	}
 	disconnectedCallback() {
-		controllers.delete(this);
 		this.stopTimer(); this.observer?.disconnect(); this.events?.abort();
 		this.prepared.forEach((element) => this.release(element));
 		this.prepared.clear();
-		refreshPlayback();
 	}
 	sync() {
 		this.updateVideo();
@@ -128,8 +81,14 @@ class MediaPreview extends HTMLElement {
 		clearTimeout(this.timer);
 		this.timer = undefined;
 	}
-	updateVideo() { refreshPlayback(); }
-
+	updateVideo() {
+		this.prepared.forEach((element, index) => {
+			modelModule?.updateModelPreview(element, this.running && index === this.index);
+			if (!(element instanceof HTMLVideoElement)) return;
+			if (this.running && index === this.index) void element.play().catch(() => {});
+			else element.pause();
+		});
+	}
 	preload() {
 		if (!this.running) return;
 		// Keep only the current slide and two random ready/loading candidates.
@@ -172,25 +131,24 @@ class MediaPreview extends HTMLElement {
 		this.querySelector(".preview-layers")?.append(element);
 		element.classList.add("active");
 		// Explicit keyframes also work when a detached, cached element is reused.
-		if (!reducedMotion.matches) element.animate([{ opacity: 0 }, { opacity: 1 }], {
+		element.animate([{ opacity: 0 }, { opacity: 1 }], {
 			duration: 1200, easing: "cubic-bezier(0.4, 0, 0.2, 1)",
 		});
 		old.forEach((node) => {
 			node.classList.remove("active");
-			if (!reducedMotion.matches) node.animate([{ opacity: 1 }, { opacity: 0 }], {
+			node.animate([{ opacity: 1 }, { opacity: 0 }], {
 				duration: 1200, easing: "cubic-bezier(0.4, 0, 0.2, 1)",
 			});
 		});
 		for (const [oldIndex, oldElement] of this.prepared) {
 			if (oldIndex === index || !old.includes(oldElement)) continue;
 			modelModule?.updateModelPreview(oldElement, false);
-			if (oldElement instanceof HTMLVideoElement) oldElement.pause();
 			this.prepared.delete(oldIndex);
 		}
 		setTimeout(() => old.forEach((node) => { node.remove(); this.release(node); }), 1250);
 		this.index = index;
 		this.shownInCycle.add(index);
-		modelModule?.updateModelPreview(element, false, this.timer === undefined ? MEDIA_INTERVAL_MS : Math.max(1, this.deadline - performance.now()));
+		modelModule?.updateModelPreview(element, this.running, this.timer === undefined ? MEDIA_INTERVAL_MS : Math.max(1, this.deadline - performance.now()));
 		this.updateVideo();
 	}
 	release(element: HTMLElement) {
@@ -207,11 +165,17 @@ class MediaPreview extends HTMLElement {
 		if (item.kind === "video") {
 			const video = document.createElement("video");
 			video.muted = true; video.defaultMuted = true; video.playsInline = true; video.loop = true;
-			video.preload = "none"; video.tabIndex = -1; video.setAttribute("aria-hidden", "true");
-			video.disablePictureInPicture = true;
+			video.preload = "auto"; video.tabIndex = -1; video.setAttribute("aria-hidden", "true");
 			if (item.poster) video.poster = localizedMediaUrl(item.poster);
-			// Sources are attached only after winning the shared playback budget.
-			return video;
+			for (const source of item.sources ?? []) {
+				const node = document.createElement("source"); node.src = localizedMediaUrl(source.src); node.type = source.type; video.append(node);
+			}
+			try { await this.ready(video, "loadeddata"); return video; }
+			catch {
+				video.pause(); video.replaceChildren(); video.load();
+				if (item.poster) return this.image(item.poster);
+				throw new Error("Video unavailable");
+			}
 		}
 		if (item.kind === "model") {
 			try { modelModule ??= await import("./modelPreview"); return await modelModule.createModelPreview(item.src); }
