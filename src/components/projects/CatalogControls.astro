@@ -1,5 +1,8 @@
 ---
 import { directions } from "../../data/directions";
+interface Props { activeDirections?: string[]; }
+const { activeDirections } = Astro.props;
+const catalogDirections = directions.filter(direction => direction.slug !== "software" && (!activeDirections || activeDirections.includes(direction.slug)));
 ---
 
 <project-catalog>
@@ -10,7 +13,7 @@ import { directions } from "../../data/directions";
 		<label>Direction
 			<select name="direction">
 				<option value="">All directions</option>
-				{directions.map((direction) => <option value={direction.slug}>{direction.title}</option>)}
+				{catalogDirections.map((direction) => <option value={direction.slug}>{direction.title}</option>)}
 			</select>
 		</label>
 		<label>Sort
@@ -28,6 +31,7 @@ import { directions } from "../../data/directions";
 </project-catalog>
 
 <script>
+	import { translateExact } from "../../data/translations";
 	class ProjectCatalogElement extends HTMLElement {
 		cleanup?: () => void;
 		connectedCallback() {
@@ -41,11 +45,12 @@ import { directions } from "../../data/directions";
 			if (!form || !search || !direction || !sort || !results || !empty) return;
 			const normalize = (value: string) => value.normalize("NFKC").toLocaleLowerCase().trim();
 			const searchIndex = new Map(cards.map((card) => [card, normalize(card.dataset.search ?? "")]));
-			const collator = new Intl.Collator("en", { numeric: true, sensitivity: "base" });
 			const apply = (writeUrl = true) => {
+				const language = document.documentElement.lang === "ru" ? "ru" : "en";
+				const collator = new Intl.Collator(language, { numeric: true, sensitivity: "base" });
 				const terms = normalize(search.value).split(/\s+/).filter(Boolean);
 				const ordered = [...cards].sort((a, b) => {
-					if (sort.value === "title") return collator.compare(a.dataset.title ?? "", b.dataset.title ?? "");
+					if (sort.value === "title") return collator.compare(translateExact(a.dataset.title ?? "", language), translateExact(b.dataset.title ?? "", language));
 					const difference = Number(a.dataset.date) - Number(b.dataset.date);
 					return sort.value === "oldest" ? difference : -difference;
 				});
@@ -81,7 +86,9 @@ import { directions } from "../../data/directions";
 			form.addEventListener("submit", (event) => { event.preventDefault(); clearTimeout(timer); apply(); });
 			form.addEventListener("reset", () => { clearTimeout(timer); setTimeout(() => apply(), 0); });
 			window.addEventListener("popstate", restore);
-			this.cleanup = () => { clearTimeout(timer); window.removeEventListener("popstate", restore); };
+			const languageChanged = () => { if (sort.value === "title") apply(false); };
+			document.addEventListener("portfolio:language-change", languageChanged);
+			this.cleanup = () => { clearTimeout(timer); window.removeEventListener("popstate", restore); document.removeEventListener("portfolio:language-change", languageChanged); };
 			restore();
 			form.hidden = false;
 			results.hidden = false;

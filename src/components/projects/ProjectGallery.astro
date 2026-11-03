@@ -55,31 +55,41 @@ const { items, projectTitle, sectionKey = "gallery", open = false } = Astro.prop
 				</button>
 
 				<img data-gallery-image alt="" />
-				<p data-gallery-caption hidden></p>
+			<p data-gallery-caption data-i18n-ignore hidden></p>
 			</div>
 		</dialog>
 	</project-gallery>
 </CollapsibleSection>
 
 <script>
+	import { translateExact } from "../../data/translations";
 	class ProjectGalleryElement extends HTMLElement {
+		events?: AbortController;
 		connectedCallback() {
+			this.events?.abort();
+			this.events = new AbortController();
 			const dialog = this.querySelector<HTMLDialogElement>("[data-gallery-dialog]");
 			const viewerImage = this.querySelector<HTMLImageElement>("[data-gallery-image]");
 			const viewerCaption = this.querySelector<HTMLParagraphElement>("[data-gallery-caption]");
 			const closeButton = this.querySelector<HTMLButtonElement>("[data-gallery-close]");
 
 			if (!dialog || !viewerImage || !viewerCaption || !closeButton) return;
+			let selected: HTMLButtonElement | undefined;
+			const updateViewer = () => {
+				if (!selected) return;
+				const language = document.documentElement.lang === "ru" ? "ru" : "en";
+				viewerImage.src = selected.dataset.fullSrc ?? "";
+				viewerImage.alt = translateExact(selected.dataset.alt ?? "", language);
+				const caption = translateExact(selected.dataset.caption ?? "", language);
+				viewerCaption.textContent = caption;
+				viewerCaption.hidden = caption.length === 0;
+			};
+			document.addEventListener("portfolio:language-change", () => { if (dialog.open) updateViewer(); }, {signal:this.events.signal});
 
 			this.querySelectorAll<HTMLButtonElement>("[data-gallery-open]").forEach((button) => {
 				button.addEventListener("click", () => {
-					viewerImage.src = button.dataset.fullSrc ?? "";
-					viewerImage.alt = button.dataset.alt ?? "";
-
-					const caption = button.dataset.caption ?? "";
-					viewerCaption.textContent = caption;
-					viewerCaption.hidden = caption.length === 0;
-
+					selected = button;
+					updateViewer();
 					dialog.showModal();
 				});
 			});
@@ -91,10 +101,12 @@ const { items, projectTitle, sectionKey = "gallery", open = false } = Astro.prop
 			});
 
 			dialog.addEventListener("close", () => {
+				selected = undefined;
 				viewerImage.removeAttribute("src");
 				viewerImage.alt = "";
 			});
 		}
+		disconnectedCallback() { this.events?.abort(); }
 	}
 
 	if (!customElements.get("project-gallery")) {

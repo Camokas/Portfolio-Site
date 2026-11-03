@@ -33,7 +33,7 @@ function localizeMedia(language: SiteLanguage): void {
 const ignoredParents = new Set(["CODE", "PRE", "SCRIPT", "STYLE", "TEXTAREA", "SVG"]);
 const originalText = new WeakMap<Text, string>();
 const originalAttributes = new WeakMap<Element, Map<string, string>>();
-const translatedAttributes = ["aria-label", "placeholder", "title", "content"];
+const translatedAttributes = ["aria-label", "placeholder", "title", "content", "alt"];
 
 function projectWord(count: number): string {
 	const mod10 = count % 10;
@@ -63,6 +63,9 @@ function toRussian(value: string): string {
 	match = value.match(/^Back to (.+)$/);
 	if (match) return `Назад: ${translatedName(match[1])}`;
 
+	match = value.match(/^Open image (\d+) of (\d+)$/);
+	if (match) return `Открыть изображение ${match[1]} из ${match[2]}`;
+
 	match = value.match(/^Open (.+)$/);
 	if (match) return `Открыть «${translatedName(match[1])}»`;
 
@@ -71,9 +74,6 @@ function toRussian(value: string): string {
 
 	match = value.match(/^Shader Graph: (.+)$/);
 	if (match) return `Шейдер-граф: ${translatedName(match[1])}`;
-
-	match = value.match(/^Open image (\d+) of (\d+)$/);
-	if (match) return `Открыть изображение ${match[1]} из ${match[2]}`;
 
 	match = value.match(/^Interactive 3D view: (.+)$/);
 	if (match) return `Интерактивный 3D-просмотр: ${translatedName(match[1])}`;
@@ -113,6 +113,8 @@ function translateElementAttributes(element: Element, language: SiteLanguage): v
 	}
 
 	for (const attribute of translatedAttributes) {
+		// The lightbox renders its current translated alt directly from its source button.
+		if (attribute === "alt" && element.hasAttribute("data-gallery-image")) continue;
 		const current = element.getAttribute(attribute);
 		if (current === null) continue;
 		if (!saved.has(attribute)) saved.set(attribute, current);

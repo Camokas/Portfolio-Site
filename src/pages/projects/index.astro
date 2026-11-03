@@ -41,7 +41,7 @@ const projectCountLabel = `${projects.length} ${
 				<p>{projectCountLabel}</p>
 			</div>
 
-			<CatalogControls>
+			<CatalogControls activeDirections={[...new Set(projects.map(project => project.data.direction))]}>
 			{
 				projects.length > 0 ? (
 					<ul class="project-grid">
