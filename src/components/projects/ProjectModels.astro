@@ -95,11 +95,13 @@ const modelUrl = (src?: string) => src
 </CollapsibleSection>
 
 <script>
+	import { previewDistance } from "../../scripts/modelPreviewFraming.mjs";
 	let modelPreparationQueue: Promise<void> = Promise.resolve();
 
 	class ProjectModelViewerElement extends HTMLElement {
 		initialized = false;
 		pending = false;
+		thumbnailPending = false;
 		cleanup: (() => void) | undefined;
 		setRendering: ((active: boolean) => void) | undefined;
 
@@ -114,23 +116,46 @@ const modelUrl = (src?: string) => src
 			const outerDetails = details.parentElement?.closest("details");
 			const isVisible = () => details.open && (!outerDetails || outerDetails.open);
 			const handleToggle = () => {
-				if (!this.initialized && (!outerDetails || outerDetails.open)) {
-					void this.initialize();
-				} else if (isVisible()) {
+				if (isVisible()) {
 					void this.initialize();
 				} else {
 					this.setRendering?.(false);
 				}
 			};
 
+			const thumbnailObserver = new IntersectionObserver(([entry]) => {
+				if (entry.isIntersecting && (!outerDetails || outerDetails.open)) void this.prepareThumbnail();
+			}, {rootMargin: "160px"});
+			thumbnailObserver.observe(details.querySelector("summary")!);
 			details.addEventListener("toggle", handleToggle);
 			outerDetails?.addEventListener("toggle", handleToggle);
 			this.cleanup = () => {
+				thumbnailObserver.disconnect();
 				details.removeEventListener("toggle", handleToggle);
 				outerDetails?.removeEventListener("toggle", handleToggle);
 			};
 
-			if (!outerDetails || outerDetails.open) void this.initialize();
+			if (isVisible()) void this.initialize();
+		}
+
+		async prepareThumbnail() {
+			const thumbnail = this.closest("[data-model-card]")?.querySelector<HTMLImageElement>("[data-model-thumbnail]");
+			if (!thumbnail || thumbnail.getAttribute("src") || this.thumbnailPending) return;
+			this.thumbnailPending = true;
+			const prepare = async () => {
+				if (!this.isConnected) return;
+				try {
+					const previews = await import("../../scripts/modelPreview");
+					const canvas = await previews.createModelPreview(this.dataset.modelSrc ?? "", 384 / 320, false);
+					try {
+						if (!this.isConnected || thumbnail.getAttribute("src")) return;
+						thumbnail.src = canvas.toDataURL("image/png"); thumbnail.hidden = false;
+						const placeholder = thumbnail.parentElement?.querySelector<HTMLElement>("[data-model-thumbnail-placeholder]");
+						if (placeholder) placeholder.hidden = true;
+					} finally { previews.releaseModelPreview(canvas); }
+				} catch { this.thumbnailPending = false; }
+			};
+			modelPreparationQueue = modelPreparationQueue.then(prepare, prepare);
 		}
 
 		disconnectedCallback() {
@@ -453,10 +478,18 @@ const modelUrl = (src?: string) => src
 				grid.position.y = -1.3;
 				scene.add(grid);
 
+				scene.updateMatrixWorld(true);
+				const framedSize = new THREE.Box3().setFromObject(loadedModel ?? object).getSize(new THREE.Vector3());
+				const cameraDirection = defaultCameraPosition.clone().normalize();
+				const fitCamera = (aspect: number) => {
+					defaultCameraPosition.copy(cameraDirection).multiplyScalar(previewDistance(framedSize, aspect, camera.fov, true));
+					camera.position.copy(defaultCameraPosition);
+				};
+				let cameraInteracted = false;
 				const controls = new OrbitControls(camera, renderer.domElement);
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.06;
-				controls.minDistance = 2.5;
+				controls.minDistance = 0.7;
 				controls.maxDistance = 10;
 				controls.target.set(0, 0, 0);
 
@@ -471,6 +504,7 @@ const modelUrl = (src?: string) => src
 				updateRotationButton();
 
 				const stopAutoRotation = () => {
+					cameraInteracted = true;
 					controls.autoRotate = false;
 					updateRotationButton();
 				};
@@ -484,7 +518,8 @@ const modelUrl = (src?: string) => src
 
 				const resetCamera = () => {
 					stopAutoRotation();
-					camera.position.copy(defaultCameraPosition);
+					cameraInteracted = false;
+					fitCamera(camera.aspect);
 					controls.target.set(0, 0, 0);
 					controls.update();
 				};
@@ -497,6 +532,7 @@ const modelUrl = (src?: string) => src
 					if (width === 0 || height === 0) return;
 
 					camera.aspect = width / height;
+					if (!cameraInteracted) { fitCamera(camera.aspect); controls.update(); }
 					camera.updateProjectionMatrix();
 					renderer.setSize(width, height, false);
 				};
@@ -638,7 +674,7 @@ const modelUrl = (src?: string) => src
 						edges.visible = false;
 						renderer.setSize(384, 320, false);
 						camera.aspect = 384 / 320;
-						camera.position.copy(defaultCameraPosition).multiplyScalar(0.8);
+						camera.position.copy(cameraDirection).multiplyScalar(previewDistance(framedSize, camera.aspect, camera.fov));
 						camera.lookAt(0, 0, 0);
 						camera.updateProjectionMatrix();
 						renderer.render(scene, camera);

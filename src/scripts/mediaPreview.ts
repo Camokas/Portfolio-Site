@@ -3,6 +3,7 @@ import { localizedMediaUrl } from "./localizedMediaClient";
 
 // Общий интервал после первой смены (миллисекунды).
 const MEDIA_INTERVAL_MS = 3500;
+let modelModule: typeof import("./modelPreview") | undefined;
 
 class MediaPreview extends HTMLElement {
 	items: PreviewMedia[] = [];
@@ -82,6 +83,7 @@ class MediaPreview extends HTMLElement {
 	}
 	updateVideo() {
 		this.prepared.forEach((element, index) => {
+			modelModule?.updateModelPreview(element, this.running && index === this.index);
 			if (!(element instanceof HTMLVideoElement)) return;
 			if (this.running && index === this.index) void element.play().catch(() => {});
 			else element.pause();
@@ -89,10 +91,12 @@ class MediaPreview extends HTMLElement {
 	}
 	preload() {
 		if (!this.running) return;
-		// Slow video/model loading never blocks the slideshow clock.
-		for (let step = 1; step <= this.items.length && this.pending.size < 2; step++) {
-			const index = (this.index + step) % this.items.length;
-			if (this.prepared.has(index) || this.pending.has(index) || this.failed.has(index)) continue;
+		// Keep only the current slide and two random ready/loading candidates.
+		let candidates = this.items.map((_, index) => index).filter(index => index !== this.index && !this.failed.has(index) && !this.shownInCycle.has(index));
+		if (!candidates.length) candidates = this.items.map((_, index) => index).filter(index => index !== this.index && !this.failed.has(index));
+		candidates = candidates.filter(index => !this.prepared.has(index) && !this.pending.has(index));
+		while (candidates.length && this.pending.size + this.prepared.size < 3 && this.pending.size < 2) {
+			const index = candidates.splice(Math.floor(Math.random() * candidates.length), 1)[0];
 			this.pending.add(index);
 			void this.prepare(this.items[index], index).then((element) => {
 				if (!this.isConnected) { this.release(element); return; }
@@ -104,6 +108,7 @@ class MediaPreview extends HTMLElement {
 			}).finally(() => { this.pending.delete(index); this.preload(); });
 		}
 	}
+
 	advance() {
 		if (!this.running) return;
 		// Finish every non-failed item before starting another random cycle.
@@ -135,12 +140,19 @@ class MediaPreview extends HTMLElement {
 				duration: 1200, easing: "cubic-bezier(0.4, 0, 0.2, 1)",
 			});
 		});
-		setTimeout(() => old.forEach((node) => node.remove()), 1250);
+		for (const [oldIndex, oldElement] of this.prepared) {
+			if (oldIndex === index || !old.includes(oldElement)) continue;
+			modelModule?.updateModelPreview(oldElement, false);
+			this.prepared.delete(oldIndex);
+		}
+		setTimeout(() => old.forEach((node) => { node.remove(); this.release(node); }), 1250);
 		this.index = index;
 		this.shownInCycle.add(index);
+		modelModule?.updateModelPreview(element, this.running, this.timer === undefined ? MEDIA_INTERVAL_MS : Math.max(1, this.deadline - performance.now()));
 		this.updateVideo();
 	}
 	release(element: HTMLElement) {
+		modelModule?.releaseModelPreview(element);
 		if (element instanceof HTMLVideoElement) { element.pause(); element.removeAttribute("src"); element.replaceChildren(); element.load(); }
 	}
 	async prepare(item: PreviewMedia, index: number): Promise<HTMLElement> {
@@ -165,10 +177,11 @@ class MediaPreview extends HTMLElement {
 				throw new Error("Video unavailable");
 			}
 		}
-		const src = item.kind === "model"
-			? item.poster ?? await (await import("./modelPreview")).modelPreview(item.src)
-			: item.src;
-		return this.image(src);
+		if (item.kind === "model") {
+			try { modelModule ??= await import("./modelPreview"); return await modelModule.createModelPreview(item.src); }
+			catch (error) { if (item.poster) return this.image(item.poster); throw error; }
+		}
+		return this.image(item.src);
 	}
 	async image(src: string) {
 		const image = new Image(); image.alt = ""; image.decoding = "async";
