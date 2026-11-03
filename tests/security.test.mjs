@@ -46,7 +46,8 @@ test('Astro CSP keeps executable content local and blocks risky document feature
     "base-uri 'none'",
     "object-src 'none'",
     "form-action 'none'",
-    "connect-src 'self' https://api.github.com",
+    // Embedded GLB images use fetch(blob:...) in Three.js ImageBitmapLoader.
+    "connect-src 'self' blob: https://api.github.com",
   ]) {
     assert.ok(config.includes(directive), `Missing CSP directive: ${directive}`);
   }
