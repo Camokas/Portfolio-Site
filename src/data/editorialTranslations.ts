@@ -245,5 +245,18 @@ export const editorialTranslations: Record<string, string> = {
   "Skeleton": "Скелет",
   "Skeleton and joints": "Кости и суставы",
   "Display mode": "Режим отображения",
-  "Rigging": "Риггинг"
+  "Rigging": "Риггинг",
+  "Card Game · Vintage Card Pack": "Карточная игра · Упаковка колоды",
+  "A worn, vintage-style card pack, modelled in Blender and textured by painting in Photoshop over an exported UV layout.": "Старая упаковка колоды: модель в Blender и послойная работа в Photoshop поверх экспортированной UV-развёртки.",
+  "A first deck with a history": "Первая колода с историей",
+  "I made this pack in August 2024 for an early deck in a Unity card-game prototype. I wanted it to look realistic and old. The card itself was a simple two-sided plane; most of the visual work went into the packaging.": "Упаковку я сделал в августе 2024 года для одной из первых колод в прототипе карточной игры на Unity. Хотелось реалистичного, старого вида. Сама карта была простой двухсторонней плоскостью; основная визуальная работа пришлась на упаковку.",
+  "I created the model and its artwork myself. The separate flaps were prepared to make opening the pack easier to animate in Unity.": "Модель и оформление создавал самостоятельно. Клапаны упаковки подготовлены так, чтобы её открывание было удобно анимировать в Unity.",
+  "Vintage Card Pack": "Упаковка колоды",
+  "Painting over the UV layout": "Рисование поверх UV-развёртки",
+  "I exported the UV layout from Blender to Photoshop and built the texture in layers: mixing textures, painting with brushes, arranging vintage-style decorative elements, and choosing and treating the lettering. UV work and this way of texturing were the main learning experience for me.": "Экспортировал UV-развёртку из Blender в Photoshop и собирал текстуру слоями: смешивал текстуры, рисовал кистями, подбирал элементы старого оформления, шрифт и его обработку. Главным опытом для меня стали работа с UV и такой способ текстурирования.",
+  "Flat packaging artwork with worn paper, decorative ornaments, and lettering": "Плоское оформление упаковки с потёртой бумагой, орнаментами и надписями",
+  "The packaging artwork extracted from the supplied textured model.": "Оформление упаковки из загруженной модели с текстурами.",
+  "The game prototype": "Игровой прототип",
+  "The idea involved collecting cards and using their abilities in a top-down 3D battle view. The project reached the menu and deck-opening animation, without progressing into a complete game. I also worked on procedural card animation in Unity; those movements are not included in this GLB export.": "Идея предполагала коллекционирование карт и использование их способностей в трёхмерном поле битвы с видом сверху. Проект дошёл до меню и анимации открытия колоды. Также работал над процедурной анимацией карты в Unity; в этот GLB-экспорт движения не включены.",
+  "Texturing": "Текстурирование"
 };
