@@ -1,0 +1,153 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import type { CollectionEntry } from "astro:content";
+import { projectAssetUrl } from "../../data/projectAssetPaths.mjs";
+import Icon from "../ui/Icon.astro";
+
+interface Props {
+	track: CollectionEntry<"projects">["data"]["audio"][number];
+	cover?: ImageMetadata;
+}
+const { track, cover } = Astro.props;
+const timestamp = (seconds: number) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
+---
+
+<music-player class="music-player" data-hook={track.hookSeconds}>
+	{cover && <Image class="cover" src={cover} alt={`${track.title} cover`} width={480} height={480} loading="eager" />}
+	<div class="player-body">
+		<p class="artist">{track.artist ?? "Camoka"}</p>
+		<h2>{track.title}</h2>
+		<audio controls controlslist="nodownload" preload={track.preload} aria-label={track.title}>
+			{track.sources.map(source => <source src={projectAssetUrl(source.src, import.meta.env.BASE_URL)} type={source.type} />)}
+			Your browser does not support HTML audio.
+		</audio>
+		<div class="custom-controls" hidden>
+			<div class="transport">
+				<button class="play" type="button" data-play aria-label="Play or pause" aria-pressed="false">
+					<span data-play-icon><Icon name="play" size={24} /></span>
+					<span data-pause-icon hidden><Icon name="pause" size={24} /></span>
+				</button>
+				<div class="seek-area">
+					<input class="seek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Playback position" disabled />
+					<div class="times" data-i18n-ignore><span data-elapsed>0:00</span><span data-duration>–:––</span></div>
+				</div>
+			</div>
+			<div class="options">
+				{track.hookSeconds !== undefined && <button class="hook" type="button" data-jump><Icon name="play" size={13} /><span>Jump to hook</span><span data-i18n-ignore>{timestamp(track.hookSeconds)}</span></button>}
+				<label class="volume-label"><span>Volume</span><input class="volume" type="range" min="0" max="1" step="0.05" value="1" aria-label="Volume" /></label>
+			</div>
+			<p class="player-error" role="status" hidden>Audio could not be played. Try again or listen on the platforms.</p>
+		</div>
+		{track.listeningUrl && <a class="platforms" href={track.listeningUrl} target="_blank" rel="noopener noreferrer">Listen on platforms <Icon name="external-link" size={16} /></a>}
+	</div>
+</music-player>
+
+<script>
+	class MusicPlayerElement extends HTMLElement {
+		events?: AbortController;
+		connectedCallback() {
+			this.events?.abort();
+			const audio = this.querySelector("audio");
+			const controls = this.querySelector<HTMLElement>(".custom-controls");
+			const play = this.querySelector<HTMLButtonElement>("[data-play]");
+			const seek = this.querySelector<HTMLInputElement>(".seek");
+			const volume = this.querySelector<HTMLInputElement>(".volume");
+			if (!audio || !controls || !play || !seek || !volume) return;
+			const events = this.events = new AbortController();
+			const on = { signal: events.signal };
+			const error = this.querySelector<HTMLElement>(".player-error")!;
+			const format = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+			let pendingSeek: number | undefined;
+			const update = () => {
+				const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+				seek.disabled = !duration;
+				seek.max = String(duration || 100);
+				seek.value = String(audio.currentTime);
+				seek.setAttribute("aria-valuetext", `${format(audio.currentTime)} / ${duration ? format(duration) : '–:––'}`);
+				this.querySelector("[data-elapsed]")!.textContent = format(audio.currentTime);
+				this.querySelector("[data-duration]")!.textContent = duration ? format(duration) : '–:––';
+				play.setAttribute("aria-pressed", String(!audio.paused));
+				this.querySelector<HTMLElement>("[data-play-icon]")!.hidden = !audio.paused;
+				this.querySelector<HTMLElement>("[data-pause-icon]")!.hidden = audio.paused;
+			};
+			const start = () => {
+				error.hidden = true;
+				if (audio.error) audio.load();
+				void audio.play().catch(() => { if (this.isConnected) error.hidden = false; });
+			};
+			audio.addEventListener("play", () => {
+				document.querySelectorAll<HTMLMediaElement>("audio, video").forEach(other => { if (other !== audio && !other.muted) other.pause(); });
+			}, on);
+			play.addEventListener("click", () => { if (audio.paused) start(); else audio.pause(); }, on);
+			seek.addEventListener("input", () => { audio.currentTime = Number(seek.value); update(); }, on);
+			this.querySelector("[data-jump]")?.addEventListener("click", () => {
+				pendingSeek = Number(this.dataset.hook);
+				if (audio.readyState >= 1 && Number.isFinite(audio.duration)) {
+					audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - .1));
+					pendingSeek = undefined;
+				}
+				start();
+			}, on);
+			audio.addEventListener("loadedmetadata", () => {
+				if (pendingSeek !== undefined) {
+					audio.currentTime = Math.min(pendingSeek, Math.max(0, audio.duration - .1));
+					pendingSeek = undefined;
+				}
+				update();
+			}, on);
+			for (const name of ["timeupdate", "durationchange", "play", "pause", "ended"]) audio.addEventListener(name, update, on);
+			audio.addEventListener("error", () => { error.hidden = false; update(); }, on);
+			// Share the page with other media without playing several soundtracks at once.
+			document.addEventListener("play", event => {
+				if (event.target instanceof HTMLMediaElement && event.target !== audio && !event.target.muted) audio.pause();
+			}, { ...on, capture: true });
+			try {
+				const saved = Number(localStorage.getItem("portfolio-music-volume") ?? 1);
+				if (Number.isFinite(saved)) audio.volume = Math.min(1, Math.max(0, saved));
+			} catch { /* System audio controls remain available. */ }
+			volume.value = String(audio.volume);
+			volume.addEventListener("input", () => {
+				audio.volume = Number(volume.value);
+				volume.value = String(audio.volume);
+				try { localStorage.setItem("portfolio-music-volume", volume.value); } catch { /* Optional preference. */ }
+			}, on);
+			window.addEventListener("pagehide", () => audio.pause(), on);
+			controls.hidden = false;
+			audio.controls = false;
+			audio.hidden = true;
+			update();
+		}
+		disconnectedCallback() { this.querySelector("audio")?.pause(); this.events?.abort(); }
+	}
+	if (!customElements.get("music-player")) customElements.define("music-player", MusicPlayerElement);
+</script>
+
+<style>
+	.music-player { display: grid; grid-template-columns: minmax(10rem, 18rem) minmax(0, 1fr); align-items: center; gap: clamp(1.5rem, 4vw, 3rem); max-width: 62rem; margin: 0 auto 4rem; padding: clamp(1rem, 3vw, 2rem); background: var(--color-surface); border-radius: 1.2rem; }
+	.cover { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: .6rem; }
+	.player-body { min-width: 0; }
+	.artist { margin: 0 0 .35rem; color: var(--color-muted); font-size: .85rem; }
+	h2 { margin: 0 0 1.5rem; font-size: clamp(1.5rem, 3vw, 2.25rem); letter-spacing: -.03em; }
+	[hidden] { display: none !important; }
+	audio { width: 100%; }
+	.transport { display: flex; align-items: center; gap: 1rem; }
+	button { font: inherit; cursor: pointer; }
+	.play { display: grid; place-items: center; flex: 0 0 3.25rem; width: 3.25rem; height: 3.25rem; padding: 0; border: 0; border-radius: 50%; color: var(--color-background); background: var(--color-accent); transition: transform .2s ease; }
+	.play:hover { transform: scale(1.05); }
+	.seek-area { flex: 1; min-width: 0; }
+	input { accent-color: var(--color-accent); cursor: pointer; min-height: 2rem; margin: 0; }
+	.seek { display: block; width: 100%; }
+	.times { display: flex; justify-content: space-between; color: var(--color-muted); font-size: .75rem; font-variant-numeric: tabular-nums; }
+	.options { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; margin-top: 1.25rem; }
+	.hook { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: .5rem .75rem; border: 1px solid var(--color-border); border-radius: 999px; background: transparent; color: var(--color-text); font-size: .8rem; }
+	.hook:hover { border-color: var(--color-accent); }
+	.hook span:last-child { color: var(--color-muted); font-variant-numeric: tabular-nums; }
+	.volume-label { display: flex; align-items: center; gap: .6rem; color: var(--color-muted); font-size: .75rem; }
+	.volume { width: 5rem; }
+	.platforms { display: inline-flex; align-items: center; gap: .4rem; margin-top: 1.5rem; color: var(--color-accent); font-size: .85rem; text-underline-offset: .25em; }
+	.player-error { color: var(--color-muted); font-size: .85rem; line-height: 1.5; }
+	:where(button, input, a):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
+	@media (max-width: 40rem) { .music-player { grid-template-columns: 1fr; gap: 1.25rem; } .cover { width: min(100%, 18rem); justify-self: center; } h2 { margin-bottom: 1rem; } }
+	@media (prefers-reduced-motion: reduce) { .play { transition: none; } }
+</style>

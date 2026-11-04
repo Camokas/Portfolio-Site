@@ -75,6 +75,8 @@ const projects = defineCollection({
 				z.object({
 					title: z.string(),
 					artist: z.string().optional(),
+					hookSeconds: z.number().finite().nonnegative().optional(),
+					listeningUrl: z.string().refine(isHttpsMediaUrl, "Listening links must use HTTPS").optional(),
 					showInCards: z.boolean().default(true),
 					caption: z.string().optional(),
 					preload: z.enum(["none", "metadata", "auto"]).default("metadata"),

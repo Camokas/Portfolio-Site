@@ -5,6 +5,7 @@ import StoryPanel from "../../components/projects/StoryPanel.astro";
 import ProjectGallery from "../../components/projects/ProjectGallery.astro";
 import ProjectVideo from "../../components/projects/ProjectVideo.astro";
 import ProjectAudio from "../../components/projects/ProjectAudio.astro";
+import MusicPlayer from "../../components/projects/MusicPlayer.astro";
 import ProjectResources from "../../components/projects/ProjectResources.astro";
 import ProjectCode from "../../components/projects/ProjectCode.astro";
 import ProjectModels from "../../components/projects/ProjectModels.astro";
@@ -54,6 +55,8 @@ if (!direction) {
 
 const baseUrl = import.meta.env.BASE_URL;
 const directionUrl = `${baseUrl}directions/${direction.slug}/`;
+const musicTrack = direction.slug === "music-sound" ? project.data.audio[0] : undefined;
+const otherAudio = musicTrack ? project.data.audio.slice(1) : project.data.audio;
 ---
 
 <BaseLayout
@@ -91,6 +94,7 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 					{project.data.demo && <span class="demo-label">Demo content</span>}
 				</div>
 			</header>
+			{musicTrack && <MusicPlayer track={musicTrack} cover={project.data.cover} />}
 
 			{
 				!inline && project.data.gallery.length > 0 && (
@@ -114,8 +118,8 @@ const directionUrl = `${baseUrl}directions/${direction.slug}/`;
 			}
 
 			{
-				!inline && project.data.audio.length > 0 && (
-					<ProjectAudio items={project.data.audio} />
+				!inline && otherAudio.length > 0 && (
+					<ProjectAudio items={otherAudio} />
 				)
 			}
 

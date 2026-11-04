@@ -15,6 +15,8 @@ export const iconPaths = {
 	blend: '<circle cx="15" cy="9" r="7"/><circle cx="9" cy="15" r="7"/>',
 	"file-code-2": '<path d="M4 12.15V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2h-3.35"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m5 16-3 3 3 3"/><path d="m9 22 3-3-3-3"/>',
 	"arrow-right": '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+	play: '<path d="m8 5 11 7-11 7z"/>',
+	pause: '<path d="M8 5v14M16 5v14"/>',
 	"arrow-left": '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
 	"external-link": '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
 	"clock-3": '<circle cx="12" cy="12" r="10"/><path d="M12 6v6h4"/>',
