@@ -258,5 +258,16 @@ export const editorialTranslations: Record<string, string> = {
   "The packaging artwork extracted from the supplied textured model.": "Оформление упаковки из загруженной модели с текстурами.",
   "The game prototype": "Игровой прототип",
   "The idea involved collecting cards and using their abilities in a top-down 3D battle view. The project reached the menu and deck-opening animation, without progressing into a complete game. I also worked on procedural card animation in Unity; those movements are not included in this GLB export.": "Идея предполагала коллекционирование карт и использование их способностей в трёхмерном поле битвы с видом сверху. Проект дошёл до меню и анимации открытия колоды. Также работал над процедурной анимацией карты в Unity; в этот GLB-экспорт движения не включены.",
-  "Texturing": "Текстурирование"
+  "Texturing": "Текстурирование",
+  "Early Cinema 4D Studies": "Ранние работы в Cinema4D",
+  "Two simple scenes from September 2020: a tree and a small boat, created in Cinema 4D for personal practice and YouTube speed-art videos.": "Две простые сцены сентября 2020 года: дерево и лодка, созданные в Cinema4D для практики и спидарт-видео на YouTube.",
+  "Tree": "Дерево",
+  "I built these scenes independently after working through tutorials. The tree combines simple forms and plain coloured materials. I keep it as an example of my early interest in minimalist 3D scenes.": "Эти сцены я делал самостоятельно после изучения уроков. В дереве сочетаются простые формы и обычные цветные материалы. Сохранил его как пример раннего интереса к минималистичным 3D-сценам.",
+  "A simple green tree on a block of ground": "Простое зелёное дерево на блоке земли",
+  "Original tree render from September 2020.": "Исходный рендер дерева, сентябрь 2020 года.",
+  "Boat": "Лодка",
+  "A small boat on stylised water. During these experiments I practised physics simulations and procedural geometry displacement, using simple materials without image textures.": "Небольшая лодка на стилизованной воде. В этих экспериментах практиковался с физическими симуляциями и процедурным смещением геометрии, используя простые материалы без текстурных изображений.",
+  "A small boat with a mast on a block of blue water": "Небольшая лодка с мачтой на блоке синей воды",
+  "Original boat render from September 2020.": "Исходный рендер лодки, сентябрь 2020 года.",
+  "Early Work": "Ранние работы"
 };
