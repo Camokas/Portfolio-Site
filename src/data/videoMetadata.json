@@ -1,4 +1,16 @@
 {
+  "projects/3DModeling/BuildestTheGame/Doll/BuildestTheGame_Doll_GameFootage.webm": {
+    "width": 1500,
+    "height": 1500,
+    "poster": "projects/3DModeling/BuildestTheGame/Doll/_previews/66f49e584e3fbe5d.webp",
+    "hash": "66f49e584e3fbe5d6c728a0d4b03b9e10d6aa6710767ea42ebeeca465f8bef74"
+  },
+  "projects/3DModeling/BuildestTheGame/HighPoly_Tree/HighPolyTree_BlenderModelingProcess.webm": {
+    "width": 1920,
+    "height": 1080,
+    "poster": "projects/3DModeling/BuildestTheGame/HighPoly_Tree/_previews/644c9f1853b986b6.webp",
+    "hash": "644c9f1853b986b6a4bd8fa2f6477667927565fa7d6473c2d2aa5a51f378cfaa"
+  },
   "projects/Animation/Buildest/2D_UI_Anim/BuildestUnity_2D_InfoBTNAnim.webm": {
     "width": 1500,
     "height": 1500,

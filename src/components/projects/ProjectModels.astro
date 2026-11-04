@@ -1,5 +1,6 @@
 ---
 import CollapsibleSection from "../ui/CollapsibleSection.astro";
+import Icon from "../ui/Icon.astro";
 import { projectAssetUrl } from "../../data/projectAssetPaths.mjs";
 
 interface ModelItem {
@@ -19,6 +20,13 @@ interface Props {
 }
 
 const { items, sectionKey = "models", open = false } = Astro.props;
+const modes = [
+	{value: "original", label: "Materials", title: "Original materials", icon: "palette"},
+	{value: "neutral", label: "Neutral", title: "Neutral material", icon: "box"},
+	{value: "wireframe", label: "Wireframe", title: "Wireframe", icon: "layout-grid"},
+	{value: "checker", label: "UV", title: "UV checker", icon: "images"},
+	{value: "skeleton", label: "Skeleton", title: "Skeleton and joints", icon: "person-standing"},
+] as const;
 const baseUrl = import.meta.env.BASE_URL;
 const modelUrl = (src?: string) => src
 	? projectAssetUrl(src, baseUrl)
@@ -43,6 +51,11 @@ const modelUrl = (src?: string) => src
 					</summary>
 
 					<project-model-viewer data-auto-rotate={String(item.autoRotate)} data-model-src={modelUrl(item.src)} data-presentation={item.presentation}>
+						<div class="model-mode-toolbar" role="group" aria-label="Display mode">
+							{modes.map(mode => <button type="button" data-display-mode data-mode={mode.value} title={mode.title} aria-pressed={String(mode.value === "original")} disabled hidden={mode.value === "skeleton"}>
+								<Icon name={mode.icon} size={15} /><span>{mode.label}</span>
+							</button>)}
+						</div>
 						<div
 							class="model-viewport"
 							data-model-viewport
@@ -53,15 +66,6 @@ const modelUrl = (src?: string) => src
 						</div>
 
 						<div class="model-controls" aria-label="3D viewer controls">
-							<label class="display-mode">
-								Display
-								<select data-display-mode disabled>
-									<option value="original">Original materials</option>
-									<option value="neutral">Neutral material</option>
-									<option value="wireframe">Wireframe</option>
-									<option value="checker">UV checker</option>
-								</select>
-							</label>
 							<button type="button" data-retry-viewer hidden>Retry 3D preview</button>
 							<button type="button" data-toggle-rotation aria-pressed="true" disabled>
 								Pause rotation
@@ -195,7 +199,8 @@ const modelUrl = (src?: string) => src
 			const rotationButton = this.querySelector<HTMLButtonElement>("[data-toggle-rotation]");
 			const resetButton = this.querySelector<HTMLButtonElement>("[data-reset-camera]");
 			const retryButton = this.querySelector<HTMLButtonElement>("[data-retry-viewer]");
-			const displayMode = this.querySelector<HTMLSelectElement>("[data-display-mode]");
+			const modeButtons = [...this.querySelectorAll<HTMLButtonElement>("[data-display-mode]")];
+			let displayMode = "original";
 			const animationPanel = this.querySelector<HTMLElement>("[data-animation-panel]");
 			const animationClip = this.querySelector<HTMLSelectElement>("[data-animation-clip]");
 			const animationToggle = this.querySelector<HTMLButtonElement>("[data-animation-toggle]");
@@ -377,16 +382,28 @@ const modelUrl = (src?: string) => src
 				checkerTexture.colorSpace = THREE.SRGBColorSpace;
 				checkerTexture.wrapS = checkerTexture.wrapT = THREE.RepeatWrapping;
 				const checkerMaterial = new THREE.MeshBasicMaterial({ map: checkerTexture, side: interior ? THREE.FrontSide : THREE.DoubleSide });
+				const skeletonView = loadedModel ? (await import("../../scripts/modelSkeleton.mjs")).createSkeletonView(loadedModel) : null;
+				if (skeletonView) scene.add(skeletonView.group);
+				const skeletonBody = new THREE.MeshBasicMaterial({color: 0xc8d0d4, transparent: true, opacity: 0.09, depthWrite: false});
 				const applyDisplayMode = () => {
-					const mode = displayMode?.value ?? "original";
+					const mode = displayMode;
+					if (skeletonView) { skeletonView.group.visible = mode === "skeleton"; if (skeletonView.group.visible) skeletonView.update(); }
+					modeButtons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.mode === mode)));
 					originalMaterials.forEach((original, mesh) => {
-						mesh.material = mode === "neutral" ? neutralMaterial
+						mesh.material = mode === "skeleton" ? skeletonBody : mode === "neutral" ? neutralMaterial
 							: mode === "wireframe" ? wireframeMaterial
 								: mode === "checker" && mesh.geometry.getAttribute("uv") ? checkerMaterial : original;
 					});
 					edges.visible = mode === "original";
 				};
-				displayMode?.addEventListener("change", applyDisplayMode);
+				const chooseDisplayMode = (event: Event) => {
+					displayMode = (event.currentTarget as HTMLButtonElement).dataset.mode ?? "original";
+					applyDisplayMode();
+				};
+				modeButtons.forEach(button => {
+					if (button.dataset.mode === "skeleton") button.hidden = !skeletonView;
+					button.addEventListener("click", chooseDisplayMode);
+				});
 
 				const meshes = [...originalMaterials.keys()];
 				meshes.forEach((mesh, index) => {
@@ -621,6 +638,7 @@ const modelUrl = (src?: string) => src
 					const delta = lastFrameTime === undefined ? 0 : Math.min((time - lastFrameTime) / 1000, 0.1);
 					lastFrameTime = time;
 					mixer?.update(delta);
+					if (skeletonView?.group.visible) skeletonView.update();
 					controls.update();
 					renderer.render(scene, camera);
 				};
@@ -677,7 +695,8 @@ const modelUrl = (src?: string) => src
 					materialSelect?.removeEventListener("change", showTextures);
 					materialSelect?.replaceChildren();
 					textureGrid?.replaceChildren();
-					displayMode?.removeEventListener("change", applyDisplayMode);
+					modeButtons.forEach(button => button.removeEventListener("click", chooseDisplayMode));
+					skeletonView?.dispose(); skeletonBody.dispose();
 					originalMaterials.forEach((original, mesh) => { mesh.material = original; });
 					neutralMaterial.dispose();
 					wireframeMaterial.dispose();
@@ -734,7 +753,7 @@ const modelUrl = (src?: string) => src
 				}
 				rotationButton.disabled = false;
 				resetButton.disabled = false;
-				if (displayMode) displayMode.disabled = false;
+				modeButtons.forEach(button => { button.disabled = button.dataset.mode === "skeleton" && !skeletonView; });
 				resumeRendering();
 			} catch (error) {
 				releaseResources?.();
@@ -752,7 +771,7 @@ const modelUrl = (src?: string) => src
 				console.error(`[Portfolio 3D: ${stage}]`, error);
 				rotationButton.disabled = true;
 				resetButton.disabled = true;
-				if (displayMode) displayMode.disabled = true;
+				modeButtons.forEach(button => { button.disabled = true; });
 				if (retryButton) retryButton.hidden = false;
 			}
 		}
@@ -861,6 +880,11 @@ const modelUrl = (src?: string) => src
 		cursor: default;
 	}
 
+	.model-mode-toolbar { display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0.65rem; border-bottom: 1px solid var(--color-border); }
+	.model-mode-toolbar button { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 0.65rem; border-radius: 0.55rem; }
+	.model-mode-toolbar button[hidden] { display: none; }
+	.model-mode-toolbar button[aria-pressed="true"] { background: #25312f; border-color: #78928d; color: #e5f4f0; }
+	.model-mode-toolbar button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 	.model-controls {
 		display: flex;
 		align-items: center;

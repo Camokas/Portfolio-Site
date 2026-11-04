@@ -1,0 +1,142 @@
+---
+title: "Buildest The Game · Character & Trees"
+summary: "A wooden character with a joint-based IK rig, detailed tree experiments, and a simpler foliage model developed for the Unity version of Buildest The Game."
+direction: "3d-modeling"
+date: 2024-10-01
+dateEnd: 2024-11-01
+mediaLayout: "inline"
+tags: ["Blender", "Rigging", "Low-poly", "Buildest The Game"]
+cover: "projects/3DModeling/BuildestTheGame/Doll/BuildestTheGame_Doll_PoseRender.jpg"
+draft: false
+demo: false
+models:
+  - title: "Wooden Doll · Full Body"
+    kind: "glb"
+    src: "projects/3DModeling/BuildestTheGame/Doll/FullBody/Doll_FullBody.glb"
+    showInCards: true
+  - title: "Doll Arms · Walk"
+    kind: "glb"
+    src: "projects/3DModeling/BuildestTheGame/Doll/FirstPerson/Doll_FirstPerson_Anim_Walk.glb"
+    showInCards: false
+  - title: "Doll Arms · Run"
+    kind: "glb"
+    src: "projects/3DModeling/BuildestTheGame/Doll/FirstPerson/Doll_FirstPerson_Anim_Run.glb"
+    showInCards: false
+  - title: "Doll Arms · Fall"
+    kind: "glb"
+    src: "projects/3DModeling/BuildestTheGame/Doll/FirstPerson/Doll_FirstPerson_Anim_Fall.glb"
+    showInCards: false
+  - title: "Low-Poly Tree · LOD0"
+    kind: "glb"
+    src: "projects/3DModeling/BuildestTheGame/LowPoly_Tree/OakTree_lod0.glb"
+    showInCards: true
+gallery:
+  - image: "projects/3DModeling/BuildestTheGame/Doll/BuildestTheGame_Doll_PoseRender.jpg"
+    alt: "Character pose render"
+    caption: "The wooden character posed beside a tree."
+    showInCards: true
+  - image: "projects/3DModeling/BuildestTheGame/Doll/BuildestTheGame_Doll_ProcessScreen.jpg"
+    alt: "Character rig in Blender"
+    caption: "The character and its rig controls during development."
+    showInCards: false
+  - image: "projects/3DModeling/BuildestTheGame/HighPoly_Tree/HighPolyTree_BlenderTexturing.jpg"
+    alt: "Detailed tree during texturing in Blender"
+    caption: "Archived texturing view of the detailed tree."
+    showInCards: false
+  - image: "projects/3DModeling/BuildestTheGame/HighPoly_Tree/HighPolyTree_BlenderTexturing_1.jpg"
+    alt: "Detailed tree materials in Blender"
+    caption: "Another archived view of the tree and its leaf materials."
+    showInCards: false
+  - image: "projects/3DModeling/BuildestTheGame/HighPoly_Tree/HighPolyTree_UnityExample_1.jpg"
+    alt: "Detailed trees in a Unity scene"
+    caption: "The high-poly tree used in a development scene."
+    showInCards: false
+  - image: "projects/3DModeling/BuildestTheGame/HighPoly_Tree/HighPolyTree_UnityExample_2.jpg"
+    alt: "Detailed foliage in Unity"
+    caption: "A closer view of the detailed foliage in the engine."
+    showInCards: true
+  - image: "projects/3DModeling/BuildestTheGame/LowPoly_Tree/BuildestTheGame_HighQualitySettings.jpg"
+    alt: "Stylised trees and quality settings"
+    caption: "Archived quality-settings view; no performance comparison is implied."
+    showInCards: false
+  - image: "projects/3DModeling/BuildestTheGame/LowPoly_Tree/BuildestTheGame_LowPolyTrees_BeautifulLookInGame.jpg"
+    alt: "Stylised trees in the game"
+    caption: "The simpler trees arranged in a game scene."
+    showInCards: true
+  - image: "projects/3DModeling/BuildestTheGame/LowPoly_Tree/BuildestTheGame_LowPolyTree_FutureLook.jpg"
+    alt: "Later foliage appearance"
+    caption: "The leafy appearance produced from a simple crown mesh."
+    showInCards: true
+videos:
+  - title: "Doll · Archived Gameplay"
+    autoplay: true
+    muted: true
+    loop: true
+    autoAspect: true
+    showInCards: true
+    sources:
+      - src: "projects/3DModeling/BuildestTheGame/Doll/BuildestTheGame_Doll_GameFootage.webm"
+        type: "video/webm"
+  - title: "High-Poly Tree · Modelling Process"
+    autoplay: true
+    muted: true
+    loop: true
+    autoAspect: true
+    showInCards: false
+    sources:
+      - src: "projects/3DModeling/BuildestTheGame/HighPoly_Tree/HighPolyTree_BlenderModelingProcess.webm"
+        type: "video/webm"
+---
+
+## A wooden character
+
+I liked the toy-like, simple, inanimate appearance of a wooden doll. It also seemed a flexible base for future skins and cut-out details. I started with a high-poly model, simplified it, and completed the UVs; the final textures remained unfinished.
+
+I made the model and rig myself. Some early AI-generated images served as references. This version of the character was used during development, but the corresponding game build has been lost.
+
+<Models index={1} group open />
+
+<Image index={1} group open />
+
+## Building a mechanical rig
+
+I built the rig from scratch while following YouTube lessons, including a robotic-arm rigging tutorial. The doll moved at its joints rather than bending like a soft human body. Working with IK was the most useful part of this process: the result was convenient to pose and animate.
+
+The browser viewer shows the exported joint skeleton. The original Blender control rig is shown in the process screenshot.
+
+<Image index={2} group open />
+
+## First-person movement
+
+The supplied GLB files retain walking, running, and falling clips for the first-person arms. They can be played in the viewer, including with the skeleton visible. The archived gameplay clip shows the character work in its game context.
+
+<Video index={1} group open />
+
+<Models indices={[2, 3, 4]} group />
+
+## October 2024 · The detailed tree
+
+I wanted more detailed, varied trees. The high-poly version was used in development, but its heavy geometry was cumbersome to work with. As optimisation became a priority, I moved towards a different visual style.
+
+<Video index={2} group open />
+
+## From Blender to Unity
+
+These archived screenshots show the detailed tree during texturing and in Unity scenes. They document an intermediate version; the trees did not make it into the final build while optimisation was still in progress.
+
+<Gallery indices={[3, 4, 5, 6]} group open />
+
+## November 2024 · A simpler tree
+
+I built a new low-poly tree instead of simplifying the old one. Its crown started as a deformed sphere, with the final foliage appearance handled by a shader. I focused on the amount of geometry visible to the camera and on reducing draw calls.
+
+For the game, I made LOD levels manually with help from retopology and simplification plug-ins, without a billboard. The viewer here contains the supplied LOD0 export.
+
+<Models index={5} group open />
+
+## Foliage in the game
+
+The screenshots show the stylised trees in a game scene, a quality-settings view, and a later foliage appearance. The shader supplies the leafy silhouette that the plain crown mesh does not have on its own.
+
+<Gallery indices={[7, 8, 9]} group open />
+
