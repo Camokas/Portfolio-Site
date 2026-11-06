@@ -1,4 +1,5 @@
 import type { IconName } from "./icons";
+import { siteRepository } from "./siteRepository.mjs";
 
 export interface ContactLink {
 	label: string;
@@ -32,9 +33,9 @@ export const contactLinks = [
 	},
 	{
 		label: "Website source",
-		detail: "Portfolio-Site",
+		detail: siteRepository.name,
 		description: "Development history and source code for this portfolio.",
-		href: "https://github.com/Camokas/Portfolio-Site",
+		href: siteRepository.url,
 		icon: "file-code-2",
 	},
 ] satisfies readonly ContactLink[];

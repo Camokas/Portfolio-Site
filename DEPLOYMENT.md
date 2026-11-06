@@ -1,10 +1,10 @@
 # Публикация на GitHub Pages
 
-Адрес сайта: https://camokas.github.io/Portfolio-Site/
+Адрес сайта: https://camokas.github.io/portfolio/
 
 ## Первое включение
 
-1. Открой репозиторий https://github.com/Camokas/Portfolio-Site.
+1. Открой репозиторий https://github.com/Camokas/portfolio.
 2. Перейди в **Settings → Pages**.
 3. В **Build and deployment → Source** выбери **GitHub Actions**.
 4. Открой **Actions → Deploy to GitHub Pages**.
@@ -20,12 +20,22 @@
 
 ## Настройки адреса
 
-В `astro.config.mjs` указаны `site: 'https://camokas.github.io'` и `base: '/Portfolio-Site/'`. Регистр имени репозитория важен. При переименовании репозитория или подключении своего домена эти параметры нужно обновить.
+В `astro.config.mjs` указан `site: 'https://camokas.github.io'`. Префикс пути и ссылки на исходный код определяются в `src/data/siteRepository.mjs`: локально это `/portfolio/`, а GitHub Actions берёт актуальное имя из `GITHUB_REPOSITORY`. До переименования старый адрес продолжает собираться корректно; после переименования следующая публикация использует новый адрес.
 
-Локальный адрес после этой настройки: http://localhost:4321/Portfolio-Site/
+Локальный адрес после этой настройки: http://localhost:4321/portfolio/
 
 ## Если публикация не удалась
 
 Открой неудачный запуск во вкладке Actions и прочитай ошибку конкретного шага. Ошибка поиска Pages обычно означает, что в Settings → Pages ещё не выбран источник GitHub Actions. Ошибка сборки требует проверки исходных файлов, путей и зависимостей.
 
 Все используемые файлы, включая GLB и текстуры, должны быть добавлены в Git. Файл, который есть только на компьютере, в опубликованный сайт не попадёт.
+
+## Переход с Portfolio-Site на portfolio
+
+1. В старом репозитории откройте Settings → General.
+2. В поле Repository name замените `Portfolio-Site` на `portfolio` и нажмите Rename.
+3. Откройте Actions → Deploy to GitHub Pages → Run workflow → master → Run workflow. Само переименование не отправляет новый коммит.
+4. После успешного build/deploy откройте https://camokas.github.io/portfolio/.
+5. В локальном проекте обновите адрес origin: `git remote set-url origin https://github.com/Camokas/portfolio.git`. Старые Git-адреса перенаправляются GitHub, но явно обновлённый адрес удобнее для дальнейшей работы.
+
+Старый адрес опубликованного сайта `/Portfolio-Site/` автоматически не перенаправляется. Обновите ссылки на портфолио в профилях после публикации. Локальную папку Portfolio Site переименовывать не нужно.

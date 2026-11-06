@@ -1,13 +1,13 @@
 ---
 import Icon from "../ui/Icon.astro";
 import { getBuildCommit } from "../../data/latestCommit";
+import { siteRepository } from "../../data/siteRepository.mjs";
 
 const currentYear = new Date().getFullYear();
 const homeUrl = import.meta.env.BASE_URL;
 const contactUrl = `${homeUrl}#contact`;
-const repositoryUrl = "https://github.com/Camokas/Portfolio-Site";
-const commitsApiUrl =
-	"https://api.github.com/repos/Camokas/Portfolio-Site/commits?sha=master&per_page=1";
+const repositoryUrl = siteRepository.url;
+const commitsApiUrl = siteRepository.commitsApi;
 const buildCommit = getBuildCommit(repositoryUrl);
 const formattedCommitDate = buildCommit
 	? new Intl.DateTimeFormat("en", {

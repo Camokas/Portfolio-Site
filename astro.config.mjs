@@ -3,11 +3,12 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import { unified } from '@astrojs/markdown-remark';
 import remarkMediaGroups from './src/plugins/remark-media-groups.mjs';
+import { siteRepository } from './src/data/siteRepository.mjs';
 
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://camokas.github.io',
-	base: '/Portfolio-Site/',
+	base: siteRepository.base,
 	trailingSlash: 'always',
 	output: 'static',
 	security: {
