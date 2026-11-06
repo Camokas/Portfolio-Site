@@ -43,8 +43,8 @@ export const directions = [
 	},
 	{
 		slug: "drawing",
-		title: "Drawing",
-		description: "Illustrations, sketches, and visual studies.",
+		title: "Photo Editing & Drawing",
+		description: "Photo editing, illustrations, thumbnails, and texture artwork.",
 		icon: "palette",
 	},
 	{

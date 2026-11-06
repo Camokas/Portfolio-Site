@@ -6,6 +6,7 @@ import ProjectGallery from "../../components/projects/ProjectGallery.astro";
 import ProjectVideo from "../../components/projects/ProjectVideo.astro";
 import ProjectAudio from "../../components/projects/ProjectAudio.astro";
 import MusicPlayer from "../../components/projects/MusicPlayer.astro";
+import AtlasViewer from "../../components/projects/AtlasViewer.astro";
 import ProjectResources from "../../components/projects/ProjectResources.astro";
 import ProjectCode from "../../components/projects/ProjectCode.astro";
 import ProjectModels from "../../components/projects/ProjectModels.astro";
@@ -95,6 +96,7 @@ const otherAudio = musicTrack ? project.data.audio.slice(1) : project.data.audio
 				</div>
 			</header>
 			{musicTrack && <MusicPlayer track={musicTrack} cover={project.data.cover} />}
+			{project.data.atlases.length > 0 && <AtlasViewer items={project.data.atlases} />}
 
 			{
 				!inline && project.data.gallery.length > 0 && (

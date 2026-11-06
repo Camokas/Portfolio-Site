@@ -6,6 +6,9 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+	"prepare:atlases": "node scripts/prepare-atlases.mjs",
+	"predev": "npm run prepare:atlases",
+	"prebuild": "npm run prepare:atlases",
     "prepare:videos": "node scripts/prepare-video-previews.mjs",
     "dev": "astro dev",
     "build": "astro build",
