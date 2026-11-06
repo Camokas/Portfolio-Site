@@ -39,6 +39,7 @@ const projects = defineCollection({
 		coverShowInCards: z.boolean().default(true),
 		atlases: z.array(z.object({
 			title: z.string(),
+			showInCards: z.boolean().default(true),
 			image: localAsset,
 			manifest: localAsset,
 		})).default([]),

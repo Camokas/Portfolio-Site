@@ -25,6 +25,7 @@ const url = (path: string) => projectAssetUrl(path, import.meta.env.BASE_URL);
 		<label class="boundaries"><input type="checkbox" data-bounds /><span>Sprite boundaries</span></label>
 	</div>
 	<p class="viewer-help">Drag to pan. Use the zoom buttons, Ctrl + wheel, or pinch with two fingers. Select a sprite to inspect its pixels.</p>
+	<p data-loading role="status" hidden>Loading atlas…</p>
 	<div class="atlas-workspace">
 		<div class="atlas-stage">
 			<img class="atlas-fallback" src={url(items[0].image)} alt="Texture atlas artwork" decoding="async" />
@@ -48,6 +49,7 @@ const url = (path: string) => projectAssetUrl(path, import.meta.env.BASE_URL);
 
 <script>
 	import { spriteAt } from "../../data/atlasGeometry.mjs";
+	import { createAtlasLoader } from "../../scripts/atlasLoader.mjs";
 	type Rect = {x:number; y:number; width:number; height:number};
 	type Sprite = Rect & {name:string};
 	type Atlas = {width:number; height:number; bounds:Rect; sprites:Sprite[]};
@@ -61,16 +63,16 @@ const url = (path: string) => projectAssetUrl(path, import.meta.env.BASE_URL);
 			const canvas = q<HTMLCanvasElement>(".atlas-canvas"), preview = q<HTMLCanvasElement>("[data-preview]");
 			const ctx = canvas.getContext("2d"), pctx = preview.getContext("2d");
 			if (!ctx || !pctx) return;
-			const stage = q(".atlas-stage"), image = q<HTMLImageElement>(".atlas-fallback");
+			const stage = q(".atlas-stage"), fallback = q<HTMLImageElement>(".atlas-fallback");
+			let image:HTMLImageElement | undefined;
 			const atlasSelect = q<HTMLSelectElement>("[data-atlas]"), list = q<HTMLSelectElement>("[data-sprites]");
 			const search = q<HTMLInputElement>("[data-search]"), bounds = q<HTMLInputElement>("[data-bounds]");
 			let atlas:Atlas | undefined, selected = 0, scale = 1, panX = 24, panY = 24, w = 0, h = 0, frame = 0;
-			let request:AbortController | undefined, generation = 0;
 			let framed:Rect | undefined;
 			const ruler = 24, pointers = new Map<number,{x:number;y:number}>();
 			const render = () => {
 				frame = 0;
-				if (!atlas || !image.complete) return;
+				if (!atlas || !image) return;
 				const dpr = Math.min(window.devicePixelRatio || 1, 2);
 				w = stage.clientWidth; h = stage.clientHeight;
 				canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);
@@ -114,7 +116,7 @@ const url = (path: string) => projectAssetUrl(path, import.meta.env.BASE_URL);
 				panX=ruler+(w-ruler-rect.width*scale)/2-rect.x*scale; panY=ruler+(h-ruler-rect.height*scale)/2-rect.y*scale; draw();
 			};
 			const updatePreview = () => {
-				if (!atlas) return;
+				if (!atlas || !image) return;
 				const s=atlas.sprites[selected]; if(!s) return;
 				q("[data-name]").textContent=s.name;
 				q("[data-details]").textContent=`${s.width} × ${s.height} px · X ${s.x} · Y ${s.y}`;
@@ -130,23 +132,27 @@ const url = (path: string) => projectAssetUrl(path, import.meta.env.BASE_URL);
 				atlas?.sprites.forEach((s,i)=>{if(s.name.toLowerCase().includes(term)){const option=new Option(s.name,String(i));fragment.append(option);}});
 				list.replaceChildren(fragment); list.value=String(selected); q("[data-empty]").hidden=list.options.length>0;
 			};
-			const load = async () => {
-				const id=++generation; request?.abort(); request=new AbortController();
-				q(".atlas-error").hidden=true; this.setAttribute("aria-busy","true");
-				try {
-					atlas=undefined; canvas.hidden=true;
-					const option=atlasSelect.selectedOptions[0];
-					const response=await fetch(option.dataset.manifest!,{signal:request.signal}); if(!response.ok) throw new Error('Missing atlas');
-					const data:Atlas=await response.json();
-					image.src=option.value; await image.decode();
-					if(id!==generation || !this.isConnected) return;
-					if(data.width!==image.naturalWidth || data.height!==image.naturalHeight || !data.sprites?.length) throw new Error('Atlas dimensions differ');
-					atlas=data; selected=0; search.value=''; filter();
-					q("[data-stats]").textContent=`${data.width} × ${data.height} px · ${data.sprites.length}`;
-					canvas.hidden=false; image.hidden=true; updatePreview(); fit(data.bounds ?? {x:0,y:0,width:data.width,height:data.height});
-				} catch (error) { if(id===generation && !events.signal.aborted) { q(".atlas-error").hidden=false; canvas.hidden=true; image.hidden=false; } }
-				finally { if(id===generation) this.removeAttribute("aria-busy"); }
-			};
+			const selectionControls = [list, search, ...this.querySelectorAll<HTMLButtonElement>('[data-prev], [data-next], [data-focus]')];
+			const loader = createAtlasLoader({
+				loadData: async (src:string,signal:AbortSignal) => {const response=await fetch(src,{signal});if(!response.ok)throw new Error('Missing atlas');return response.json();},
+				loadImage: async (src:string) => {const next=new Image();next.decoding='async';next.src=src;await next.decode();return next;},
+				onStart: () => {
+					atlas=undefined;image=undefined;framed=undefined;selected=0;pointers.clear();
+					cancelAnimationFrame(frame);frame=0;canvas.hidden=true;fallback.hidden=true;
+					list.replaceChildren();search.value='';selectionControls.forEach(control=>control.disabled=true);
+					pctx.clearRect(0,0,preview.width,preview.height);
+					for(const name of ['data-stats','data-name','data-details'])q(`[${name}]`).textContent='';
+					q('[data-empty]').hidden=true;q('.atlas-error').hidden=true;q('[data-loading]').hidden=false;this.setAttribute('aria-busy','true');
+				},
+				onReady: ({data, image:next, selection}:{data:Atlas;image:HTMLImageElement;selection:{src:string}}) => {
+					atlas=data;image=next;fallback.src=selection.src;filter();
+					q('[data-stats]').textContent=`${data.width} × ${data.height} px · ${data.sprites.length}`;
+					canvas.hidden=false;updatePreview();fit(data.bounds ?? {x:0,y:0,width:data.width,height:data.height});
+				},
+				onError: () => {q('.atlas-error').hidden=false;},
+				onFinish: () => {this.removeAttribute('aria-busy');q('[data-loading]').hidden=true;selectionControls.forEach(control=>control.disabled=!atlas);},
+			});
+			const load = () => {const option=atlasSelect.selectedOptions[0];return loader.select({src:option.value,manifest:option.dataset.manifest!});};
 			atlasSelect.addEventListener('change',load,on);
 			search.addEventListener('input',filter,on);
 			list.addEventListener('change',()=>{selected=Number(list.value);updatePreview();if(atlas)fit(atlas.sprites[selected]);},on);
@@ -175,7 +181,7 @@ const url = (path: string) => projectAssetUrl(path, import.meta.env.BASE_URL);
 			},on);
 			canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);down=undefined;},on);
 			const observer=new ResizeObserver(()=>{if(atlas){if(framed)fit(framed);else draw();}});observer.observe(stage);
-			this.stop=()=>{events.abort();request?.abort();observer.disconnect();cancelAnimationFrame(frame);};
+			this.stop=()=>{events.abort();loader.cancel();observer.disconnect();cancelAnimationFrame(frame);};
 			void load();
 		}
 		disconnectedCallback(){this.stop?.();}

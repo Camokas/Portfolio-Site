@@ -309,7 +309,6 @@ export const editorialTranslations: Record<string, string> = {
   "IsLands · Pixel Texture Atlases": "IsLands · Атласы пиксельных текстур",
   "Pixel artwork drawn in Photoshop throughout IsLands development: block faces, items, characters, creatures, vegetation, structures, and interface elements.": "Пиксельная графика, нарисованная в Photoshop за время разработки IsLands: стороны блоков, предметы, персонажи, существа, растительность, структуры и интерфейс.",
   "A whole world in small textures": "Целый мир в маленьких текстурах",
-  "I drew these assets from scratch in Photoshop during IsLands development, from June 2025 to August 2026. I used ChatGPT-generated reference images while creating the artwork myself. The collection includes nine atlases, with 787 named sprite regions taken directly from the Unity project, as well as two game icons. Some regions are animation frames or parts of a larger object.": "Эту графику я рисовал с нуля в Photoshop во время разработки IsLands, с июня 2025 по август 2026 года. Использовал сгенерированные ChatGPT референсы, а сами изображения создавал вручную. В подборке девять атласов с 787 именованными областями спрайтов из проекта Unity и две иконки игры. Часть областей — кадры анимации или детали более крупного объекта.",
   "The 16 × 16 items are my favourite part: despite their size, I wanted each one to be recognisable and to fit alongside the others. Keeping that readability at low resolution was the main challenge. I checked the artwork in-game dozens of times and adjusted it in context.": "Больше всего мне нравятся предметы 16 × 16: несмотря на размер, хотелось сделать каждый узнаваемым и сочетающимся с остальными. Сохранить читаемость в низком разрешении было главной сложностью. Десятки раз проверял графику в игре и дорабатывал её в окружении.",
   "From block faces to interface elements": "От сторон блоков до интерфейса",
   "The atlases cover separate block faces, character and armour sprites, grass, trees, NPCs, structures, items, and an early version of the game interface. That interface later became procedural and shader-driven. The viewer also includes artwork that did not make it into the game; the original Sprite Editor names and boundaries are preserved, including regions of different sizes.": "В атласах собраны отдельные стороны блоков, спрайты персонажа и брони, трава, деревья, NPC, структуры, предметы и ранний игровой интерфейс. Позже интерфейс стал процедурным и шейдерным. В просмотрщике есть и графика, не вошедшая в игру; сохранены исходные имена и границы из Sprite Editor, в том числе области разного размера.",
@@ -347,5 +346,13 @@ export const editorialTranslations: Record<string, string> = {
   "Character": "Персонаж",
   "Armour overlays": "Наложения брони",
   "Early game interface": "Ранний игровой интерфейс",
-  "Game Art": "Игровая графика"
+  "Game Art": "Игровая графика",
+  "I drew these assets from scratch in Photoshop during IsLands development, from June 2025 to August 2026. I used ChatGPT-generated reference images while creating the artwork myself. The collection includes nine atlases, with 787 named sprite regions taken directly from the Unity project. Some regions are animation frames or parts of a larger object.": "Эту графику я рисовал с нуля в Photoshop во время разработки IsLands, с июня 2025 по август 2026 года. Использовал сгенерированные ChatGPT референсы, а сами изображения создавал вручную. В подборке девять атласов с 787 именованными областями спрайтов из проекта Unity. Часть областей — кадры анимации или детали более крупного объекта.",
+  "IsLands · Game Icon": "IsLands · Иконка игры",
+  "A small pixel-art island as the IsLands game icon, with a regular and a winter version. Created in Photoshop.": "Маленький пиксельный остров в качестве иконки IsLands: обычный и зимний варианты, созданные в Photoshop.",
+  "A little island as the game icon": "Маленький остров в качестве иконки",
+  "I drew the IsLands icon in Photoshop: a small floating island with a house, a tree, and the game's name. It brings the game's world into a compact pixel-art composition.": "Иконку IsLands я нарисовал в Photoshop: маленький парящий остров с домом, деревом и названием игры. Мир игры собран в компактную пиксельную композицию.",
+  "Winter version": "Зимний вариант",
+  "The winter version keeps the same composition, with snow, a decorated tree, and a different palette.": "Зимний вариант сохраняет ту же композицию: добавлены снег, украшенное дерево и другая палитра.",
+  "Loading atlas…": "Загрузка атласа…"
 };

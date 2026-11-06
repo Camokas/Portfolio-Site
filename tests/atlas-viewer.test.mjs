@@ -2,7 +2,40 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { deflateSync } from 'node:zlib';
 import { decodePsdComposite } from '../scripts/lib/psd-composite.mjs';
-import { unitySpritesToTopLeft, spriteAt } from '../src/data/atlasGeometry.mjs';
+import { unitySpritesToTopLeft, spriteAt, atlasPreviewCells } from '../src/data/atlasGeometry.mjs';
+import { createAtlasLoader } from '../src/scripts/atlasLoader.mjs';
+
+const deferred = () => {let resolve;const promise=new Promise(done=>{resolve=done;});return {promise,resolve};};
+test('Rapid atlas switching commits only the latest matching image and sprite map, even at equal dimensions', async () => {
+  const first=deferred(),second=deferred(),ready=[],errors=[];
+  const loader=createAtlasLoader({
+    loadData:async name=>({width:1024,height:1024,sprites:[{name}]}),
+    loadImage:src=>(src==='first'?first:second).promise,
+    onStart:()=>{},onReady:value=>ready.push(value),onError:error=>errors.push(error),onFinish:()=>{},
+  });
+  const old=loader.select({src:'first',manifest:'first-map'});
+  const current=loader.select({src:'second',manifest:'second-map'});
+  second.resolve({naturalWidth:1024,naturalHeight:1024,id:'second'});
+  assert.equal(await current,true);
+  first.resolve({naturalWidth:1024,naturalHeight:1024,id:'first'});
+  assert.equal(await old,false);
+  assert.equal(ready.length,1);
+  assert.equal(ready[0].image.id,'second');assert.equal(ready[0].data.sprites[0].name,'second-map');
+  assert.deepEqual(errors,[]);
+});
+test('Disconnected atlas loader cannot commit a late image', async () => {
+  const image=deferred();let ready=0,finished=0;
+  const loader=createAtlasLoader({loadData:async()=>({width:16,height:16,sprites:[{}]}),loadImage:()=>image.promise,onStart:()=>{},onReady:()=>ready++,onError:()=>{},onFinish:()=>finished++});
+  const request=loader.select({src:'x',manifest:'x'});loader.cancel();
+  image.resolve({naturalWidth:16,naturalHeight:16});await request;
+  assert.equal(ready,0);assert.equal(finished,0);
+});
+test('Mismatched atlas metadata never becomes interactive', async () => {
+  const errors=[];let ready=0;
+  const loader=createAtlasLoader({loadData:async()=>({width:16,height:16,sprites:[{}]}),loadImage:async()=>({naturalWidth:32,naturalHeight:16}),onStart:()=>{},onReady:()=>ready++,onError:error=>errors.push(error),onFinish:()=>{}});
+  assert.equal(await loader.select({src:'x',manifest:'x'}),false);
+  assert.equal(ready,0);assert.match(errors[0].message,/dimensions differ/);
+});
 
 function fixture(compression, body, transparent = true) {
   const header = Buffer.alloc(26);
@@ -15,6 +48,14 @@ function fixture(compression, body, transparent = true) {
 }
 const planes = Buffer.from([10,20,30,40,50,60,255,0]);
 const rgba = [10,30,50,255,20,40,60,0];
+
+test('Card cells exclude transparent regions and duplicate rectangles, retaining different sprite sizes', () => {
+  const cells = atlasPreviewCells([
+    {x:0,y:0,width:16,height:16}, {x:0,y:0,width:16,height:16},
+    {x:16,y:0,width:32,height:64}, {x:48,y:0,width:16,height:16,empty:true},
+  ]);
+  assert.deepEqual(cells,[[0,0,16,16],[16,0,32,64]]);
+});
 
 test('PSD composite retains exact RGB pixels and merged transparency, ignoring extra non-alpha channels', () => {
   assert.deepEqual([...decodePsdComposite(fixture(0,planes)).data],rgba);

@@ -3,13 +3,19 @@ import type { CollectionEntry } from "astro:content";
 import { projectAssetUrl } from "./projectAssetPaths.mjs";
 import { shaderGraphPreview } from "./shaderGraphPreview.mjs";
 import { videoPresentation } from "./videoPresentation";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { atlasPreviewCells } from "./atlasGeometry.mjs";
 
 export interface PreviewMedia {
-	kind: "image" | "video" | "model" | "code" | "shaderGraph";
+	kind: "image" | "video" | "model" | "code" | "shaderGraph" | "atlas" | "atlasSprite";
 	src: string;
 	poster?: string;
 	sources?: { src: string; type: string }[];
 	label: string;
+	cells?: [number, number, number, number][];
+	crop?: [number, number, number, number];
+	templateIndex?: number;
 	code?: Pick<CollectionEntry<"projects">["data"]["codeSamples"][number], "code" | "language">;
 }
 
@@ -24,6 +30,12 @@ export async function projectPreviews(project: CollectionEntry<"projects">): Pro
 		src: (await getImage({ src: image, width: Math.min(800, image.width) })).src,
 		label: data.title,
 	})));
+	for (const atlas of data.atlases) {
+		if (!atlas.showInCards) continue;
+		const manifest = JSON.parse(readFileSync(resolve("public", atlas.manifest), "utf8"));
+		const cells = atlasPreviewCells(manifest.sprites);
+		if (cells.length) previews.push({kind: "atlas", src: publicUrl(atlas.image), label: atlas.title, cells});
+	}
 	for (const video of data.videos) {
 		if (!video.showInCards) continue;
 		previews.push({ kind: "video", src: publicUrl(video.sources[0].src),

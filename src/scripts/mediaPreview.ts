@@ -4,6 +4,8 @@ import { localizedMediaUrl } from "./localizedMediaClient";
 // Общий интервал после первой смены (миллисекунды).
 const MEDIA_INTERVAL_MS = 3500;
 let modelModule: typeof import("./modelPreview") | undefined;
+// Bound decoded atlas retention; card slides themselves remain capped at three.
+const atlasImages = new Map<string, Promise<HTMLImageElement>>();
 
 class MediaPreview extends HTMLElement {
 	items: PreviewMedia[] = [];
@@ -21,7 +23,8 @@ class MediaPreview extends HTMLElement {
 	pending = new Set<number>();
 	get running() { return this.visible && !document.hidden && this.isConnected; }
 	connectedCallback() {
-		this.items = JSON.parse(this.dataset.items ?? "[]");
+		this.items = (JSON.parse(this.dataset.items ?? "[]") as PreviewMedia[]).flatMap((item, templateIndex) =>
+			item.kind === "atlas" ? (item.cells ?? []).map(crop => ({kind: "atlasSprite" as const, src: item.src, label: item.label, crop})) : [{...item, templateIndex}]);
 		if (!this.items.length) return;
 		this.events = new AbortController();
 		const options = { signal: this.events.signal };
@@ -127,7 +130,7 @@ class MediaPreview extends HTMLElement {
 	show(index: number) {
 		const element = this.prepared.get(index)!;
 		const old = [...this.querySelectorAll<HTMLElement>(".slide")].filter((node) => node !== element);
-		element.className = `slide${this.items[index].kind === "model" ? " model" : this.items[index].kind === "code" ? " code-preview" : this.items[index].kind === "shaderGraph" ? " graph-preview" : ""}`;
+		element.className = `slide${this.items[index].kind === "model" ? " model" : this.items[index].kind === "code" ? " code-preview" : this.items[index].kind === "shaderGraph" ? " graph-preview" : this.items[index].kind === "atlasSprite" ? " atlas-sprite" : ""}`;
 		this.querySelector(".preview-layers")?.append(element);
 		element.classList.add("active");
 		// Explicit keyframes also work when a detached, cached element is reused.
@@ -156,8 +159,28 @@ class MediaPreview extends HTMLElement {
 		if (element instanceof HTMLVideoElement) { element.pause(); element.removeAttribute("src"); element.replaceChildren(); element.load(); }
 	}
 	async prepare(item: PreviewMedia, index: number): Promise<HTMLElement> {
+		if (item.kind === "atlasSprite" && item.crop) {
+			const src = localizedMediaUrl(item.src);
+			let loading = atlasImages.get(src);
+			if (!loading) {
+				loading = this.image(src);
+				atlasImages.set(src, loading);
+				void loading.catch(() => { if (atlasImages.get(src) === loading) atlasImages.delete(src); });
+				if (atlasImages.size > 3) atlasImages.delete(atlasImages.keys().next().value!);
+			} else { atlasImages.delete(src); atlasImages.set(src, loading); }
+			const image = await loading;
+			const [x, y, width, height] = item.crop;
+			const canvas = document.createElement("canvas");
+			const ratio = Math.min(1, 512 / Math.max(width, height));
+			canvas.width = Math.max(1, Math.round(width * ratio)); canvas.height = Math.max(1, Math.round(height * ratio));
+			const context = canvas.getContext("2d");
+			if (!context) throw new Error("Atlas preview unavailable");
+			context.imageSmoothingEnabled = false;
+			context.drawImage(image, x, y, width, height, 0, 0, canvas.width, canvas.height);
+			return canvas;
+		}
 		if (item.kind === "code") {
-			const template = this.querySelector<HTMLTemplateElement>(`template[data-preview-code="${index}"]`);
+			const template = this.querySelector<HTMLTemplateElement>(`template[data-preview-code="${item.templateIndex ?? index}"]`);
 			const element = template?.content.firstElementChild?.cloneNode(true);
 			if (!(element instanceof HTMLElement)) throw new Error("Code preview unavailable");
 			return element;
